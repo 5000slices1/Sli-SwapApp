@@ -34,8 +34,8 @@ async function IdentityChanged(args){
              
  };
 
-export const convertGldsDip20_init =  function initConvertGldsDip20(){
-         
+export const convertGldsDip20_init =  async function initConvertGldsDip20(){
+             
     PubSub.unsubscribe('ConvertGldsDip20_js_UserIdentityChanged','UserIdentityChanged', IdentityChanged);
     PubSub.subscribe('ConvertGldsDip20_js_UserIdentityChanged','UserIdentityChanged', IdentityChanged);
 

@@ -13,11 +13,10 @@ export const pageIds = createEnum(
 
 export const pageIdValues = createEnum(
   [
-    'PageConvertSliDip20','PageConvertGldsDip20','PageConvertNft', 
-  'PageStartPage', 'PageTransactionsHistory'
+    'PageConvertSliDip20','PageConvertGldsDip20',
+   'PageStartPage', 'PageHistorySwapTransactions', 'PageAdminSection'
   ]
 );
-
 
 export class WalletInfo{
     Wallet_IsConnected;

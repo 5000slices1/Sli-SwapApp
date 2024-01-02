@@ -62,7 +62,7 @@ async function IdentityChanged(args){
              
  };
 
-export const convertSliDip20_init =  function initConvertSliDip20(){
+export const convertSliDip20_init =  async function initConvertSliDip20(){
             
     PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged','UserIdentityChanged', IdentityChanged);
     PubSub.subscribe('ConvertDip20_js_UserIdentityChanged','UserIdentityChanged', IdentityChanged);
