@@ -1,7 +1,12 @@
 import { CommonIdentityProvider, SwapAppActorProvider, SwapAppActorInterface,WalletTypes, pageIds, pageIdValues } from "../assets/modules/Types/CommonTypes.js";
 import { PubSub } from "../assets/modules/Utils/PubSub.js";
-import { DynamicPageContentLoad } from "../assets/modules/Utils/DynamicPageContentLoad.js";
+import { DynamicPageContentLoad,DynamicPageContentLoad_InitHandlers } from "../assets/modules/Utils/DynamicPageContentLoad.js";
 
+
+
+//Returns true if item (as object) has some of the fields described in 'fieldnames'
+//In this case the method is used to parse the returned Variant 'UserRole' from called motoko method, to find out which UserRole(s)
+//a user has.
 function ContainsRule(item, ...fieldNames){
 
   for (let fieldName of fieldNames){
@@ -26,16 +31,24 @@ async function IdentityChanged(args){
    }    
 
   await SwapAppActorProvider.Init(await CommonIdentityProvider.GetProvider());
-  let appSettingsButton = document.getElementById("NavigateToAdminSection");   
+  let appSettingsButton = document.getElementById("PageAdminSection");   
   var userRole = await SwapAppActorProvider.GetUserRole();
 
-  if ( ContainsRule(userRole, 'Owner', 'Admin')){           
+  //---------------------
+  //TODO:UNDO
+  // Enabled here only for developing/debugging purposes
+  
+  appSettingsButton.style.display = "block";
+  // if ( ContainsRule(userRole, 'Owner', 'Admin')){           
 
-    appSettingsButton.style.display = "block";
-   }
-   else{
-    appSettingsButton.style.display = "none";
-   }
+  //   appSettingsButton.style.display = "block";
+  //  }
+  //  else{
+  //   appSettingsButton.style.display = "none";
+  //  }
+  //---------------------
+
+
                     
 };
 
@@ -68,17 +81,7 @@ document.addEventListener('DOMContentLoaded', async function() {
      
   DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageStartPage);      
   
-  document.getElementById("NavigateToStartPage").addEventListener('click', 
-  function(){ DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageStartPage);}, false);
-
-  document.getElementById("NavigateConvertSli").addEventListener('click', function(){ 
-    DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageConvertSliDip20);}, false);
-
-  document.getElementById("NavigateToConvertGlds").addEventListener('click', function(){
-     DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageConvertGldsDip20);}, false);
-
-  document.getElementById("NavigateToShowHistoryTransactions").addEventListener('click', 
-  function(){ DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageTransactionsHistory);}, false);
+  DynamicPageContentLoad_InitHandlers(pageIds.mainContentPageId);
 
 
   document.getElementById("buttonWalletDropDown").addEventListener('click', function(){ OnToggleWalletDropDownMenu();}, false);
