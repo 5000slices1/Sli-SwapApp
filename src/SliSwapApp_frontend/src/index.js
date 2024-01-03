@@ -25,11 +25,12 @@ async function IdentityChanged(args){
    let labelInfo = document.getElementById("labelWalletConnectionStatus");
          
    let usersIdentity = walletInfo.UsersIdentity;
+   console.log(usersIdentity);
    if (usersIdentity.IsConnected == false){
           labelInfo.innerHTML = "Status: Not connected to a wallet"      
    }
    else{
-    labelInfo.innerHTML = "Status: connected to " + usersIdentity.Name + " (" + usersIdentity.AccountPrincipalText +" )";
+    labelInfo.innerHTML = "Status: connected to " + usersIdentity.Name + "</br>" + usersIdentity.AccountPrincipalText;
    }    
  
   let appSettingsButton = document.getElementById("PageAdminSection");   

@@ -17,7 +17,7 @@
 
 <body>
   <main>
-    <header style="min-width: 500px;">
+    <header style="min-width: 800px;">
       <div class="container" >
         <table style="width: 100%;min-width: 450px;">
           <td align="left" style="width:80px">
@@ -25,7 +25,7 @@
             style="margin-right: 12px;min-width: 75px; min-height: 75px;"
               alt="5000 Slices Swap-App" />
           </td>
-          <td align="left" style="width:auto; min-width: 200px;">
+          <td align="left" style="width:auto; min-width: 200px">
             <b>
               <!-- <img src="logo2.svg" alt="DFINITY logo" /> -->
               <p style="font-size: large;min-width: 350;">5000 Slices Swap-App</p>
@@ -33,52 +33,57 @@
           </td>
           <td align="right">
             <div style="align-content: flex-end;">
-
-              <!-- #region Wallet Connection Control -->
-              <label id="labelWalletConnectionStatus" style="margin-right: 22px;font-size: 0.8em;
-              color: rgb(11, 11, 121);
-              "></label>
-              <div class="dropdown">
-                <button id="buttonWalletDropDown" style="border-radius: 6px;" type="submit" class="dropbtn">Wallet
-                  Connection</button>
-    
-                <div id="dropDownWalletMenu" class="dropdown-content" style="padding: 3px;margin-right: -2px;
-                background-color: hsl(40, 86%, 75%);box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);border-radius: 0.8em;">
-    
-                  <table>
-                    <tr class="spaceUnder">
-                      <button id="loginStoic" type="submit" class="button-dropdownmenu">
-                        <img src="appIcons/stoic.png" width="22px" height="22px" style="float: left;margin-left: 4px;" />
-                        <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Stoic</div>
-                      </button>
-                    </tr>
-    
-                    <tr class="spaceUnder">
-                      <button id="loginPlug" type="submit" class="button-dropdownmenu">
-                        <img src="appIcons/plug.jpg" width="22px" height="22px" style="float: left;margin-left: 4px;" />
-                        <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Plug</div>
-                      </button>
-                    </tr>
-    
-                    <tr>
-                      <button id="loginDfinity" type="submit" class="button-dropdownmenu">
-                        <img src="appIcons/dfinity.svg" width="22px" height="22px" style="float: left;margin-left: 4px;" />
-                        <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Dfinity</div>
-                      </button>
-                    </tr>
-    
-                    <tr>
-                      <button id="logout" type="submit" class="button-dropdownmenu">
-    
-                        <div style="margin: auto;text-align: right;margin-right: 10px;  margin-top: 0px;">Log out</div>
-                      </button>
-                    </tr>
-                  </table>
+            <table>
+              <td>
+                <label id="labelWalletConnectionStatus" style="margin-right: 22px;font-size: 0.8em;
+                color: rgb(40, 40, 211);font-weight: bold;
+                "></label>
+              </td>
+              <td>
+                <!-- #region Wallet Connection Control -->
+                <div class="dropdown">
+                  <button id="buttonWalletDropDown" style="border-radius: 6px;height:35px;width:120px" type="submit" class="dropbtn">Wallet
+                    Connection</button>
+      
+                  <div id="dropDownWalletMenu" class="dropdown-content" style="padding: 3px;margin-right: -2px;                                    
+                  background-color: hsl(40, 86%, 75%);box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);border-radius: 0.8em;">
+      
+                    <table>
+                      <tr class="spaceUnder">
+                        <button id="loginStoic" type="submit" class="button-dropdownmenu">
+                          <img src="appIcons/stoic.png" width="22px" height="22px" style="float: left;margin-left: 4px;" />
+                          <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Stoic</div>
+                        </button>
+                      </tr>
+      
+                      <tr class="spaceUnder">
+                        <button id="loginPlug" type="submit" class="button-dropdownmenu">
+                          <img src="appIcons/plug.jpg" width="22px" height="22px" style="float: left;margin-left: 4px;" />
+                          <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Plug</div>
+                        </button>
+                      </tr>
+      
+                      <tr>
+                        <button id="loginDfinity" type="submit" class="button-dropdownmenu">
+                          <img src="appIcons/dfinity.svg" width="22px" height="22px" style="float: left;margin-left: 4px;" />
+                          <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Dfinity</div>
+                        </button>
+                      </tr>
+      
+                      <tr>
+                        <button id="logout" type="submit" class="button-dropdownmenu">
+      
+                          <div style="margin: auto;text-align: right;margin-right: 10px;  margin-top: 0px;">Log out</div>
+                        </button>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
-              </div>
-              <!-- #endregion Wallet Connection Control -->
-    
-            </div>
+                  <!-- #endregion Wallet Connection Control -->
+              </td>
+
+            </table>
+          </div>          
           </td>
         </table>                       
       </div>

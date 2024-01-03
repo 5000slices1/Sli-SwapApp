@@ -104,7 +104,7 @@ export class IdentiyProvider{
                 await this.WalletInfo.SliConvertInfo.SourceToken.UpdateAll(provider, principal);        
                 await this.WalletInfo.GldsConvertInfo.SourceToken.UpdateAll(provider, principal);
 
-                this.WalletInfo.Wallet_IsConnected = true;
+                this.WalletInfo.UsersIdentity.IsConnected = true;                
             
 
             } else{
@@ -133,17 +133,7 @@ export class IdentiyProvider{
         let connectedObj = { 
             whitelist: canisterIds, host: 'https://icp0.io/'
         };
-
-        // let connectedObj = { 
-        //     whitelist: 
-        //     [
-        //         TokenTypeToCanisterId(TokenTypes.Icp),TokenTypeToCanisterId(TokenTypes.SliDip20),
-        //         TokenTypeToCanisterId(TokenTypes.GldsDip20),TokenTypeToCanisterId(TokenTypes.Nft),
-        //         this.SwapAppPrincipalText
-        //     ]
-        //     , host: 'https://icp0.io/'
-        // };
-
+      
         this.#_adapter = new Artemis(connectedObj);         
     };
 
@@ -207,12 +197,15 @@ export class IdentiyProvider{
             }
                     
             let result = await this.#_adapter.connect(walletName);
+                                                                
                        
             if (walletType == WalletTypes.plug){
                 this.#_plugWalletConnected = true;
             };        
             
             await SwapAppActorProvider.Init(this.#_adapter.provider);
+            
+
         }
         catch(error){
             console.log(error);
@@ -233,9 +226,11 @@ export class IdentiyProvider{
         }
         this.#_inside_logout = true;
         try{
-
+                        
             if (this.#_init_done == false){
-                await this.#_adapter.disconnect();
+                if (this.#_adapter.provider != null && this.#_adapter.provider != false) {
+                    await this.#_adapter.disconnect();
+                };
                 return;
             }
 

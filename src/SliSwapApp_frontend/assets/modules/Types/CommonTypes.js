@@ -2,8 +2,6 @@ import {createEnum} from "../Utils/CommonUtils";
 import {IdentiyProvider} from "../identityProvider";
 import {SwapAppActorFetcher} from "../SubModules/ActorFetchers/SwapAppActorFetcher";
 
-
-export const TokenTypes = createEnum(['NotConnected','Icp','SliDip20', 'GldsDip20', 'Nft50Slices']);
 export const TokenInterfaceType = createEnum(['Dip20', 'Icrc1']);
 export const WalletTypes = createEnum(['NoWallet','plug','stoic', 'dfinity']);
 export const pageIds = createEnum(
