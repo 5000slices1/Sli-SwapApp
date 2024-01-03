@@ -1,4 +1,5 @@
-import { CommonIdentityProvider, WalletInfo} from "../../modules/Types/CommonTypes";
+import { CommonIdentityProvider} from "../../modules/Types/CommonTypes";
+import { WalletsProvider } from "../../modules/SubModules/Wallets/WalletsProvider";
 import { PubSub } from "../../modules/Utils/PubSub";
 
 

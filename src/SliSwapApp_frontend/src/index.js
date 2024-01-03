@@ -1,4 +1,5 @@
-import { CommonIdentityProvider, SwapAppActorProvider, SwapAppActorInterface,WalletTypes, pageIds, pageIdValues } from "../assets/modules/Types/CommonTypes.js";
+import { CommonIdentityProvider, SwapAppActorProvider, WalletTypes, pageIds, pageIdValues } from "../assets/modules/Types/CommonTypes.js";
+import { SwapAppActorInterface } from "../assets/modules/Types/Interfaces.js";
 import { PubSub } from "../assets/modules/Utils/PubSub.js";
 import { DynamicPageContentLoad,DynamicPageContentLoad_InitHandlers } from "../assets/modules/Utils/DynamicPageContentLoad.js";
 
@@ -23,16 +24,16 @@ async function IdentityChanged(args){
    let walletInfo = CommonIdentityProvider.WalletInfo;
    let labelInfo = document.getElementById("labelWalletConnectionStatus");
          
-   if (walletInfo.Wallet_IsConnected == false){
+   let usersIdentity = walletInfo.UsersIdentity;
+   if (usersIdentity.IsConnected == false){
           labelInfo.innerHTML = "Status: Not connected to a wallet"      
    }
    else{
-    labelInfo.innerHTML = "Status: connected to " + walletInfo.Wallet_Name + " (" + walletInfo.Wallet_AccountPrincipalText +" )";
+    labelInfo.innerHTML = "Status: connected to " + usersIdentity.Name + " (" + usersIdentity.AccountPrincipalText +" )";
    }    
-
-  await SwapAppActorProvider.Init(await CommonIdentityProvider.GetProvider());
+ 
   let appSettingsButton = document.getElementById("PageAdminSection");   
-  var userRole = await SwapAppActorProvider.GetUserRole();
+  //var userRole = await SwapAppActorProvider.GetUserRole();
 
   //---------------------
   //TODO:UNDO
@@ -47,9 +48,7 @@ async function IdentityChanged(args){
   //   appSettingsButton.style.display = "none";
   //  }
   //---------------------
-
-
-                    
+                      
 };
 
 

@@ -1,8 +1,9 @@
-import { CommonIdentityProvider, SwapAppActorInterface, UserRole} from "../Types/CommonTypes.js";
+import { CommonIdentityProvider, UserRole} from "../../Types/CommonTypes.js";
+import { SwapAppActorInterface } from "../../Types/Interfaces.js";
 //import { _SERVICE, SliSwapApp , UserRole } from "../../../../declarations/SliSwapApp_backend/SliSwapApp_backend.did.js"
 import { Principal } from '@dfinity/principal';
 
-export class SwapAppActor{
+export class SwapAppActorFetcher{
 
     #provider;    
     #swapAppActor;
@@ -17,16 +18,15 @@ export class SwapAppActor{
 
     async Init(provider){
         this.#provider = provider;  
-
+                
         if (this.#ProviderIsDefined() == false){            
             this.#provider = null;
-            this.#swapAppActor = null;
+            this.#swapAppActor = null;            
             return;
         }
            
         let dAppPrincipalText =  CommonIdentityProvider.SwapAppPrincipalText;                                       
-        this.#swapAppActor = await this.#provider.createActor({ canisterId: dAppPrincipalText, interfaceFactory: SwapAppActorInterface });         
-              
+        this.#swapAppActor = await this.#provider.createActor({ canisterId: dAppPrincipalText, interfaceFactory: SwapAppActorInterface });                       
     };
 
     async GetUserRole(){
@@ -36,7 +36,13 @@ export class SwapAppActor{
             return {'NormalUser':null};
         };
         
-        return await this.#swapAppActor.GetUserRole() ;                
+        try{
+            return await this.#swapAppActor.GetUserRole() ;                
+        }
+        catch(error){
+            return {'NormalUser':null};
+        };
+        
     };
 
 
