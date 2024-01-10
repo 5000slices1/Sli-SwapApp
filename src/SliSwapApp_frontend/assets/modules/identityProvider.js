@@ -1,6 +1,6 @@
 import { Artemis } from 'artemis-web3-adapter';
 import { PubSub } from "./Utils/PubSub";
-import { SwapAppActorProvider, WalletTypes, TokenInterfaceType } from './Types/CommonTypes';
+import { SwapAppActorProvider, WalletTypes, SpecifiedTokenInterfaceType } from './Types/CommonTypes';
 import { WalletsProvider } from "./SubModules/Wallets/WalletsProvider";
 import { Principal } from '@dfinity/principal';
 import { SliSwapApp_backend } from "../../../declarations/SliSwapApp_backend";
@@ -14,14 +14,15 @@ export class IdentiyProvider{
     #_inside_login;
     #_inside_logout;
     #_lastLoginWalletType;
+    #_connectionObject;
 
     //public fields
-    WalletInfo;
+    WalletsProvider;
     SwapAppPrincipalText;
-    SwapAppActorFetcher;
-
-    constructor(){
-        this.WalletInfo = new WalletsProvider();
+    
+    constructor(){              
+        this.#_adapter = new Artemis();   
+        this.WalletsProvider = new WalletsProvider();
         this.#_init_done = false;        
     };
         
@@ -45,7 +46,7 @@ export class IdentiyProvider{
     
     //SwapAppActor
     async #UserIdentityChanged(){
-        this.WalletInfo.ResetAfterUserIdentityChanged();
+        this.WalletsProvider.ResetAfterUserIdentityChanged();
         
         try
         {            
@@ -57,11 +58,11 @@ export class IdentiyProvider{
             if (connectedWalletInfo !=null && connectedWalletInfo !=false){
                 
                 switch(connectedWalletInfo.id){
-                    case 'plug': this.WalletInfo.UsersIdentity.Type = WalletTypes.plug;
+                    case 'plug': this.WalletsProvider.UsersIdentity.Type = WalletTypes.plug;
                         break;
-                    case 'stoic': this.WalletInfo.UsersIdentity.Type = WalletTypes.stoic;
+                    case 'stoic': this.WalletsProvider.UsersIdentity.Type = WalletTypes.stoic;
                         break;
-                    case 'dfinity': this.WalletInfo.UsersIdentity.Type = WalletTypes.dfinity;
+                    case 'dfinity': this.WalletsProvider.UsersIdentity.Type = WalletTypes.dfinity;
                         break;
                     default: return;
                 }
@@ -69,9 +70,9 @@ export class IdentiyProvider{
                 let principal = Principal.fromText(principalText);                            
 
 
-                this.WalletInfo.UsersIdentity.Name = connectedWalletInfo.name;
-                this.WalletInfo.UsersIdentity.AccountPrincipalText = principalText;
-                this.WalletInfo.UsersIdentity.AccountPrincipal = principal;                
+                this.WalletsProvider.UsersIdentity.Name = connectedWalletInfo.name;
+                this.WalletsProvider.UsersIdentity.AccountPrincipalText = principalText;
+                this.WalletsProvider.UsersIdentity.AccountPrincipal = principal;                
                 let provider =  this.#_adapter?.provider;
                                     
                 // let tokenActor = new TokenActors(provider, principal);
@@ -101,12 +102,12 @@ export class IdentiyProvider{
                 // this.WalletInfo.Icp_Balance = balanceIcp.Balance;
 
                 
-                await this.WalletInfo.SliConvertInfo.SourceToken.UpdateAll(provider, principal);        
-                await this.WalletInfo.GldsConvertInfo.SourceToken.UpdateAll(provider, principal);
-
-                this.WalletInfo.UsersIdentity.IsConnected = true;                
-            
-
+                await this.WalletsProvider.SliConvertInfo.SourceToken.UserIdentityChanged(provider, principal);                        
+                await this.WalletsProvider.GldsConvertInfo.SourceToken.UserIdentityChanged(provider, principal);                
+                await this.WalletsProvider.GldsConvertInfo.TargetToken.UserIdentityChanged(provider, principal);
+                await this.WalletsProvider.GldsConvertInfo.TargetToken.UserIdentityChanged(provider, principal);
+                this.WalletsProvider.UsersIdentity.IsConnected = true;                
+                            
             } else{
                 return;
             };
@@ -116,6 +117,7 @@ export class IdentiyProvider{
         finally{
                         
             PubSub.publish('UserIdentityChanged', null);            
+            PubSub.publish('UpdateAllWalletBalances_Started', null);            
         };        
     };
    
@@ -125,29 +127,54 @@ export class IdentiyProvider{
         await this.Login(WalletTypes.plug);        
     }
 
-    async ReInitAdapter(){
+    async ReInitConnectionObject(){
 
-        let canisterIds = this.WalletInfo.GetAllCanisterIds();
+        var canisterIds = this.WalletsProvider.GetAllCanisterIds();        
         canisterIds.push(this.SwapAppPrincipalText);
-        
+        canisterIds = Array.from(new Set([...canisterIds]));
+                
         let connectedObj = { 
-            whitelist: canisterIds, host: 'https://icp0.io/'
+            whitelist: canisterIds, 
+            host: 'https://icp0.io/'
         };
-      
-        this.#_adapter = new Artemis(connectedObj);         
+                      
+        this.#_connectionObject = connectedObj;                                               
     };
 
     async Init(){                  
                 
+        console.log("IN INIIT");
 
+        console.log("1");
         this.SwapAppPrincipalText = await SliSwapApp_backend.GetSwapAppPrincipalText();
               
+        console.log("2");
         //Set Sli-Dip20 canister-id
-        await this.WalletInfo.SliConvertInfo.SourceToken.Init("zzriv-cqaaa-aaaao-a2gjq-cai", TokenInterfaceType.Dip20);          
+        await this.WalletsProvider.SliConvertInfo.SourceToken.SetCanisterId("zzriv-cqaaa-aaaao-a2gjq-cai");          
 
+        console.log("3");
         //Set Glds-Dip20 canister-id
-        await this.WalletInfo.GldsConvertInfo.SourceToken.Init("7a6j3-uqaaa-aaaao-a2g5q-cai", TokenInterfaceType.Dip20);
-        await this.ReInitAdapter();        
+        await this.WalletsProvider.GldsConvertInfo.SourceToken.SetCanisterId("7a6j3-uqaaa-aaaao-a2g5q-cai");
+        
+        console.log("4");
+        console.log("Sli icrc1 canister id:" + this.WalletsProvider.SliConvertInfo.TargetToken.CanisterId);
+        if (this.WalletsProvider.SliConvertInfo.TargetToken.CanisterId == null){
+            let sliCanisterId = await SliSwapApp_backend.SliIcrc1_GetCanisterId();            
+            console.log("can id got: " + sliCanisterId);
+            if (sliCanisterId!=null && sliCanisterId.length > 0){
+                await this.WalletsProvider.SliConvertInfo.TargetToken.SetCanisterId(sliCanisterId);
+            }
+        };
+
+        console.log("Glds icrc1 canister id:" + this.WalletsProvider.GldsConvertInfo.TargetToken.CanisterId);
+        if (this.WalletsProvider.GldsConvertInfo.TargetToken.CanisterId == null){
+            let gldsCanisterId = await SliSwapApp_backend.GldsIcrc1_GetCanisterId();
+            if (gldsCanisterId!=null && gldsCanisterId.length > 0){
+                await this.WalletsProvider.GldsConvertInfo.TargetToken.SetCanisterId(gldsCanisterId);
+            }
+        };
+        
+        await this.ReInitConnectionObject();        
       
         //Plug wallet is sending this event when user-identity is switched 
         window.addEventListener("updateConnection",async () => {this.OnPlugUserIdentitySwitched();},false);       
@@ -182,7 +209,9 @@ export class IdentiyProvider{
         {
             var walletName  = "";        
             switch(walletType){
-                case WalletTypes.plug: walletName="plug";
+                case WalletTypes.plug: {
+                    walletName="plug";                    
+                }
                     break;
                 case WalletTypes.stoic: walletName="stoic";
                     break;
@@ -194,11 +223,10 @@ export class IdentiyProvider{
                 
             if (walletName == ""){
                 return;
-            }
-                    
-            let result = await this.#_adapter.connect(walletName);
-                                                                
-                       
+            }                                
+
+            let result =  await this.#_adapter.connect(walletName,this.#_connectionObject);
+                                                                                                   
             if (walletType == WalletTypes.plug){
                 this.#_plugWalletConnected = true;
             };        
@@ -238,14 +266,11 @@ export class IdentiyProvider{
                 return;
             }
 
-            if (this.#_adapter?.connectedWalletInfo?.id == 'plug'){                
-                //disConnect on plug-wallet is throwing exception, therefore this workaround:
+            if (this.#_adapter?.connectedWalletInfo?.id == 'plug'){                                
                 this.#_plugWalletConnected = false;
-
             }
-            else{                
-                await this.#_adapter.disconnect();                                
-            }            
+            
+            await this.#_adapter.disconnect();                                
         }
         catch(error){
             console.log(error);    

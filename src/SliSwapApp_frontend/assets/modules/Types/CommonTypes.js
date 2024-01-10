@@ -2,8 +2,10 @@ import {createEnum} from "../Utils/CommonUtils";
 import {IdentiyProvider} from "../identityProvider";
 import {SwapAppActorFetcher} from "../SubModules/ActorFetchers/SwapAppActorFetcher";
 
-export const TokenInterfaceType = createEnum(['Dip20', 'Icrc1']);
+// export const TokenInterfaceType = createEnum(['Dip20', 'Icrc1']);
+export const SpecifiedTokenInterfaceType = createEnum(['Dip20Sli','Dip20Glds', 'Icrc1Sli','Icrc1Glds']);
 export const WalletTypes = createEnum(['NoWallet','plug','stoic', 'dfinity']);
+export const ResultTypes = createEnum(['ok','err','unknown']);
 export const pageIds = createEnum(
   [
     'mainContentPageId','leftContentPageId'
@@ -17,6 +19,17 @@ export const pageIdValues = createEnum(
   ]
 );
 
+export class ResultInfo{
+    Result;
+    ResultText;
+
+    constructor(result = ResultTypes.unknown, resultText = "")
+    {
+      this.Result = result;
+      this.ResultText = resultText;
+    }
+    
+};
 
 export class MetadataInfo{  
     Fee;

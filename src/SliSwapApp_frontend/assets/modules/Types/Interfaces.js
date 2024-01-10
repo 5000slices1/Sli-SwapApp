@@ -521,17 +521,34 @@ export const NftInterface = ({ IDL }) => {
 };
 
 export const SwapAppActorInterface = ({ IDL }) => {
+  const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
   const UserRole = IDL.Variant({
-    'Anonymous': IDL.Null,
-    'NormalUser': IDL.Null,
-    'Admin': IDL.Null,
-    'Owner': IDL.Null,
+    'Anonymous' : IDL.Null,
+    'NormalUser' : IDL.Null,
+    'Admin' : IDL.Null,
+    'Owner' : IDL.Null,
   });
-  const Result = IDL.Variant({ 'ok': IDL.Text, 'err': IDL.Text });
+  const Metadata = IDL.Record({
+    'fee' : IDL.Nat,
+    'decimals' : IDL.Nat,
+    'logo' : IDL.Text,
+    'name' : IDL.Text,
+    'symbol' : IDL.Text,
+    'canisterId' : IDL.Text,
+  });
   return IDL.Service({
-    'GetSwapAppPrincipalText': IDL.Func([], [IDL.Text], []),
-    'GetUserRole': IDL.Func([], [UserRole], []),
-    'SetTargetICRC1TokenCanisterId': IDL.Func([IDL.Text], [Result], []),
+    'AddAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
+    'GetUserRole' : IDL.Func([], [UserRole], ['query']),
+    'GldsIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
+    'GldsIcrc1_GetMetadata' : IDL.Func([], [Metadata], ['query']),
+    'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
+    'ListAdminUsers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
+    'RemoveAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'SliIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
+    'SliIcrc1_GetMetadata' : IDL.Func([], [Metadata], ['query']),
+    'SliIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
   });
+  
 };
 

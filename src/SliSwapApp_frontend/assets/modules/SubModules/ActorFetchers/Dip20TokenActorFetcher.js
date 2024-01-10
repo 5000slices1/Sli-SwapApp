@@ -34,10 +34,6 @@ export class Dip20TokenActorFetcher {
         if (this.#internalActor == null) {
             return null;
         }
-
-        let metadata = await this.#internalActor.getMetadata();
-        console.log("metadata");
-        console.log(metadata);
-
+        return await this.#internalActor.getMetadata();        
     };
 }

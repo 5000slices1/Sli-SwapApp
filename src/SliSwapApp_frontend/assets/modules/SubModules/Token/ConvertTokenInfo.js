@@ -8,10 +8,10 @@ export class ConvertTokenInfo {
   //The token that will be send to users wallet, after depositing the 'SourceToken' 
   TargetToken;
 
-  constructor() {
+  constructor(sourceTokenType, targetTockenType) {
 
-    this.SourceToken = new TokenInfo();
-    this.TargetToken = new TokenInfo();
+    this.SourceToken = new TokenInfo(sourceTokenType);
+    this.TargetToken = new TokenInfo(targetTockenType);
   };
 
   Reset() {

@@ -21,11 +21,10 @@ function ContainsRule(item, ...fieldNames){
 
 async function IdentityChanged(args){
      
-   let walletInfo = CommonIdentityProvider.WalletInfo;
+   let walletInfo = CommonIdentityProvider.WalletsProvider;
    let labelInfo = document.getElementById("labelWalletConnectionStatus");
          
-   let usersIdentity = walletInfo.UsersIdentity;
-   console.log(usersIdentity);
+   let usersIdentity = walletInfo.UsersIdentity;   
    if (usersIdentity.IsConnected == false){
           labelInfo.innerHTML = "Status: Not connected to a wallet"      
    }
@@ -39,7 +38,7 @@ async function IdentityChanged(args){
   //---------------------
   //TODO:UNDO
   // Enabled here only for developing/debugging purposes
-  
+  //console("appsettings button: " + appSettingsButton);
   appSettingsButton.style.display = "block";
   // if ( ContainsRule(userRole, 'Owner', 'Admin')){           
 

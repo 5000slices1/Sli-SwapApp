@@ -9,7 +9,7 @@ function RelatedHtmlPageExist(){
 
 
 function getDepositableAmount(){
-    let walletInfo = CommonIdentityProvider.WalletInfo;    
+    let walletInfo = CommonIdentityProvider.WalletsProvider;    
     
     if (walletInfo.Wallet_IsConnected == false){
         return 0.0;
@@ -24,7 +24,7 @@ async function deposit_oldSliTokens(){
             
     return;
     await SliSwapApp_backend.GetDepositAddress();
-    let walletInfo = CommonIdentityProvider.WalletInfo;    
+    let walletInfo = CommonIdentityProvider.WalletsProvider;    
     
     if (walletInfo.Wallet_IsConnected == false){
         return;
@@ -52,7 +52,7 @@ async function IdentityChanged(args){
         return;
     }
 
-    let walletInfo = CommonIdentityProvider.WalletInfo;    
+    let walletInfo = CommonIdentityProvider.WalletsProvider;    
     if (walletInfo.Wallet_IsConnected == false){
         document.getElementById('walletAmountOldSliDip20').value = 0;           
     }

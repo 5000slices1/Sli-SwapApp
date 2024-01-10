@@ -1,6 +1,8 @@
 import { ConvertTokenInfo } from "../Token/ConvertTokenInfo";
 import { TokenBalance } from "../Token/TokenBalance";
 import { UsersIdentity } from "../Identity/UsersIdentity";
+import { PubSub } from "../../Utils/PubSub";
+import { SpecifiedTokenInterfaceType } from "../../Types/CommonTypes";
 
 export class WalletsProvider {
 
@@ -16,16 +18,30 @@ export class WalletsProvider {
   //Balance of users Icp (Dont know if we need this...)
   IcpBalance;
 
-
   constructor() {
+    let tokenType = SpecifiedTokenInterfaceType;
+
     this.UsersIdentity = new UsersIdentity();
-    this.SliConvertInfo = new ConvertTokenInfo();
-    this.GldsConvertInfo = new ConvertTokenInfo();
+    this.SliConvertInfo = new ConvertTokenInfo(tokenType.Dip20Sli, tokenType.Icrc1Sli);
+    this.GldsConvertInfo = new ConvertTokenInfo(tokenType.Dip20Glds, tokenType.Icrc1Sli);
     this.IcpBalance = new TokenBalance();
-    this.Reset();
+    //this.Reset();
+
+    PubSub.unsubscribe('WalletsProvider_UpdateAllWalletBalances_Started', 
+    'UpdateAllWalletBalances_Started',this.UpdateAllWalletBalances );
+
+    PubSub.subscribe('WalletsProvider_UpdateAllWalletBalances_Started', 
+    'UpdateAllWalletBalances_Started',this.UpdateAllWalletBalances );
   };
 
-  GetAllCanisterIds(){
+  Init(){
+    
+
+
+
+  };
+
+  GetAllCanisterIds(){    
     const idArray = [];
     if (this.SliConvertInfo?.SourceToken?.CanisterId !=null && this.SliConvertInfo?.SourceToken?.CanisterId.length > 0){
       idArray.push(this.SliConvertInfo.SourceToken.CanisterId);
@@ -43,6 +59,20 @@ export class WalletsProvider {
     return idArray;
   };
 
+
+  UpdateAllWalletBalances(){
+   
+    try{
+
+
+    }
+    finally{
+
+      PubSub.publish('UpdateAllWalletBalances_Completed', null);            
+    }
+
+  }
+
   ResetAfterUserIdentityChanged() {
     this.UsersIdentity.Reset();
     this.SliConvertInfo.ResetAfterUserIdentityChanged();
@@ -50,11 +80,10 @@ export class WalletsProvider {
     this.IcpBalance.Reset();
   };
 
-  Reset() {
-    this.UsersIdentity.Reset();
-    this.SliConvertInfo.Reset();
-    this.GldsConvertInfo.Reset();
-    this.IcpBalance.Reset();
-  };
-}
-;
+  // Reset() {
+  //   this.UsersIdentity.Reset();
+  //   this.SliConvertInfo.Reset();
+  //   this.GldsConvertInfo.Reset();
+  //   this.IcpBalance.Reset();
+  // };
+};

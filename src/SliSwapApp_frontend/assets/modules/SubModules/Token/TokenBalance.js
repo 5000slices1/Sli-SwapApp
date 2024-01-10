@@ -1,7 +1,12 @@
 export class TokenBalance {
 
   #RawBalance;
+  #Decimals;
 
+  SetDecimals(decimals){
+    this.#Decimals = decimals;
+  }
+  
   SetRawBalance(balanceValue) {
     this.#RawBalance = balanceValue;
   }
@@ -14,11 +19,12 @@ export class TokenBalance {
   //Display-Balance
   GetBalance() {
     let number = Math.max(Number(this.#RawBalance), 0);
-    return number / (10 ** 8);
+    return number / (10 ** this.#Decimals);
   };
 
-  constructor(tokenBalance = 0.0) {
+  constructor(tokenBalance = 0.0,decimals = 8) {
     this.#RawBalance = tokenBalance;
+    this.#Decimals = decimals;
   };
 
   Reset() {
