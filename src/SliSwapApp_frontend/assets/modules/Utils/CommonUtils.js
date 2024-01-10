@@ -1,4 +1,4 @@
-import { TokenTypes } from "../Types/CommonTypes";
+import {ResultInfo, ResultTypes} from "../Types/CommonTypes";
 
 //Helper function, so that fake-enum's can be created
 export function createEnum(values) {
@@ -10,17 +10,26 @@ export function createEnum(values) {
   }
 
 
-  //Convert TokenType-Enum to corresponding canister-id
-
-export function TokenTypeToCanisterId(TokenType){
-    switch(TokenType){
-        case TokenTypes.Icp: return "ryjl3-tyaaa-aaaaa-aaaba-cai";
-        case TokenTypes.SliDip20: return "zzriv-cqaaa-aaaao-a2gjq-cai";
-        case TokenTypes.GldsDip20: return "7a6j3-uqaaa-aaaao-a2g5q-cai";        
-        case TokenTypes.Nft50Slices: return "yd2q3-zyaaa-aaaag-qcisq-cai";        
-        default: return "";
+export function GetResultFromVariant(item){
+              
+    if (Object.hasOwn(item,'err')){
+      return new ResultInfo(ResultTypes.err, item['err']);
     }
-};
+
+    if (Object.hasOwn(item,'Err')){
+      return new ResultInfo(ResultTypes.err, item['Err']);
+    }
+
+    if (Object.hasOwn(item,'ok')){
+      return new ResultInfo(ResultTypes.ok, item['ok']);
+    }
+
+    if (Object.hasOwn(item,'Ok')){
+      return new ResultInfo(ResultTypes.ok, item['Ok']);
+    }
+
+    return new ResultInfo(ResultTypes.unknown, "");    
+}
 
 
 

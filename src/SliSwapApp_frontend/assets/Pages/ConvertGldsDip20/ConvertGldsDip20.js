@@ -1,4 +1,5 @@
-import { CommonIdentityProvider, WalletInfo} from "../../modules/Types/CommonTypes";
+import { CommonIdentityProvider} from "../../modules/Types/CommonTypes";
+import { WalletsProvider } from "../../modules/SubModules/Wallets/WalletsProvider";
 import { PubSub } from "../../modules/Utils/PubSub";
 
 function RelatedHtmlPageExist(){
@@ -10,7 +11,7 @@ async function deposit_oldGldsTokens(){
         
     return;
     var availableAmount = document.getElementById('walletAmountOldGldsDip20').valueAsNumber;  
-    var availableAmount1 = CommonIdentityProvider.WalletInfo.DisplayBalance_SliDip20;
+    var availableAmount1 = CommonIdentityProvider.WalletsProvider.DisplayBalance_SliDip20;
     var amountToDeposit = document.getElementById('depositAmountOldGldsDip20').valueAsNumber;     
     alert(availableAmount.toString() + " - " + availableAmount1.toString() + " - " + amountToDeposit.toString());
 }
@@ -21,7 +22,7 @@ async function IdentityChanged(args){
         return;
     }
 
-    let walletInfo = CommonIdentityProvider.WalletInfo;    
+    let walletInfo = CommonIdentityProvider.WalletsProvider;    
     if (walletInfo.Wallet_IsConnected == false){
         document.getElementById('walletAmountOldGldsDip20').value = 0;           
     }
