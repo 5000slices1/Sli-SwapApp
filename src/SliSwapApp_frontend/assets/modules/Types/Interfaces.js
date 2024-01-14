@@ -522,12 +522,6 @@ export const NftInterface = ({ IDL }) => {
 
 export const SwapAppActorInterface = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const UserRole = IDL.Variant({
-    'Anonymous' : IDL.Null,
-    'NormalUser' : IDL.Null,
-    'Admin' : IDL.Null,
-    'Owner' : IDL.Null,
-  });
   const Metadata = IDL.Record({
     'fee' : IDL.Nat,
     'decimals' : IDL.Nat,
@@ -536,17 +530,36 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'symbol' : IDL.Text,
     'canisterId' : IDL.Text,
   });
+  const TokensInfoAsResponse = IDL.Record({
+    'Icrc1_Glds' : Metadata,
+    'Dip20_Sli' : Metadata,
+    'Dip20_Glds' : Metadata,
+    'Icrc1_Sli' : Metadata,
+  });
+  const UserRole = IDL.Variant({
+    'Anonymous' : IDL.Null,
+    'NormalUser' : IDL.Null,
+    'Admin' : IDL.Null,
+    'Owner' : IDL.Null,
+  });
+  const Balance = IDL.Nat;
+  const Result_1 = IDL.Variant({ 'ok' : Balance, 'err' : IDL.Text });
   return IDL.Service({
     'AddAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'GetListOfAdminUsers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
+    'GetTokensInfos' : IDL.Func([], [TokensInfoAsResponse], ['query']),
     'GetUserRole' : IDL.Func([], [UserRole], ['query']),
     'GldsIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
-    'GldsIcrc1_GetMetadata' : IDL.Func([], [Metadata], ['query']),
+    'GldsIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
+    'GldsIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
     'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
-    'ListAdminUsers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'RemoveAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'ShowPrincipal' : IDL.Func([], [], []),
+    'ShowPrincipal2' : IDL.Func([], [IDL.Principal], []),
     'SliIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
-    'SliIcrc1_GetMetadata' : IDL.Func([], [Metadata], ['query']),
+    'SliIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
+    'SliIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
     'SliIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
   });
   

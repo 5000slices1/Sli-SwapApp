@@ -21,13 +21,13 @@ export class Dip20TokenActorFetcher {
         this.#internalActor = await provider.createActor({ canisterId: canisterId, interfaceFactory: Dip20Interface });
     };
 
-    async GetBalance() {
+    async GetBalance(decimal) {
 
         if (this.#internalActor == null) {
-            return new TokenBalance(0);
+            return new TokenBalance(0), decimal;
         }
 
-        return new TokenBalance(await this.#internalActor.balanceOf(this.#principal));
+        return new TokenBalance(await this.#internalActor.balanceOf(this.#principal), decimal);
     }
 
     async GetMetadata() {
@@ -35,5 +35,15 @@ export class Dip20TokenActorFetcher {
             return null;
         }
         return await this.#internalActor.getMetadata();        
+    };
+
+    async GetTotalSupply(decimals){
+
+        if (this.#internalActor == null) {
+            return new TokenBalance(0,decimals);
+        }
+              
+        let totalSupply = await this.#internalActor.totalSupply();   
+        return new TokenBalance(totalSupply, decimals);         
     };
 }

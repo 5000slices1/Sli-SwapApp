@@ -1,10 +1,10 @@
 import { CommonIdentityProvider,ResultInfo, ResultTypes, UserRole} from "../../Types/CommonTypes.js";
 import { SwapAppActorInterface } from "../../Types/Interfaces.js";
-
-//import { _SERVICE, SliSwapApp , UserRole } from "../../../../declarations/SliSwapApp_backend/SliSwapApp_backend.did.js"
 import { Principal } from '@dfinity/principal';
 import {GetResultFromVariant} from "../../Utils/CommonUtils.js"
 import {SliSwapAppInterface} from "../../../../../declarations/SliSwapApp_backend/SliSwapApp_backend.did.js"
+
+
 export class SwapAppActorFetcher{
 
     #provider;    
@@ -56,9 +56,10 @@ export class SwapAppActorFetcher{
         return GetResultFromVariant(await this.#swapAppActor.SliIcrc1_SetCanisterId(canisterId));            
     };
 
-    async SliIcrc1_GetMetadata(){
-        return await this.#swapAppActor.SliIcrc1_GetMetadata();
-    }
+
+    // async SliIcrc1_GetMetadata(){
+    //     return await this.#swapAppActor.SliIcrc1_GetMetadata();
+    // }
 
     //Set Glds canister-id in the backend:
     async GldsIcrc1_SetCanisterId(canisterId){
@@ -68,9 +69,11 @@ export class SwapAppActorFetcher{
         return GetResultFromVariant(await this.#swapAppActor.GldsIcrc1_SetCanisterId(canisterId));
     };
 
-    async GldsIcrc1_GetMetadata(){
-        return await this.#swapAppActor.GldsIcrc1_GetMetadata();
-    }
+    // async GldsIcrc1_GetMetadata(){
+    //     return await this.#swapAppActor.GldsIcrc1_GetMetadata();
+    // }
 
+
+  
 
 };

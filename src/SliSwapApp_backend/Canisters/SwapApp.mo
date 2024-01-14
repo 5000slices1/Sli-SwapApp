@@ -10,86 +10,111 @@ import Interfaces "../Interfaces/Interfaces";
 import TypesCommon "../Types/TypesCommon";
 import Icrc1 "../Types/TypesICRC1";
 import Error "mo:base/Error";
-import { setTimer; recurringTimer;cancelTimer } = "mo:base/Timer";
+import { setTimer; recurringTimer; cancelTimer } = "mo:base/Timer";
 
-
-shared ({ caller = creator }) actor class SliSwapApp():async Interfaces.InterfaceSwapApp = this{
+shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
   stable var wasInitialized = false;
   stable var initializeTimerId = 0;
 
-  stable var appSettings:T.AppSettings = lib.SwapAppInit(creator);
-  stable var tokensInfo:T.TokensInfo = lib.TokensInfoInit();
+  stable var appSettings : T.AppSettings = lib.SwapAppInit(creator);
+  stable var tokensInfo : T.TokensInfo = lib.TokensInfoInit();
 
-  
+  // //Transfer-Fee that is used if transfering SLI-Ircrc1 tokens from/to this Sli-Swapp-App wallet
+  // stable var sli_icrc_transferFee:?Icrc1.Balance = null;
+
+  // //Transfer-Fee that is used if transfering GLDS-Ircrc1 tokens from/to this Sli-Swapp-App wallet
+  // stable var glds_icrc_transferFee:?Icrc1.Balance = null;
+
   //Returns the current user-role
-  public shared query ({ caller }) func GetUserRole():async T.UserRole{        
-     return lib.GetUserRole(appSettings, caller);    
+  public shared query ({ caller }) func GetUserRole() : async T.UserRole {
+    return lib.GetUserRole(appSettings, caller);
   };
 
   //Returns the principal (==canisterId) of this dApp
-  public shared query func GetSwapAppPrincipalText():async Text{    
-    let principal:Principal = Principal.fromActor(this);
+  public shared query func GetSwapAppPrincipalText() : async Text {
+    let principal : Principal = Principal.fromActor(this);
     return Principal.toText(principal);
   };
 
-
   //------------------------------------------------------------------------------
   //Sli related
-  
-  public shared query func SliIcrc1_GetCanisterId(): async Text{
-    return tokensInfo.Icrc1_Sli.canisterId;            
+
+  public shared query func SliIcrc1_GetCanisterId() : async Text {
+    return tokensInfo.Icrc1_Sli.canisterId;
   };
 
-  public shared query func SliIcrc1_GetMetadata(): async TypesCommon.Metadata{
-    return tokensInfo.Icrc1_Sli;            
+  public shared func SliIcrc1_GetCurrentTransferFee() : async Result.Result<Icrc1.Balance, Text> {
+    let canisterId = tokensInfo.Icrc1_Sli.canisterId;
+    return await lib.IcrcGetCurrentTransferFee(canisterId);
   };
 
-   //Set the sli-icrc1-canisterId for the token that should be transfered to users during the conversion process
-  public shared ({caller}) func SliIcrc1_SetCanisterId (canisterId:Text): async Result.Result<Text, Text>{        
-    var result = await* lib.SliIcrc1_SetCanisterId(caller,appSettings,tokensInfo, canisterId);    
+  public shared func SliIcrc1_GetCurrentTotalSupply() : async Result.Result<Icrc1.Balance, Text> {
+    let canisterId = tokensInfo.Icrc1_Sli.canisterId;
+    return await lib.IcrcGetCurrentTotalSupply(canisterId);
+  };
+
+  //Set the sli-icrc1-canisterId for the token that should be transfered to users during the conversion process
+  //The token-Metadata is automatically retrieved and stored after the canister-id was set.
+  public shared ({ caller }) func SliIcrc1_SetCanisterId(canisterId : Text) : async Result.Result<Text, Text> {
+    var result = await* lib.SliIcrc1_SetCanisterId(caller, appSettings, tokensInfo, canisterId);
     Debug.print("Metadatas:");
-    Debug.print(debug_show(tokensInfo));
+    Debug.print(debug_show (tokensInfo));
+
+    // switch(result){
+    //   case (#ok(text))  {
+    //     ignore setTimer(#seconds 1, func():async(){
+    //        await SliIcrc1_UpdateAfterCanisterIdWasInitiallySet();
+    //     });
+    //   };
+
+    //   case (#err(text)) {
+    //     //do nothing
+    //   };
+    // };
+
     return result;
   };
 
-
   //------------------------------------------------------------------------------
-  
 
   //------------------------------------------------------------------------------
   //Glds related
-  public shared query func GldsIcrc1_GetCanisterId(): async Text{
-    return tokensInfo.Icrc1_Glds.canisterId;           
+  public shared query func GldsIcrc1_GetCanisterId() : async Text {
+    return tokensInfo.Icrc1_Glds.canisterId;
   };
-  
-  public shared query func GldsIcrc1_GetMetadata(): async TypesCommon.Metadata{
-    return tokensInfo.Icrc1_Glds;            
+
+  public shared func GldsIcrc1_GetCurrentTransferFee() : async Result.Result<Icrc1.Balance, Text> {
+    let canisterId = tokensInfo.Icrc1_Glds.canisterId;
+    return await lib.IcrcGetCurrentTransferFee(canisterId);
+  };
+
+  public shared func GldsIcrc1_GetCurrentTotalSupply() : async Result.Result<Icrc1.Balance, Text> {
+    let canisterId = tokensInfo.Icrc1_Glds.canisterId;
+    return await lib.IcrcGetCurrentTotalSupply(canisterId);
   };
 
   //Set the glds-icrc1-canisterId for the token that should be transfered to users during the conversion process
-  public shared ({caller}) func GldsIcrc1_SetCanisterId (canisterId:Text): async Result.Result<Text, Text>{        
-    return await* lib.GldsIcrc1_SetCanisterId(caller,appSettings,tokensInfo,canisterId);    
+  //The token-Metadata is automatically retrieved and stored after the canister-id was set.
+  public shared ({ caller }) func GldsIcrc1_SetCanisterId(canisterId : Text) : async Result.Result<Text, Text> {
+    return await* lib.GldsIcrc1_SetCanisterId(caller, appSettings, tokensInfo, canisterId);
   };
-
 
   //------------------------------------------------------------------------------
 
-
-  public shared ({caller}) func AddAdminUser (principal:Text): async Result.Result<Text, Text>{
+  public shared ({ caller }) func AddAdminUser(principal : Text) : async Result.Result<Text, Text> {
     return await* lib.AddAdminUser(caller, appSettings, principal);
   };
 
-  public shared ({caller}) func RemoveAdminUser (principal:Text): async Result.Result<Text, Text>{
+  public shared ({ caller }) func RemoveAdminUser(principal : Text) : async Result.Result<Text, Text> {
     return await* lib.RemoveAdminUser(caller, appSettings, principal);
   };
 
-  public shared query func ListAdminUsers (): async [Text]{
-        return lib.ListAdminUsers(appSettings);        
+  public shared query func GetListOfAdminUsers() : async [Text] {
+    return lib.GetListOfAdminUsers(appSettings);
   };
 
-  
-  //Here create new deposit-address and encrypt this adress and send back 
+  //Here create new deposit-address and encrypt this adress and send back
   //new identity seed -> (principal + random text)
   // public shared ({ caller }) func GetDepositAddress():async Principal{
 
@@ -99,12 +124,23 @@ shared ({ caller = creator }) actor class SliSwapApp():async Interfaces.Interfac
 
   // public shared ({caller})func SetSwapAppUiPrincipal(UiPrincipal:Principal){
 
-
   // }
 
-  public shared query func GetTokensInfos(): async T.TokensInfoAsResponse{
+  stable var testPrincipal : Principal = Principal.fromText("aaaaa-aa");
 
-    let result:T.TokensInfoAsResponse = {
+  public shared ({ caller }) func ShowPrincipal2() : async Principal {
+    return testPrincipal;
+  };
+
+  public shared ({ caller }) func ShowPrincipal() : async () {
+    testPrincipal := caller;
+    Debug.print("caller principal:");
+    Debug.print(debug_show (caller));
+  };
+
+  public shared query func GetTokensInfos() : async T.TokensInfoAsResponse {
+
+    let result : T.TokensInfoAsResponse = {
       Icrc1_Sli = tokensInfo.Icrc1_Sli;
       Dip20_Sli = tokensInfo.Dip20_Sli;
       Icrc1_Glds = tokensInfo.Icrc1_Glds;
@@ -114,44 +150,38 @@ shared ({ caller = creator }) actor class SliSwapApp():async Interfaces.Interfac
     return result;
   };
 
+  private func InitTokenMetaDatas() : async () {
 
-    private func InitTokenMetaDatas(): async (){
-      
-      try
-      {        
-        ignore await* lib.SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Dip20Sli, "zzriv-cqaaa-aaaao-a2gjq-cai", creator);                
-        ignore await* lib.SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Dip20Glds, "7a6j3-uqaaa-aaaao-a2g5q-cai", creator);                                
-        cancelTimer(initializeTimerId);
-        wasInitialized:=true;
+    try {
+      ignore await* lib.SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Dip20Sli, "zzriv-cqaaa-aaaao-a2gjq-cai", creator);
+      ignore await* lib.SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Dip20Glds, "7a6j3-uqaaa-aaaao-a2g5q-cai", creator);
+      cancelTimer(initializeTimerId);
+      wasInitialized := true;
 
-      }
-      catch(error)
-      {
-        
-      }
-      
-    };
-    
-    wasInitialized:=false;
-    if (wasInitialized == false){
-        initializeTimerId := setTimer(#seconds 1, func():async(){ 
-           await InitTokenMetaDatas();
-        });             
+    } catch (error) {
+      //do nothing...
     };
 
+  };
 
+  wasInitialized := false;
+  if (wasInitialized == false) {
+    initializeTimerId := setTimer(
+      #seconds 1,
+      func() : async () {
+        await InitTokenMetaDatas();
+      },
+    );
+  };
 
-      system func inspect(args : {caller : Principal;arg : Blob;}) : Bool {
-        let caller = args.caller;       
-        let msgArg = args.arg;
+  system func inspect(args : { caller : Principal; arg : Blob }) : Bool {
+    let caller = args.caller;
+    let msgArg = args.arg;
 
-        //Set max allowed passed argument size to 1024 bytes, 
-        //because 'Text' is provided as argument in some of the above methods.
-        if (msgArg.size() > 1024) { return false };       
-        return true;
-    };
+    //Set max allowed passed argument size to 1024 bytes,
+    //because 'Text' is provided as argument in some of the above methods.
+    if (msgArg.size() > 1024) { return false };
+    return true;
+  };
 
 };
-
-
-

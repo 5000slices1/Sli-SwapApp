@@ -21,7 +21,7 @@ module{
 
         AddAdminUser: shared(principal:Text) -> async Result.Result<Text, Text>;
         RemoveAdminUser: shared(principal:Text) -> async Result.Result<Text, Text>;
-        ListAdminUsers: shared query () -> async [Text];
+        GetListOfAdminUsers: shared query () -> async [Text];
         //IcrcGetMetaData: shared (canisterId:Text) -> async ICRC1.MetaData;
         //IcrcGetBalance: shared (canisterId:Text, principalText:Text)-> async Result.Result<ICRC1.Balance, Text>
     };

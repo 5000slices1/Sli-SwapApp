@@ -68,10 +68,8 @@ export async function DynamicPageContentLoad(tagName, tagValueToSearch) {
         continue;
       }
      
-      let javascript_init_method = elmnt.getAttribute("javascript-init-method");
+      
       /* Make an HTTP request using the attribute value as the file name: */
-      
-      
       xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = async function() {
         if (this.readyState == 4) {

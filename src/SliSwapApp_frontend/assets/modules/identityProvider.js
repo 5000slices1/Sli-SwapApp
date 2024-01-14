@@ -33,7 +33,7 @@ export class IdentiyProvider{
         }
 
         let connectedWalletInfo = this.#_adapter?.connectedWalletInfo;
-        if (connectedWalletInfo ==null || connectedWalletInfo ==false){
+        if (connectedWalletInfo ==null  || connectedWalletInfo ==false){
             return false;            
         };
 
@@ -75,37 +75,8 @@ export class IdentiyProvider{
                 this.WalletsProvider.UsersIdentity.AccountPrincipal = principal;                
                 let provider =  this.#_adapter?.provider;
                                     
-                // let tokenActor = new TokenActors(provider, principal);
-                // await tokenActor.init();
-            
-                // const responses = await Promise.all([
-                //     await tokenActor.GetSliBalance(),
-                //     await tokenActor.GetGldsBalance(),
-                //     await tokenActor.GetIcpBalance(),    
-                //     await tokenActor.GetSliFee(),
-                //     await tokenActor.GetGldsFee()                
-                // ]);
-
-                 
-                // let balanceSli = responses[0];
-                // this.WalletInfo.SliDip20_RawBalance = balanceSli.RawBalance;
-                // this.WalletInfo.SliDip20_Balance = balanceSli.Balance;
-                // this.WalletInfo.SliDip20_Fee = responses[3];
-                                
-                // let balanceGlds = responses[1];
-                // this.WalletInfo.GldsDip20_RawBalance = balanceGlds.RawBalance;
-                // this.WalletInfo.GldsDip20_Balance = balanceGlds.Balance;
-                // this.WalletInfo.GldsDip20_Fee = responses[4];
-
-                // let balanceIcp = responses[2];
-                // this.WalletInfo.Icp_RawBalance = balanceIcp.RawBalance;
-                // this.WalletInfo.Icp_Balance = balanceIcp.Balance;
-
-                
-                await this.WalletsProvider.SliConvertInfo.SourceToken.UserIdentityChanged(provider, principal);                        
-                await this.WalletsProvider.GldsConvertInfo.SourceToken.UserIdentityChanged(provider, principal);                
-                await this.WalletsProvider.GldsConvertInfo.TargetToken.UserIdentityChanged(provider, principal);
-                await this.WalletsProvider.GldsConvertInfo.TargetToken.UserIdentityChanged(provider, principal);
+                        
+                await this.WalletsProvider.UserIdentityChanged(provider, principal);                                        
                 this.WalletsProvider.UsersIdentity.IsConnected = true;                
                             
             } else{
@@ -142,40 +113,10 @@ export class IdentiyProvider{
     };
 
     async Init(){                  
-                
-        console.log("IN INIIT");
-
-        console.log("1");
-        this.SwapAppPrincipalText = await SliSwapApp_backend.GetSwapAppPrincipalText();
-              
-        console.log("2");
-        //Set Sli-Dip20 canister-id
-        await this.WalletsProvider.SliConvertInfo.SourceToken.SetCanisterId("zzriv-cqaaa-aaaao-a2gjq-cai");          
-
-        console.log("3");
-        //Set Glds-Dip20 canister-id
-        await this.WalletsProvider.GldsConvertInfo.SourceToken.SetCanisterId("7a6j3-uqaaa-aaaao-a2g5q-cai");
-        
-        console.log("4");
-        console.log("Sli icrc1 canister id:" + this.WalletsProvider.SliConvertInfo.TargetToken.CanisterId);
-        if (this.WalletsProvider.SliConvertInfo.TargetToken.CanisterId == null){
-            let sliCanisterId = await SliSwapApp_backend.SliIcrc1_GetCanisterId();            
-            console.log("can id got: " + sliCanisterId);
-            if (sliCanisterId!=null && sliCanisterId.length > 0){
-                await this.WalletsProvider.SliConvertInfo.TargetToken.SetCanisterId(sliCanisterId);
-            }
-        };
-
-        console.log("Glds icrc1 canister id:" + this.WalletsProvider.GldsConvertInfo.TargetToken.CanisterId);
-        if (this.WalletsProvider.GldsConvertInfo.TargetToken.CanisterId == null){
-            let gldsCanisterId = await SliSwapApp_backend.GldsIcrc1_GetCanisterId();
-            if (gldsCanisterId!=null && gldsCanisterId.length > 0){
-                await this.WalletsProvider.GldsConvertInfo.TargetToken.SetCanisterId(gldsCanisterId);
-            }
-        };
-        
-        await this.ReInitConnectionObject();        
-      
+                        
+        this.SwapAppPrincipalText = await SliSwapApp_backend.GetSwapAppPrincipalText();              
+        await this.WalletsProvider.UpdateTokenInfos();        
+        await this.ReInitConnectionObject();              
         //Plug wallet is sending this event when user-identity is switched 
         window.addEventListener("updateConnection",async () => {this.OnPlugUserIdentitySwitched();},false);       
                         

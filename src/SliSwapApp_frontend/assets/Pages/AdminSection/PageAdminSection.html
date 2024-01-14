@@ -1,6 +1,9 @@
+<html>
+  <header>
+  </header>
+  <body>
 
-
-
+  
 <div class="container" id ="DivPageAdminSection">
     <swapControl style="width: 780px;">
       <b><label style="color: #430dd9;">Token settings</label></b>
@@ -9,21 +12,44 @@
       <!-- <p style="margin-top: 8px;margin-bottom: 8px;"><b>Step 1:</b></p> -->
       <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">SLI-ICRC1 token:</p>
       <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table style="font-size:smaller;table-layout: fixed;">
+        <table id="TableSli" style="font-size:smaller;table-layout: fixed;">
           <tr>
             <td style="width: 150px;"><label>SLI-ICRC1 canister-id: </label></td>
             <td style="width: 200px;"><input id="sli-icrc1-canister-id" 
-              style="margin-left: 0.2em;width: 420px;" type="text" value=""></td>
+              style="width: 420px;" type="text" value=""></td>
             <td><button id="set-sli-icrc1-canister-id" class="button-49"
-                style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>
-            
+                style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>           
+          </tr>      
+          <tr id="row_sli_MetadataLogo">
+            <td><label>Logo: </label></td>
+            <td style="width: 200px;"><label id="sliTokenLogo">name </label></td>            
+          </tr>
+          <tr id="row_sli_MetadataSymbol">
+            <td style="width: 150px;"><label>Symbol: </label></td>
+            <td style="width: 200px;"><label id="sliTokenSymbol">name </label></td>            
+          </tr>
+          <tr id="row_sli_MetadataName">
+            <td style="width: 150px;"><label>Name: </label></td>
+            <td style="width: 200px;"><label id="sliTokenName">name </label></td>            
+          </tr>
+          <tr id="row_sli_MetadataDecimals">
+            <td style="width: 150px;"><label>Decimals: </label></td>
+            <td style="width: 200px;"><label id="sliTokenDecimals" >name </label></td>            
+          </tr>
+          <tr id="row_sli_MetadataTotalSupply">
+            <td style="width: 150px;"><label>Total supply: </label></td>
+            <td style="width: 200px;"><label id="sliTokenTotalSupply">name </label></td>            
+          </tr>
+          <tr id="row_sli_MetadataFee">
+            <td style="width: 150px;"><label>Transfer fee: </label></td>
+            <td style="width: 200px;"><label id="sliTokenTransferFee">name </label></td>            
           </tr>
           <tr>
-            <td><label>Available in Swap-App: </label></td>
+            <td><label>Deposited in Swap-App: </label></td>
             <td><input pattern="[0-9]*" step="0.001" inputmode="numeric" min="0.001"
-                id="sli-icrc1-deposited-in-swap-app" style="padding-right: 12px;margin-left: 0.2em;background-color: lightgray;"
+                id="sli-icrc1-deposited-in-swap-app" style="padding-right: 12px; background-color: lightgray;"
                 type="number" readonly value="0.0"></td>
-          </tr>
+          </tr>          
         </table>
       </div>
 
@@ -75,3 +101,6 @@
       <br />
     </swapControl>
   </div>
+
+</body>
+</html>

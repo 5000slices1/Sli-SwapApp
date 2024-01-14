@@ -3,6 +3,7 @@ import { SpecifiedTokenInterfaceType } from "../../Types/CommonTypes";
 import { Dip20TokenActorFetcher } from "../ActorFetchers/Dip20TokenActorFetcher";
 import { Icrc1TokenActorFetcher } from "../ActorFetchers/Icrc1TokenActorFetcher";
 import { SliSwapApp_backend } from "../../../../../declarations/SliSwapApp_backend";
+import { PubSub } from "../../Utils/PubSub";
 
 export class TokenInfo {
 
@@ -13,6 +14,7 @@ export class TokenInfo {
   TransferFee;
   CanisterId;
   TokenActor;
+  MetaDataPresent;
   SpecifiedTokenInterfaceType;
 
   //Token amount of logged in users wallet
@@ -23,6 +25,9 @@ export class TokenInfo {
   // Therefore we need to track the total deposited amount
   TotalBalanceDepositedInsideSwapApp;
 
+  #provider;
+  #loggedInPrincipal;
+
   constructor(specifiedTokenInterfaceType) {
 
     this.SpecifiedTokenInterfaceType = specifiedTokenInterfaceType;
@@ -30,111 +35,67 @@ export class TokenInfo {
     this.TotalBalanceDepositedInsideSwapApp = new TokenBalance();
     this.TransferFee = new TokenBalance();
     this.CanisterId = null;
+    this.MetaDataPresent = false;
     this.Reset();
   };
 
-  async SetCanisterId(canisterId) {
-    this.CanisterId = canisterId;
-    await this.UpdateMetaInfos();
-  };
 
-  async UpdateMetaInfos() {
-    
-    if (this.TokenActor == null){
-      return;
+  async GetTotalSupply(){
+    if (this.MetaDataPresent  == false){
+      return new TokenBalance();
     }
-    
-    var metaData = null;
-    //we should also set the metadata now:
-    switch (this.SpecifiedTokenInterfaceType) {
 
-      case SpecifiedTokenInterfaceType.Dip20Sli:
-      case SpecifiedTokenInterfaceType.Dip20Glds: {
-        try{
-          metaData = await this.TokenActor.GetMetadata();
-        } catch(err){
-          console.log(err);
-        }        
-      }
-        break;
-
-      case SpecifiedTokenInterfaceType.Icrc1Glds: {
-        try
-        {
-          metaData = await SliSwapApp_backend.GldsIcrc1_GetMetadata();
-        }
-        catch(err)
-        {
-          console.log(err);
-        }
-      }
-        break;
-
-      case SpecifiedTokenInterfaceType.Icrc1Sli: {
-        metaData = await SliSwapApp_backend.SliIcrc1_GetMetadata();
-        console.log("metadta sli");
-        console.log(metaData);
-      }
-        break;
-      default: return;
-    }
-    
-    await this.UpdateMetaInfosDirectly(metaData);
-   
+    return await this.TokenActor.GetTotalSupply(this.Decimals);   
   }
 
-  async UpdateMetaInfosDirectly(metaData, alsoSetCanisterId = false){
-
-    if (metaData != null) {
-      console.log("In Set canister id - metadata result:");
-      console.log(metaData);
-      this.Name = metaData['name'];
-      this.Symbol = metaData['symbol'];
-      this.Decimals = Number(metaData['decimals']);
-      this.TransferFee = new TokenBalance(Number(metaData['fee']), this.Decimals);
-      this.Logo = metaData['logo'];
-
-      if (alsoSetCanisterId == true){
-        this.CanisterId = metaData['canisterId'];
-      }
-      console.log(this.Name);
-      console.log(this.Symbol);
-      console.log(this.Decimals);
-      console.log(this.TransferFee);
-      //console.log(this.Logo);
+  async UpdateTokenInfo(tokenInfo){
+    if (tokenInfo.hasData()){
+      this.Name = tokenInfo.name;
+      this.Symbol = tokenInfo.symbol;
+      this.Logo = tokenInfo.logo;
+      this.Decimals = tokenInfo.decimals;
+      this.TransferFee = tokenInfo.fee;
+      this.CanisterId = tokenInfo.canisterId; 
+      this.MetaDataPresent = true;
+      PubSub.publish("TokenInfo_WasUpdated", this.SpecifiedTokenInterfaceType);
     }
-
   }
-
+  
   async UserIdentityChanged(provider, principal){
     this.ResetAfterUserIdentityChanged();  
         
-    console.log("in user identoy changed (tokeninfos) for cnaister-id: " + this.CanisterId);
-    if (this.CanisterId == null) {
+    this.#provider = provider;
+    this.#loggedInPrincipal = principal;    
+    await this.UpdateTokenActors();           
+  };
+
+  async UpdateTokenActors(){
+
+    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+      this.#provider == null || this.#loggedInPrincipal == null) {
       return;
     }
-    
+
     switch (this.SpecifiedTokenInterfaceType) {
 
       case SpecifiedTokenInterfaceType.Dip20Sli:
       case SpecifiedTokenInterfaceType.Dip20Glds: {        
         this.TokenActor = new Dip20TokenActorFetcher();        
-        await this.TokenActor.Init(provider, principal, this.CanisterId);        
+        await this.TokenActor.Init(this.#provider, this.#loggedInPrincipal, this.CanisterId);        
       }
         break;
 
       case SpecifiedTokenInterfaceType.Icrc1Glds:
       case SpecifiedTokenInterfaceType.Icrc1Sli: {        
         this.TokenActor = new Icrc1TokenActorFetcher();        
-        await this.TokenActor.Init(provider, principal, this.CanisterId);        
+        await this.TokenActor.Init(this.#provider, this.#loggedInPrincipal, this.CanisterId);        
       }
         break;
       default: return;
     }
 
-    await this.UpdateMetaInfos();
-
   };
+
 
   async UpdateBalances(){
 
@@ -174,10 +135,14 @@ export class TokenInfo {
     this.Symbol = "";
     this.Logo = null;
     this.TokenActor = null;
+    this.#loggedInPrincipal = null;
+    this.#provider = null;
   }
 
   ResetAfterUserIdentityChanged() {
     this.TokenActor = null;
+    this.#loggedInPrincipal = null;
+    this.#provider = null;
     this.BalanceInUserWallet.Reset();
     this.TotalBalanceDepositedInsideSwapApp.Reset();
   }

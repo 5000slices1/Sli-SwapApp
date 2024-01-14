@@ -21,10 +21,10 @@ export class Icrc1TokenActorFetcher {
         this.#internalActor = await provider.createActor({ canisterId: canisterId, interfaceFactory: Icrc1Interface });
     };
 
-    async GetBalance() {
+    async GetBalance(decimal) {
 
         if (this.#internalActor == null) {
-            return new TokenBalance(0);
+            return new TokenBalance(0, decimal);
         }
 
         let balance = await this.#internalActor.icrc1_balance_of({
@@ -32,18 +32,20 @@ export class Icrc1TokenActorFetcher {
             subaccount: [],
         });
 
-        return new TokenBalance(balance);
+        return new TokenBalance(balance, decimal);
     }
 
-    async GetMetadata() {
+    async GetTotalSupply(decimals){
+
         if (this.#internalActor == null) {
-            return null;
+            return new TokenBalance(0,decimals);
         }
-
-        return null;
-
-      
-
+              
+        let totalSupply = await this.#internalActor.icrc1_total_supply();   
+        return new TokenBalance(totalSupply, decimals);         
     };
+
+
+   
 
 }
