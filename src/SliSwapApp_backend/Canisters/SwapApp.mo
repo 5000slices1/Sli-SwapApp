@@ -20,12 +20,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   stable var appSettings : T.AppSettings = lib.SwapAppInit(creator);
   stable var tokensInfo : T.TokensInfo = lib.TokensInfoInit();
 
-  // //Transfer-Fee that is used if transfering SLI-Ircrc1 tokens from/to this Sli-Swapp-App wallet
-  // stable var sli_icrc_transferFee:?Icrc1.Balance = null;
-
-  // //Transfer-Fee that is used if transfering GLDS-Ircrc1 tokens from/to this Sli-Swapp-App wallet
-  // stable var glds_icrc_transferFee:?Icrc1.Balance = null;
-
   //Returns the current user-role
   public shared query ({ caller }) func GetUserRole() : async T.UserRole {
     return lib.GetUserRole(appSettings, caller);
@@ -58,21 +52,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //The token-Metadata is automatically retrieved and stored after the canister-id was set.
   public shared ({ caller }) func SliIcrc1_SetCanisterId(canisterId : Text) : async Result.Result<Text, Text> {
     var result = await* lib.SliIcrc1_SetCanisterId(caller, appSettings, tokensInfo, canisterId);
-    Debug.print("Metadatas:");
-    Debug.print(debug_show (tokensInfo));
-
-    // switch(result){
-    //   case (#ok(text))  {
-    //     ignore setTimer(#seconds 1, func():async(){
-    //        await SliIcrc1_UpdateAfterCanisterIdWasInitiallySet();
-    //     });
-    //   };
-
-    //   case (#err(text)) {
-    //     //do nothing
-    //   };
-    // };
-
     return result;
   };
 
@@ -114,28 +93,12 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return lib.GetListOfAdminUsers(appSettings);
   };
 
-  //Here create new deposit-address and encrypt this adress and send back
-  //new identity seed -> (principal + random text)
-  // public shared ({ caller }) func GetDepositAddress():async Principal{
 
-  //   Debug.print("principal: " #debug_show(caller));
-  //   return Principal.fromText("aaaaa-aa");
-  // };
-
-  // public shared ({caller})func SetSwapAppUiPrincipal(UiPrincipal:Principal){
-
-  // }
-
-  stable var testPrincipal : Principal = Principal.fromText("aaaaa-aa");
-
-  public shared ({ caller }) func ShowPrincipal2() : async Principal {
-    return testPrincipal;
-  };
-
-  public shared ({ caller }) func ShowPrincipal() : async () {
-    testPrincipal := caller;
-    Debug.print("caller principal:");
-    Debug.print(debug_show (caller));
+  public shared func GetIcrc1Balance(canisterId:Principal): async Result.Result<Icrc1.Balance, Text>{
+    
+    let canisterIdText = Principal.toText(canisterId);
+    let appPrincipalText = Principal.toText(Principal.fromActor(this));
+    return await lib.IcrcGetBalance(canisterIdText, appPrincipalText);
   };
 
   public shared query func GetTokensInfos() : async T.TokensInfoAsResponse {

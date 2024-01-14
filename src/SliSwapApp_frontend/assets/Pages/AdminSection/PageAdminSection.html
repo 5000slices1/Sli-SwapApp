@@ -1,5 +1,6 @@
 <html>
-  <header>
+  <header style="display: none;">
+    <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
   </header>
   <body>
 
@@ -12,37 +13,37 @@
       <!-- <p style="margin-top: 8px;margin-bottom: 8px;"><b>Step 1:</b></p> -->
       <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">SLI-ICRC1 token:</p>
       <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table id="TableSli" style="font-size:smaller;table-layout: fixed;">
+        <table id="Table_sli" style="font-size:smaller;table-layout: fixed;">
           <tr>
             <td style="width: 150px;"><label>SLI-ICRC1 canister-id: </label></td>
             <td style="width: 200px;"><input id="sli-icrc1-canister-id" 
-              style="width: 420px;" type="text" value=""></td>
+              style="width: 420px;padding-right: 12px;" type="text" value=""></td>
             <td><button id="set-sli-icrc1-canister-id" class="button-49"
                 style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>           
           </tr>      
-          <tr id="row_sli_MetadataLogo">
-            <td><label>Logo: </label></td>
-            <td style="width: 200px;"><label id="sliTokenLogo">name </label></td>            
+          <tr id="row_sli_MetadataLogo" >
+            <td style="width: 150px;"><label>Logo: </label></td>
+            <td style="width: 200px;"><label id="sliTokenLogo"></label></td>            
           </tr>
-          <tr id="row_sli_MetadataSymbol">
+          <tr id="row_sli_MetadataSymbol" >
             <td style="width: 150px;"><label>Symbol: </label></td>
-            <td style="width: 200px;"><label id="sliTokenSymbol">name </label></td>            
+            <td style="width: 200px;"><label id="sliTokenSymbol"></label></td>            
           </tr>
           <tr id="row_sli_MetadataName">
             <td style="width: 150px;"><label>Name: </label></td>
-            <td style="width: 200px;"><label id="sliTokenName">name </label></td>            
+            <td style="width: 200px;"><label id="sliTokenName"></label></td>            
           </tr>
-          <tr id="row_sli_MetadataDecimals">
+          <tr id="row_sli_MetadataDecimals" >
             <td style="width: 150px;"><label>Decimals: </label></td>
-            <td style="width: 200px;"><label id="sliTokenDecimals" >name </label></td>            
+            <td style="width: 200px;"><label id="sliTokenDecimals" ></label></td>            
           </tr>
           <tr id="row_sli_MetadataTotalSupply">
             <td style="width: 150px;"><label>Total supply: </label></td>
-            <td style="width: 200px;"><label id="sliTokenTotalSupply">name </label></td>            
+            <td style="width: 200px;"><label id="sliTokenTotalSupply"></label></td>            
           </tr>
           <tr id="row_sli_MetadataFee">
             <td style="width: 150px;"><label>Transfer fee: </label></td>
-            <td style="width: 200px;"><label id="sliTokenTransferFee">name </label></td>            
+            <td style="width: 200px;"><label id="sliTokenTransferFee"></label></td>            
           </tr>
           <tr>
             <td><label>Deposited in Swap-App: </label></td>
@@ -56,7 +57,7 @@
       <p style="margin-top: 28px;margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">
         GLDS-ICRC1 token:</p>
       <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table style="font-size:smaller;table-layout: fixed;">
+        <table  id="Table_glds"style="font-size:smaller;table-layout: fixed;">
           <tr>
             <td style="width: 150px;"><label>GLDS-ICRC1 canister-id: </label></td>
             <td style="width: 200px;"><input id="glds-icrc1-canister-id" 
@@ -64,6 +65,30 @@
             <td><button id="set-glds-icrc1-canister-id" class="button-49"
                 style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>
             <td></td>
+          </tr>
+          <tr id="row_glds_MetadataLogo">
+            <td style="width: 150px;"><label>Logo: </label></td>
+            <td style="width: 200px;"><label id="gldsTokenLogo"></label></td>            
+          </tr>
+          <tr id="row_glds_MetadataSymbol">
+            <td style="width: 150px;"><label>Symbol: </label></td>
+            <td style="width: 200px;"><label id="gldsTokenSymbol"></label></td>            
+          </tr>
+          <tr id="row_glds_MetadataName">
+            <td style="width: 150px;"><label>Name: </label></td>
+            <td style="width: 200px;"><label id="gldsTokenName"></label></td>            
+          </tr>
+          <tr id="row_glds_MetadataDecimals" >
+            <td style="width: 150px;"><label>Decimals: </label></td>
+            <td style="width: 200px;"><label id="gldsTokenDecimals" ></label></td>            
+          </tr>
+          <tr id="row_glds_MetadataTotalSupply" >
+            <td style="width: 150px;"><label>Total supply: </label></td>
+            <td style="width: 200px;"><label id="gldsTokenTotalSupply"></label></td>            
+          </tr>
+          <tr id="row_glds_MetadataFee" >
+            <td style="width: 150px;"><label>Transfer fee: </label></td>
+            <td style="width: 200px;"><label id="gldsTokenTransferFee"></label></td>            
           </tr>
           <tr>
             <td><label>Available in Swap-App: </label></td>

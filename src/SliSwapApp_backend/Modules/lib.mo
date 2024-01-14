@@ -51,7 +51,7 @@ module {
     public func UserIsOwnerOrAdmin(appSettings : T.AppSettings, principal : Principal) : async* Bool {
 
         //TODO:undo
-        return true;
+        //return true;
 
         let userRole = GetUserRole(appSettings, principal);
         if (userRole == #Owner or userRole == #Admin) {
@@ -283,7 +283,7 @@ module {
         return resultMeta;
     };
 
-    private func IcrcGetBalance(canisterId : Text, principalText : Text) : async Result.Result<TypesIcrc.Balance, Text> {
+    public func IcrcGetBalance(canisterId : Text, principalText : Text) : async Result.Result<TypesIcrc.Balance, Text> {
 
         try {
             let principal : Principal = Principal.fromText(principalText);
@@ -334,14 +334,4 @@ module {
             return #err("Error: " #Error.message(error));
         };
     };
-    // private func IcrcGetMetaData(canisterId:Text): async Icrc1.MetaData{
-
-    //     Debug.print("show metadata");
-    //     let actorIcrc1:Interfaces.InterfaceIcrc = actor(canisterId);
-    //     let metaData = await actorIcrc1.icrc1_metadata();
-
-    //     Debug.print(debug_show(metaData));
-    //     return metaData;
-    // };
-
 };

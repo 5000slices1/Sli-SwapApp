@@ -19,7 +19,7 @@ export class Icrc1TokenActorFetcher {
 
         this.#principal = principal;
         this.#internalActor = await provider.createActor({ canisterId: canisterId, interfaceFactory: Icrc1Interface });
-    };
+    }
 
     async GetBalance(decimal) {
 
@@ -40,12 +40,8 @@ export class Icrc1TokenActorFetcher {
         if (this.#internalActor == null) {
             return new TokenBalance(0,decimals);
         }
-              
-        let totalSupply = await this.#internalActor.icrc1_total_supply();   
+                    
+        let totalSupply = await this.#internalActor.icrc1_total_supply();        
         return new TokenBalance(totalSupply, decimals);         
-    };
-
-
-   
-
+    }
 }

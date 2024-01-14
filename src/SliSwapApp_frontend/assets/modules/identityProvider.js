@@ -1,11 +1,11 @@
 import { Artemis } from 'artemis-web3-adapter';
 import { PubSub } from "./Utils/PubSub";
-import { SwapAppActorProvider, WalletTypes, SpecifiedTokenInterfaceType } from './Types/CommonTypes';
+import { SwapAppActorProvider, WalletTypes } from './Types/CommonTypes';
 import { WalletsProvider } from "./SubModules/Wallets/WalletsProvider";
 import { Principal } from '@dfinity/principal';
 import { SliSwapApp_backend } from "../../../declarations/SliSwapApp_backend";
 
-export class IdentiyProvider{
+export class IdentiyProvider {
 
     //private fields    
     #_adapter;
@@ -19,45 +19,44 @@ export class IdentiyProvider{
     //public fields
     WalletsProvider;
     SwapAppPrincipalText;
-    
-    constructor(){              
-        this.#_adapter = new Artemis();   
+
+    constructor() {
+        this.#_adapter = new Artemis();
         this.WalletsProvider = new WalletsProvider();
-        this.#_init_done = false;        
-    };
-        
-    IsWalletConnected(){
+        this.#_init_done = false;
+    }
+
+    IsWalletConnected() {
 
         if (this.#_adapter.provider == null || this.#_adapter.provider == false) {
             return false;
         }
 
         let connectedWalletInfo = this.#_adapter?.connectedWalletInfo;
-        if (connectedWalletInfo ==null  || connectedWalletInfo ==false){
-            return false;            
-        };
-
-        if (connectedWalletInfo.id == 'plug' && this.#_plugWalletConnected == false ){
+        if (connectedWalletInfo == null || connectedWalletInfo == false) {
             return false;
         }
-        
+
+        if (connectedWalletInfo.id == 'plug' && this.#_plugWalletConnected == false) {
+            return false;
+        }
+
         return true;
-    };
-    
+    }
+
     //SwapAppActor
-    async #UserIdentityChanged(){
+    async #UserIdentityChanged() {
         this.WalletsProvider.ResetAfterUserIdentityChanged();
-        
-        try
-        {            
+
+        try {
             if (this.IsWalletConnected() == false) {
                 return;
             }
-            
-            let connectedWalletInfo = this.#_adapter?.connectedWalletInfo;            
-            if (connectedWalletInfo !=null && connectedWalletInfo !=false){
-                
-                switch(connectedWalletInfo.id){
+
+            let connectedWalletInfo = this.#_adapter?.connectedWalletInfo;
+            if (connectedWalletInfo != null && connectedWalletInfo != false) {
+
+                switch (connectedWalletInfo.id) {
                     case 'plug': this.WalletsProvider.UsersIdentity.Type = WalletTypes.plug;
                         break;
                     case 'stoic': this.WalletsProvider.UsersIdentity.Type = WalletTypes.stoic;
@@ -67,166 +66,160 @@ export class IdentiyProvider{
                     default: return;
                 }
                 let principalText = this.#_adapter?.principalId;
-                let principal = Principal.fromText(principalText);                            
+                let principal = Principal.fromText(principalText);
 
 
                 this.WalletsProvider.UsersIdentity.Name = connectedWalletInfo.name;
                 this.WalletsProvider.UsersIdentity.AccountPrincipalText = principalText;
-                this.WalletsProvider.UsersIdentity.AccountPrincipal = principal;                
-                let provider =  this.#_adapter?.provider;
-                                    
-                        
-                await this.WalletsProvider.UserIdentityChanged(provider, principal);                                        
-                this.WalletsProvider.UsersIdentity.IsConnected = true;                
-                            
-            } else{
+                this.WalletsProvider.UsersIdentity.AccountPrincipal = principal;
+                let provider = this.#_adapter?.provider;
+
+
+                await this.WalletsProvider.UserIdentityChanged(provider, principal);
+                this.WalletsProvider.UsersIdentity.IsConnected = true;
+
+            } else {
                 return;
-            };
-        } catch(error){
-            
+            }
+        } catch (error) {
+            //do nothing
         }
-        finally{
-                        
-            PubSub.publish('UserIdentityChanged', null);            
-            PubSub.publish('UpdateAllWalletBalances_Started', null);            
-        };        
-    };
-   
-    //This method is called when user identiy (inside plug wallet) is switched 
-    async OnPlugUserIdentitySwitched()
-    {        
-        await this.Login(WalletTypes.plug);        
+        finally {
+
+            PubSub.publish('UserIdentityChanged', null);
+            PubSub.publish('UpdateAllWalletBalances_Started', null);
+        }
     }
 
-    async ReInitConnectionObject(){
+    //This method is called when user identiy (inside plug wallet) is switched 
+    async OnPlugUserIdentitySwitched() {
+        await this.Login(WalletTypes.plug);
+    }
 
-        var canisterIds = this.WalletsProvider.GetAllCanisterIds();        
+    async ReInitConnectionObject() {
+
+        var canisterIds = this.WalletsProvider.GetAllCanisterIds();
         canisterIds.push(this.SwapAppPrincipalText);
         canisterIds = Array.from(new Set([...canisterIds]));
-                
-        let connectedObj = { 
-            whitelist: canisterIds, 
+
+        let connectedObj = {
+            whitelist: canisterIds,
             host: 'https://icp0.io/'
         };
-                      
-        this.#_connectionObject = connectedObj;                                               
-    };
 
-    async Init(){                  
-                        
-        this.SwapAppPrincipalText = await SliSwapApp_backend.GetSwapAppPrincipalText();              
-        await this.WalletsProvider.UpdateTokenInfos();        
-        await this.ReInitConnectionObject();              
+        this.#_connectionObject = connectedObj;
+    }
+
+    async Init() {
+
+        this.SwapAppPrincipalText = await SliSwapApp_backend.GetSwapAppPrincipalText();
+        await this.WalletsProvider.UpdateTokenInfos();
+        await this.ReInitConnectionObject();
         //Plug wallet is sending this event when user-identity is switched 
-        window.addEventListener("updateConnection",async () => {this.OnPlugUserIdentitySwitched();},false);       
-                        
-        try{
+        window.addEventListener("updateConnection", async () => { this.OnPlugUserIdentitySwitched(); }, false);
+
+        try {
             await this.Logout();
         }
-        catch(error)
-        {
+        catch (error) {
             console.log(error);
-        }        
+        }
         this.#_init_done = true;
-        
-    };
-    
-    async ReLogin(){
-        if (!this.#_lastLoginWalletType){
+
+    }
+
+    async ReLogin() {
+        if (!this.#_lastLoginWalletType) {
             return;
         }
         await this.Logout(false);
         await this.Login(this.#_lastLoginWalletType, true);
-    };
+    }
 
-    async Login(walletType, sendEventUserIdentyChanged = true){
+    async Login(walletType, sendEventUserIdentyChanged = true) {
 
-        if (this.#_inside_login == true){
+        if (this.#_inside_login == true) {
             return;
         }
         this.#_inside_login = true;
         this.#_lastLoginWalletType = walletType;
-        try
-        {
-            var walletName  = "";        
-            switch(walletType){
+        try {
+            var walletName = "";
+            switch (walletType) {
                 case WalletTypes.plug: {
-                    walletName="plug";                    
+                    walletName = "plug";
                 }
                     break;
-                case WalletTypes.stoic: walletName="stoic";
+                case WalletTypes.stoic: walletName = "stoic";
                     break;
-                case WalletTypes.dfinity: walletName="dfinity";               
+                case WalletTypes.dfinity: walletName = "dfinity";
                     break;
                 default: walletName = "";
                     break;
             }
-                
-            if (walletName == ""){
-                return;
-            }                                
 
-            let result =  await this.#_adapter.connect(walletName,this.#_connectionObject);
-                                                                                                   
-            if (walletType == WalletTypes.plug){
+            if (walletName == "") {
+                return;
+            }
+
+            let result = await this.#_adapter.connect(walletName, this.#_connectionObject);
+
+            if (walletType == WalletTypes.plug) {
                 this.#_plugWalletConnected = true;
-            };        
-            
+            }
+
             await SwapAppActorProvider.Init(this.#_adapter.provider);
-            
+
 
         }
-        catch(error){
+        catch (error) {
             console.log(error);
         }
-        finally{
+        finally {
             this.#_inside_login = false;
-            
-            if (sendEventUserIdentyChanged == true){
-                this.#UserIdentityChanged(); 
-            };
-        }
-    };
 
-    async Logout(sendEventUserIdentyChanged = true){
-        
-        if (this.#_inside_logout){
+            if (sendEventUserIdentyChanged == true) {
+                this.#UserIdentityChanged();
+            }
+        }
+    }
+
+    async Logout(sendEventUserIdentyChanged = true) {
+
+        if (this.#_inside_logout) {
             return;
         }
         this.#_inside_logout = true;
-        try{
-                        
-            if (this.#_init_done == false){
+        try {
+
+            if (this.#_init_done == false) {
                 if (this.#_adapter.provider != null && this.#_adapter.provider != false) {
                     await this.#_adapter.disconnect();
                 };
                 return;
             }
 
-            if (this.IsWalletConnected() == false){
+            if (this.IsWalletConnected() == false) {
                 return;
             }
 
-            if (this.#_adapter?.connectedWalletInfo?.id == 'plug'){                                
+            if (this.#_adapter?.connectedWalletInfo?.id == 'plug') {
                 this.#_plugWalletConnected = false;
             }
-            
-            await this.#_adapter.disconnect();                                
+
+            await this.#_adapter.disconnect();
         }
-        catch(error){
-            console.log(error);    
+        catch (error) {
+            console.log(error);
         }
-        finally{
+        finally {
             this.#_inside_logout = false;
-            if (sendEventUserIdentyChanged == true){
-                await this.#UserIdentityChanged(); 
-            };
+            if (sendEventUserIdentyChanged == true) {
+                await this.#UserIdentityChanged();
+            }
         }
-
-               
-    };
-
-};
+    }
+}
 
 
 

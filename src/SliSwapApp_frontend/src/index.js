@@ -14,7 +14,7 @@ function ContainsRule(item, ...fieldNames){
     if (Object.hasOwn(item, fieldName)){
       return true;
     }
-  };
+  }
   return false;
 }
 
@@ -33,23 +33,21 @@ async function IdentityChanged(args){
    }    
  
   let appSettingsButton = document.getElementById("PageAdminSection");   
-  //var userRole = await SwapAppActorProvider.GetUserRole();
+  var userRole = await SwapAppActorProvider.GetUserRole();
 
   //---------------------
-  //TODO:UNDO
+  if ( ContainsRule(userRole, 'Owner', 'Admin')){           
+    appSettingsButton.style.display = "block";
+   }
+   else{
+    appSettingsButton.style.display = "none";
+   }
+  //---------------------
+
   // Enabled here only for developing/debugging purposes
-  //console("appsettings button: " + appSettingsButton);
-  appSettingsButton.style.display = "block";
-  // if ( ContainsRule(userRole, 'Owner', 'Admin')){           
-
-  //   appSettingsButton.style.display = "block";
-  //  }
-  //  else{
-  //   appSettingsButton.style.display = "none";
-  //  }
-  //---------------------
+  //appSettingsButton.style.display = "block";
                       
-};
+}
 
 
 

@@ -2,7 +2,6 @@ import { TokenBalance } from "./TokenBalance";
 import { SpecifiedTokenInterfaceType } from "../../Types/CommonTypes";
 import { Dip20TokenActorFetcher } from "../ActorFetchers/Dip20TokenActorFetcher";
 import { Icrc1TokenActorFetcher } from "../ActorFetchers/Icrc1TokenActorFetcher";
-import { SliSwapApp_backend } from "../../../../../declarations/SliSwapApp_backend";
 import { PubSub } from "../../Utils/PubSub";
 
 export class TokenInfo {
@@ -37,11 +36,11 @@ export class TokenInfo {
     this.CanisterId = null;
     this.MetaDataPresent = false;
     this.Reset();
-  };
+  }
 
 
   async GetTotalSupply(){
-    if (this.MetaDataPresent  == false){
+    if (this.MetaDataPresent  == false || this.TokenActor == null){
       return new TokenBalance();
     }
 
@@ -94,36 +93,7 @@ export class TokenInfo {
       default: return;
     }
 
-  };
-
-
-  async UpdateBalances(){
-
-
-
   }
-
-  // async UpdateAll(provider, principal) {
-  //   await this.UserIdentityChanged();
-
-
-  //   await this.#UpdateAllInternal();
-
-  // };
-
-  async #UpdateAllInternal() {
-
-    try {
-
-      //this.BalanceInUserWallet = await this.TokenActor.GetBalance();      
-      //let metaData = await this.TokenActor.GetMetadata();                  
-    }
-    catch (error) {
-      console.log(error);
-    }
-
-
-  };
 
 
   //Reset all, except CanisterId and TokenInterfaceType

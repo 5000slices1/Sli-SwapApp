@@ -5,7 +5,6 @@ import { TokenBalance } from "../Token/TokenBalance";
 import { UsersIdentity } from "../Identity/UsersIdentity";
 import { PubSub } from "../../Utils/PubSub";
 import { SpecifiedTokenInterfaceType } from "../../Types/CommonTypes";
-import { SliSwapApp_backend } from "../../../../../declarations/SliSwapApp_backend";
 import { GetTokensInfos } from "../../Utils/CommonUtils";
 export class WalletsProvider {
 
@@ -27,13 +26,12 @@ export class WalletsProvider {
     this.SliConvertInfo = new ConvertTokenInfo(SpecifiedTokenInterfaceType.Dip20Sli, SpecifiedTokenInterfaceType.Icrc1Sli);
     this.GldsConvertInfo = new ConvertTokenInfo(SpecifiedTokenInterfaceType.Dip20Glds, SpecifiedTokenInterfaceType.Icrc1Glds);
     this.IcpBalance = new TokenBalance();
-    //this.Reset();
-
+ 
     PubSub.unsubscribe('WalletsProvider_UpdateAllWalletBalances_Started');
 
     PubSub.subscribe('WalletsProvider_UpdateAllWalletBalances_Started',
       'UpdateAllWalletBalances_Started', this.UpdateAllWalletBalances);
-  };
+  }
 
 
   /**
@@ -49,14 +47,14 @@ export class WalletsProvider {
       case SpecifiedTokenInterfaceType.Icrc1Glds: return this.GldsConvertInfo.TargetToken;
     }
   
-  };
+  }
 
   //MetaData + canisterId of the tokens are updated
   async UpdateTokenInfos() {
     let tokenInfos = await GetTokensInfos();
     await this.SliConvertInfo.UpdateTokensInfos(tokenInfos.Dip20_Sli, tokenInfos.Icrc1_Sli);
     await this.GldsConvertInfo.UpdateTokensInfos(tokenInfos.Dip20_Glds, tokenInfos.Icrc1_Glds);
-  };
+  }
 
   async UserIdentityChanged(provider, principal) {
     await this.SliConvertInfo.UserIdentityChanged(provider, principal);
@@ -80,13 +78,13 @@ export class WalletsProvider {
       idArray.push(this.GldsConvertInfo.TargetToken.CanisterId);
     }
     return idArray;
-  };
+  }
 
   UpdateAllWalletBalances() {
 
     try {
 
-
+        //nothing at this moment
     }
     finally {
 
@@ -100,12 +98,6 @@ export class WalletsProvider {
     this.SliConvertInfo.ResetAfterUserIdentityChanged();
     this.GldsConvertInfo.ResetAfterUserIdentityChanged();
     this.IcpBalance.Reset();
-  };
+  }
 
-  // Reset() {
-  //   this.UsersIdentity.Reset();
-  //   this.SliConvertInfo.Reset();
-  //   this.GldsConvertInfo.Reset();
-  //   this.IcpBalance.Reset();
-  // };
-};
+}
