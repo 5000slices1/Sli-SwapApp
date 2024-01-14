@@ -7,7 +7,6 @@ import Principal "mo:base/Principal";
 
 module{
 
-
     public type SpecificTokenType = {
         #Icrc1Sli;
         #Icrc1Glds;
@@ -15,12 +14,7 @@ module{
         #Dip20Sli;        
         #Dip20Glds;
     };
-
-    // public type TokenType = {
-    //     #Icrc1;
-    //     #Dip20
-    // };
-
+  
     public type UserRole = {    
         #Anonymous;
         #NormalUser;
@@ -29,7 +23,8 @@ module{
     };
 
  
-    //The static tokens information
+    //Contains Token static data (except fee, but fee is ignored 
+    //for ICRC1 and instead used from 'TokensDynamicInfoAsResponse')
     public type TokensInfo = {
         
         var Icrc1_Sli:Metadata;
@@ -39,7 +34,9 @@ module{
         var Dip20_Glds:Metadata;        
     };
 
-     public type TokensInfoAsResponse = {
+    //Contains Token static data as response (except fee (because dynamic), but fee is ignored 
+    //for ICRC1 and instead used from 'TokensDynamicInfoAsResponse')
+    public type TokensInfoAsResponse = {
         
         Icrc1_Sli:Metadata;
         Dip20_Sli:Metadata;
@@ -47,8 +44,6 @@ module{
         Icrc1_Glds:Metadata;
         Dip20_Glds:Metadata;        
     };
-
-
 
     public type Metadata = {
         canisterId:Text;

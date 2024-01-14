@@ -12,7 +12,18 @@ export class ConvertTokenInfo {
 
     this.SourceToken = new TokenInfo(sourceTokenType);
     this.TargetToken = new TokenInfo(targetTockenType);
-  };
+  }
+
+  async UpdateTokensInfos(sourceToken_TokenInfo, targetToken_TokenInfo){
+    await this.SourceToken.UpdateTokenInfo(sourceToken_TokenInfo);
+    await this.TargetToken.UpdateTokenInfo(targetToken_TokenInfo);
+  }
+
+  async UserIdentityChanged(provider, principal){
+    await this.SourceToken.UserIdentityChanged(provider, principal);
+    await this.TargetToken.UserIdentityChanged(provider, principal);
+
+  }
 
   Reset() {
     this.SourceToken.Reset();
@@ -24,4 +35,4 @@ export class ConvertTokenInfo {
     this.TargetToken.ResetAfterUserIdentityChanged();
   }
 
-};
+}

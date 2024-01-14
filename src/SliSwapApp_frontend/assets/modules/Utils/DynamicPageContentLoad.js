@@ -11,15 +11,15 @@ async function init_javascript_code(tagValue){
         {
             case pageIdValues.PageConvertSliDip20:{
                 await convertSliDip20_init();
-            };
+            }
             break;
             case pageIdValues.PageConvertGldsDip20:{
                 await convertGldsDip20_init();
-            };
+            }
             break;
             case pageIdValues.PageAdminSection:{              
               await admin_section_init();
-            };
+            }
             break;
             default:
                 break;
@@ -28,7 +28,7 @@ async function init_javascript_code(tagValue){
 
 
 async function DynamicPageContentLoadRemoveAllPreviousContent(){
-    var z, i, elmnt, file, xhttp; 
+    var z, i, elmnt; 
     z = document.getElementsByTagName("div");
     
     for (i = 0; i < z.length; i++) {
@@ -45,12 +45,12 @@ async function DynamicPageContentLoadRemoveAllPreviousContent(){
             elmnt.innerHTML = "";        
         }     
     }
-};
+}
 
 export async function DynamicPageContentLoad(tagName, tagValueToSearch) {
       
     await DynamicPageContentLoadRemoveAllPreviousContent();
-    var z, i, elmnt, file, xhttp; 
+    var z, i, elmnt,xhttp; 
     z = document.getElementsByTagName("div");
     for (i = 0; i < z.length; i++) {
       elmnt = z[i];      
@@ -61,17 +61,15 @@ export async function DynamicPageContentLoad(tagName, tagValueToSearch) {
       if (pageIdValue != tagValueToSearch){
         elmnt.innerHTML = "";
         continue;
-      };
+      }
   
       let htmlSource = elmnt.getAttribute("html-source");
       if (!htmlSource){
         continue;
       }
      
-      let javascript_init_method = elmnt.getAttribute("javascript-init-method");
+      
       /* Make an HTTP request using the attribute value as the file name: */
-      
-      
       xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = async function() {
         if (this.readyState == 4) {
@@ -109,8 +107,8 @@ export async function DynamicPageContentLoad(tagName, tagValueToSearch) {
     }
     
     let buttons = document.getElementsByTagName("button");    
-    for (var i = 0; i < buttons.length; i++) {
-      let buttonItem = buttons[i];
+    for (var j = 0; j < buttons.length; j++) {
+      let buttonItem = buttons[j];
 
       let buttonIdValue = buttonItem.getAttribute("id");      
       let htmlPageValue = dict[buttonIdValue];      
@@ -119,7 +117,7 @@ export async function DynamicPageContentLoad(tagName, tagValueToSearch) {
         buttonItem.addEventListener('click', 
           function(){ DynamicPageContentLoad(tagName, buttonIdValue);}, false);
 
-      };      
+      }    
     }
         
   }

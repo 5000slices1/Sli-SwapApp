@@ -10,7 +10,4 @@ module{
     public type InterfaceSwapApp = swapApp.SliSwapAppInterface;
     public type InterfaceICRC1 = InterfaceIcrc1.TokenInterface;
     public type InterfaceDip20 = InterfaceDip20.InterfaceDip20;
-
-
-
 };

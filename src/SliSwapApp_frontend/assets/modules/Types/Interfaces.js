@@ -41,9 +41,48 @@ export const Icrc1Interface = ({ IDL }) => {
     'owner': IDL.Principal,
     'subaccount': IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
+  const MetadataValue = IDL.Variant({
+    'Int' : IDL.Int,
+    'Nat' : IDL.Nat,
+    'Blob' : IDL.Vec(IDL.Nat8),
+    'Text' : IDL.Text,
+  });
+  const TransferArg = IDL.Record({
+    'to' : Account,
+    'fee' : IDL.Opt(IDL.Nat),
+    'memo' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'from_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'created_at_time' : IDL.Opt(IDL.Nat64),
+    'amount' : IDL.Nat,
+  });
+  const TransferError = IDL.Variant({
+    'GenericError' : IDL.Record({
+      'message' : IDL.Text,
+      'error_code' : IDL.Nat,
+    }),
+    'TemporarilyUnavailable' : IDL.Null,
+    'BadBurn' : IDL.Record({ 'min_burn_amount' : IDL.Nat }),
+    'Duplicate' : IDL.Record({ 'duplicate_of' : IDL.Nat }),
+    'BadFee' : IDL.Record({ 'expected_fee' : IDL.Nat }),
+    'CreatedInFuture' : IDL.Record({ 'ledger_time' : IDL.Nat64 }),
+    'TooOld' : IDL.Null,
+    'InsufficientFunds' : IDL.Record({ 'balance' : IDL.Nat }),
+  });
+  const Result = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : TransferError });
   return IDL.Service({
     'icrc1_balance_of': IDL.Func([Account], [IDL.Nat], ['query']),
-    'icrc1_name': IDL.Func([], [IDL.Text], ['query'])
+    'icrc1_name': IDL.Func([], [IDL.Text], ['query']),
+    'icrc1_symbol' : IDL.Func([], [IDL.Text], ['query']),
+    'icrc1_decimals' : IDL.Func([], [IDL.Nat8], ['query']),
+    'icrc1_fee' : IDL.Func([], [IDL.Nat], ['query']),
+    'icrc1_total_supply' : IDL.Func([], [IDL.Nat], ['query']),
+    'icrc1_transfer' : IDL.Func([TransferArg], [Result], []),
+    'icrc1_metadata' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))],
+      ['query'],
+    ),
+
   });
 };
 
@@ -522,12 +561,6 @@ export const NftInterface = ({ IDL }) => {
 
 export const SwapAppActorInterface = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const UserRole = IDL.Variant({
-    'Anonymous' : IDL.Null,
-    'NormalUser' : IDL.Null,
-    'Admin' : IDL.Null,
-    'Owner' : IDL.Null,
-  });
   const Metadata = IDL.Record({
     'fee' : IDL.Nat,
     'decimals' : IDL.Nat,
@@ -536,17 +569,36 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'symbol' : IDL.Text,
     'canisterId' : IDL.Text,
   });
+  const TokensInfoAsResponse = IDL.Record({
+    'Icrc1_Glds' : Metadata,
+    'Dip20_Sli' : Metadata,
+    'Dip20_Glds' : Metadata,
+    'Icrc1_Sli' : Metadata,
+  });
+  const UserRole = IDL.Variant({
+    'Anonymous' : IDL.Null,
+    'NormalUser' : IDL.Null,
+    'Admin' : IDL.Null,
+    'Owner' : IDL.Null,
+  });
+  const Balance = IDL.Nat;
+  const Result_1 = IDL.Variant({ 'ok' : Balance, 'err' : IDL.Text });
   return IDL.Service({
     'AddAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'GetListOfAdminUsers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
+    'GetTokensInfos' : IDL.Func([], [TokensInfoAsResponse], ['query']),
     'GetUserRole' : IDL.Func([], [UserRole], ['query']),
     'GldsIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
-    'GldsIcrc1_GetMetadata' : IDL.Func([], [Metadata], ['query']),
+    'GldsIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
+    'GldsIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
     'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
-    'ListAdminUsers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'RemoveAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'ShowPrincipal' : IDL.Func([], [], []),
+    'ShowPrincipal2' : IDL.Func([], [IDL.Principal], []),
     'SliIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
-    'SliIcrc1_GetMetadata' : IDL.Func([], [Metadata], ['query']),
+    'SliIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
+    'SliIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
     'SliIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
   });
   

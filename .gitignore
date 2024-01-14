@@ -30,3 +30,4 @@ Cargo.lock
 NUL
 node_modules/.package-lock.json
 canister_ids.json
+.eslintrc.js
