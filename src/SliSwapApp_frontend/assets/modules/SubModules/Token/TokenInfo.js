@@ -16,22 +16,13 @@ export class TokenInfo {
   MetaDataPresent;
   SpecifiedTokenInterfaceType;
 
-  //Token amount of logged in users wallet
-  BalanceInUserWallet;
-
-  //Total-Balance consist of all deposit-transfers into the dApp wallet from user-Wallet
-  //p.s. For each deposit into swap-app, a separate created deposit-wallet will be used. 
-  // Therefore we need to track the total deposited amount
-  TotalBalanceDepositedInsideSwapApp;
-
   #provider;
   #loggedInPrincipal;
 
   constructor(specifiedTokenInterfaceType) {
 
     this.SpecifiedTokenInterfaceType = specifiedTokenInterfaceType;
-    this.BalanceInUserWallet = new TokenBalance();
-    this.TotalBalanceDepositedInsideSwapApp = new TokenBalance();
+
     this.TransferFee = new TokenBalance();
     this.CanisterId = null;
     this.MetaDataPresent = false;
@@ -47,6 +38,7 @@ export class TokenInfo {
     return await this.TokenActor.GetTotalSupply(this.Decimals);   
   }
 
+  //The metadata of the token is updated
   async UpdateTokenInfo(tokenInfo){
     if (tokenInfo.hasData()){
       this.Name = tokenInfo.name;
@@ -95,11 +87,12 @@ export class TokenInfo {
 
   }
 
+  async GetBalanceFromUsersWallet(){   
+    return await this.TokenActor.GetBalance(this.Decimals);
+  }
 
   //Reset all, except CanisterId and TokenInterfaceType
   Reset() {
-    this.BalanceInUserWallet.Reset();
-    this.TotalBalanceDepositedInsideSwapApp.Reset();
     this.TransferFee.Reset();
     this.Name = "";
     this.Symbol = "";
@@ -113,8 +106,6 @@ export class TokenInfo {
     this.TokenActor = null;
     this.#loggedInPrincipal = null;
     this.#provider = null;
-    this.BalanceInUserWallet.Reset();
-    this.TotalBalanceDepositedInsideSwapApp.Reset();
   }
 
 }
