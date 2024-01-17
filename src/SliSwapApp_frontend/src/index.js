@@ -19,7 +19,7 @@ function ContainsRule(item, ...fieldNames){
 }
 
 
-async function IdentityChanged(args){
+async function IdentityChanged(){
      
    let walletInfo = CommonIdentityProvider.WalletsProvider;
    let labelInfo = document.getElementById("labelWalletConnectionStatus");
@@ -32,9 +32,13 @@ async function IdentityChanged(args){
     labelInfo.innerHTML = "Status: connected to " + usersIdentity.Name + "</br>" + usersIdentity.AccountPrincipalText;
    }    
  
+   console.log("SwapAppActorProvider:");
+   console.log(SwapAppActorProvider);
   let appSettingsButton = document.getElementById("PageAdminSection");   
   var userRole = await SwapAppActorProvider.GetUserRole();
 
+  console.log("userrole: ");
+  console.log(userRole);
   //---------------------
   if ( ContainsRule(userRole, 'Owner', 'Admin')){           
     appSettingsButton.style.display = "block";
@@ -45,7 +49,7 @@ async function IdentityChanged(args){
   //---------------------
 
   // Enabled here only for developing/debugging purposes
-  //appSettingsButton.style.display = "block";
+  appSettingsButton.style.display = "block";
                       
 }
 

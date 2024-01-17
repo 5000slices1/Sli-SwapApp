@@ -4,8 +4,25 @@
   </header>
   <body>
 
-  
-<div class="container" id ="DivPageAdminSection">
+ 
+
+
+<div  id ="DivPageAdminSection">
+ <!-- Tab links -->
+ <div class="tab" style="margin-right: -12px;">
+  <button class="tablinks" type="submit" id="ButtonTabpage1" onclick="showTabpage(event, 'tabContentIcrc1')">ICRC1 Tokens</button>
+  <button class="tablinks" onclick="showTabpage(event, 'Paris')">Swap-wallets</button>
+  <button class="tablinks" onclick="showTabpage(event, 'Tokyo')">Status</button>
+</div> 
+ 
+
+<!-- #region -->
+  <div class="tabcontent" id="tabContentIcrc1" 
+  style="max-width: 100%;width: 780px;"
+  >
+    <div style="width: 780px;display: flex;
+    margin: 0 auto;align-items: center;
+    max-width: 100%;">
     <swapControl style="width: 780px;">
       <b><label style="color: #430dd9;">Token settings</label></b>
       <br />
@@ -126,6 +143,24 @@
       <br />
     </swapControl>
   </div>
+  </div>
+  </div>
+
+  <script>
+    function showTabpage(evt, cityName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(cityName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+    </script>
 
 </body>
 </html>

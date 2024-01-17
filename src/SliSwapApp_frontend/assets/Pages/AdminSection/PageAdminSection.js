@@ -9,6 +9,26 @@ function RelatedHtmlPageExist() {
     return document.getElementById('DivPageAdminSection') != null;
 }
 
+function showTabpage(evt, cityName) {
+
+    if (RelatedHtmlPageExist() == false) {
+       
+        return;
+    }
+
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+
 async function UpdateVisibilityForDynamicRows(tokenSymbol, shouldShow) {
     if (RelatedHtmlPageExist() == false) {
        
@@ -179,6 +199,13 @@ export const admin_section_init = async function initAdminSection() {
     }
 
     admin_section_init.CommonThingsInitialized = false;
+
+    document.getElementById("ButtonTabpage1").removeEventListener('click', async function(){
+         showTabpage(event, 'tabContentIcrc1')}, false);
+
+    document.getElementById("ButtonTabpage1").addEventListener('click', async function(){
+        showTabpage(event, 'tabContentIcrc1')}, false);
+
     await UpdateVisibilityForDynamicRows("sli", false);
     await UpdateVisibilityForDynamicRows("glds", false);
 

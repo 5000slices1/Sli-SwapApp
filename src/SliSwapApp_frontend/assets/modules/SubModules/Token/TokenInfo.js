@@ -24,6 +24,7 @@ export class TokenInfo {
     this.SpecifiedTokenInterfaceType = specifiedTokenInterfaceType;
 
     this.TransferFee = new TokenBalance();
+    this.Decimals = new TokenBalance();
     this.CanisterId = null;
     this.MetaDataPresent = false;
     this.Reset();
@@ -87,7 +88,11 @@ export class TokenInfo {
 
   }
 
-  async GetBalanceFromUsersWallet(){   
+  async GetBalanceFromUsersWallet(){ 
+    if (this.TokenActor == null){
+       return new TokenBalance(0,0);
+    } 
+
     return await this.TokenActor.GetBalance(this.Decimals);
   }
 
@@ -96,6 +101,7 @@ export class TokenInfo {
     this.TransferFee.Reset();
     this.Name = "";
     this.Symbol = "";
+    this.Decimals.Reset();
     this.Logo = null;
     this.TokenActor = null;
     this.#loggedInPrincipal = null;

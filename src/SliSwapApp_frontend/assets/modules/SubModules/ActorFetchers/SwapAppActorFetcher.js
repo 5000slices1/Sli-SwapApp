@@ -37,7 +37,18 @@ export class SwapAppActorFetcher{
         }
         
         try{
-            return await this.#swapAppActor.GetUserRole() ;                
+            console.log("inside Swapappfetcher getuserrole");
+            console.log("SwapAppActor");
+            console.log(this.#swapAppActor);
+
+
+            let dAppPrincipalText =  CommonIdentityProvider.SwapAppPrincipalText;
+            console.log(dAppPrincipalText);
+
+            let userRole = await this.#swapAppActor.GetUserRole() ;     
+            console.log("Swapappfetcher getuserrole:");
+            console.log(userRole);     
+            return userRole;      
         }
         catch(error){
             return {'NormalUser':null};

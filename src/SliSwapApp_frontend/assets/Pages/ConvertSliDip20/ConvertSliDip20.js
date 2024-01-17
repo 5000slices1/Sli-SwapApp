@@ -22,24 +22,24 @@ function getDepositableAmount(){
 async function deposit_oldSliTokens(){
             
     return;
-    await SliSwapApp_backend.GetDepositAddress();
-    let walletInfo = CommonIdentityProvider.WalletsProvider;    
+    // await SliSwapApp_backend.GetDepositAddress();
+    // let walletInfo = CommonIdentityProvider.WalletsProvider;    
     
-    if (walletInfo.Wallet_IsConnected == false){
-        return;
-    }
+    // if (walletInfo.Wallet_IsConnected == false){
+    //     return;
+    // }
 
-    var depositable_amount = getDepositableAmount();
-    var depositAmount = document.getElementById('depositAmountOldSliDip20').valueAsNumber; 
-    depositAmount = Math.min(depositAmount, 0);
+    // var depositable_amount = getDepositableAmount();
+    // var depositAmount = document.getElementById('depositAmountOldSliDip20').valueAsNumber; 
+    // depositAmount = Math.min(depositAmount, 0);
     
-    if (depositAmount > depositable_amount){
-        return;        
-    }
+    // if (depositAmount > depositable_amount){
+    //     return;        
+    // }
 
-    if (depositAmount < walletInfo.SliDip20_Fee){
-        return;
-    }
+    // if (depositAmount < walletInfo.SliDip20_Fee){
+    //     return;
+    // }
 
 
     //alert(availableAmount.toString() + " - " + availableAmount1.toString() + " - " + amountToDeposit.toString());
