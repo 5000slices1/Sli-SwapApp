@@ -8,3 +8,4 @@ install-deps:
 #npm i @dfinity/agent @dfinity/candid @dfinity/principal @dfinity/utils @dfinity/nns-proto
 #	sudo apt-get install mops
 #npm install artemis-web3-adapter
+#npm i @dfinity/identity

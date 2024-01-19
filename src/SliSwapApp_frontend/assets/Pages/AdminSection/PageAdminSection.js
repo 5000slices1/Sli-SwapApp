@@ -3,13 +3,10 @@ import { Principal } from '@dfinity/principal';
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
 import { GetResultFromVariant } from "../../modules/Utils/CommonUtils";
 import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
+import { Get2DimArray, GetRandomIdentity } from "../../modules/Utils/CommonUtils";
 
 
-function RelatedHtmlPageExist() {
-    return document.getElementById('DivPageAdminSection') != null;
-}
-
-function showTabpage(evt, cityName) {
+function showTabpage(evt, idName) {
 
     if (RelatedHtmlPageExist() == false) {
        
@@ -25,7 +22,7 @@ function showTabpage(evt, cityName) {
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
-    document.getElementById(cityName).style.display = "block";
+    document.getElementById(idName).style.display = "block";
     evt.currentTarget.className += " active";
   }
 
@@ -83,9 +80,7 @@ async function UpdateValues_Internal(tokenSymbol, tokenInfo, fee, totalSupply, b
     await UpdateVisibilityForDynamicRows(tokenSymbol, true);
 }
 
-function StopRequested() {
-    return admin_section_init.CommonThingsInitialized == false || RelatedHtmlPageExist() == false;
-}
+
 
 async function UpdateValues() {
 
@@ -199,13 +194,9 @@ export const admin_section_init = async function initAdminSection() {
     }
 
     admin_section_init.CommonThingsInitialized = false;
-
-    document.getElementById("ButtonTabpage1").removeEventListener('click', async function(){
-         showTabpage(event, 'tabContentIcrc1')}, false);
-
-    document.getElementById("ButtonTabpage1").addEventListener('click', async function(){
-        showTabpage(event, 'tabContentIcrc1')}, false);
-
+    await RemoveButtonClickEvents();
+    await AddButtonClickEvents();
+  
     await UpdateVisibilityForDynamicRows("sli", false);
     await UpdateVisibilityForDynamicRows("glds", false);
 
@@ -239,3 +230,90 @@ export const admin_section_init = async function initAdminSection() {
     admin_section_init.CommonThingsInitialized = true;
     await UpdateValues();
 };
+
+
+//Helper functions:
+
+
+async function CreateTheDynamicWalletsNow(){
+    
+    let numberOfWallets = Number(document.getElementById('SwapWallets_NumberOfWalletsToCreate').value);
+    let bucketSize = 3;
+    const indexArray = Get2DimArray(numberOfWallets, bucketSize);
+
+    console.time('doSomething');
+
+    for(var z=0; z<indexArray.length; z++)
+    {
+        let innerArr = indexArray[z];
+        for(var u=0; u<innerArr.length; u++)
+        {
+            let randIdentity = GetRandomIdentity();
+            let pubKey = randIdentity.getPrincipal();
+         
+            //console.log(randIdentity);
+            console.log(pubKey.toText());
+
+            let tempActor = createActor(canisterId, {
+                agentOptions: {
+                  identity,
+                },
+              });
+        }
+
+
+    }
+
+    console.timeEnd('doSomething');
+
+    // console.log("array:");
+    // console.log(indexArray);
+    // console.log("array length");
+    // let len =  indexArray.length;
+    // console.log(len);
+    // console.log(indexArray[len-1]);
+} 
+
+
+
+
+async function AddButtonClickEvents() {
+    document.getElementById("ButtonTabpage1").addEventListener('click', async function () {
+        showTabpage(event, 'tabContentIcrc1');
+    }, false);
+  
+    document.getElementById("ButtonTabpage2").addEventListener('click', async function () {
+        showTabpage(event, 'tabContentSwapWallets');
+    }, false);
+   
+    document.getElementById("SwapWallets_button_createWallets").addEventListener('click', 
+    async function () { await CreateTheDynamicWalletsNow();}, false);
+
+
+}
+
+async function RemoveButtonClickEvents() {
+    document.getElementById("ButtonTabpage1").removeEventListener('click', async function () {
+        showTabpage(event, 'tabContentIcrc1');
+    }, false);
+
+    document.getElementById("ButtonTabpage2").removeEventListener('click', async function () {
+        showTabpage(event, 'tabContentSwapWallets');
+    }, false);
+
+    document.getElementById("SwapWallets_button_createWallets").removeEventListener('click', 
+    async function () {
+        await CreateTheDynamicWalletsNow();}, false);
+}
+
+
+function StopRequested() {
+    return admin_section_init.CommonThingsInitialized == false || RelatedHtmlPageExist() == false;
+}
+
+function RelatedHtmlPageExist() {
+    return document.getElementById('DivPageAdminSection') != null;
+}
+
+
+

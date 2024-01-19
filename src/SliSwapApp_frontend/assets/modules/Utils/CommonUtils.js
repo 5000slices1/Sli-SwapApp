@@ -1,6 +1,6 @@
 import { ResultInfo, ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
-
+import { Ed25519KeyIdentity } from '@dfinity/identity';
 
 //Returns true if the object has all the fileds included
 export function hasFieldsSet(item, ...fieldNames) {
@@ -86,6 +86,86 @@ export async function GetTokensInfos() {
 
   return result;
 
+}
+
+
+export function GetRandomIdentity(){
+
+  let seed = GetRandomString(32);
+  return SeedToIdentity(seed);
+}
+
+
+export function SeedToIdentity(seed) {
+  const seedBuf = new Uint8Array(new ArrayBuffer(32));
+  if (seed.length && seed.length > 0 && seed.length <= 32) {
+    seedBuf.set(new TextEncoder().encode(seed));
+    return Ed25519KeyIdentity.generate(seedBuf);
+  }
+  return null;
+}
+
+export function GetRandomString(stringLength){
+ 
+  let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  var result = "";
+  for(var i = 0; i < stringLength; i++){
+    result += getRandomChar(characters);
+  }
+  return result;
+}
+
+export function Get2DimArray(numberOfWallets, bucketSize) {
+  const indexArray = [[]];
+
+  for (var i = 0; i < numberOfWallets; i = i + bucketSize) {
+
+      var end = i + bucketSize;
+      end = Math.min(end, numberOfWallets);
+      if (i == end) {
+          break;
+      }
+      const innerArray = [];
+      for (var j = i; j < end; j++) {
+          innerArray.push(j);
+      }
+      if (i == 0) {
+          indexArray[0] = innerArray;
+      }
+      else {
+          indexArray.push(innerArray);
+      }
+  }
+  return indexArray;
+}
+
+//Internal functions:
+
+function getCryptoRandomBetween(min, max){
+  //the highest random value that crypto.getRandomValues could store in a Uint32Array
+  var MAX_VAL = 4294967295;
+  
+  //find the number of randoms we'll need to generate in order to give every number between min and max a fair chance
+  var numberOfRandomsNeeded = Math.ceil((max - min) / MAX_VAL);
+  
+  //grab those randoms
+  var cryptoRandomNumbers = new Uint32Array(numberOfRandomsNeeded);
+  crypto.getRandomValues(cryptoRandomNumbers);
+  
+  //add them together
+  for(var i = 0, sum = 0; i < cryptoRandomNumbers.length; i++){
+    sum += cryptoRandomNumbers[i];
+  }
+  
+  //and divide their sum by the max possible value to get a decimal
+  var randomDecimal = sum / (MAX_VAL * numberOfRandomsNeeded);
+  
+  //if result is 1, retry. otherwise, return decimal.
+  return randomDecimal === 1 ? getCryptoRandomBetween(min, max) : Math.floor(randomDecimal * (max - min + 1) + min);
+}
+
+function getRandomChar(str){
+  return str.charAt(getCryptoRandomBetween(0, str.length - 1));
 }
 
 

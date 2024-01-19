@@ -11,12 +11,12 @@
  <!-- Tab links -->
  <div class="tab" style="margin-right: -12px;">
   <button class="tablinks" type="submit" id="ButtonTabpage1" onclick="showTabpage(event, 'tabContentIcrc1')">ICRC1 Tokens</button>
-  <button class="tablinks" onclick="showTabpage(event, 'Paris')">Swap-wallets</button>
-  <button class="tablinks" onclick="showTabpage(event, 'Tokyo')">Status</button>
+  <button class="tablinks" type="submit" id="ButtonTabpage2" onclick="showTabpage(event, 'tabContentSwapWallets')">Swap-wallets</button>
+  <button class="tablinks"type="submit"  id="ButtonTabpage3" onclick="showTabpage(event, 'Tokyo')">Status</button>
 </div> 
  
 
-<!-- #region -->
+<!-- #region ICRC1 tokens settings -->
   <div class="tabcontent" id="tabContentIcrc1" 
   style="max-width: 100%;width: 780px;"
   >
@@ -144,6 +144,64 @@
     </swapControl>
   </div>
   </div>
+<!-- #endregion ICRC1 tokens settings -->
+
+<!-- #region Swap-Wallets settings -->
+<div class="tabcontent" id="tabContentSwapWallets" 
+style="max-width: 100%;width: 580px;"
+>
+  <div style="width: 580px;display: flex;
+  margin: 0 auto;align-items: center;
+  max-width: 100%;">
+  <swapControl style="width: 580px;">
+    <b><label style="color: #430dd9;">Wallets for the swapping process</label></b>
+    <br />
+    <br />
+    <!-- <p style="margin-top: 8px;margin-bottom: 8px;"><b>Step 1:</b></p> -->
+    <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets:</p>
+    <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+      <table id="Table_sli" style="font-size:smaller;table-layout: fixed;">
+        <tr>
+          <td style="width: 180px;">
+            <label>Number of wallets to create: </label>
+          </td>
+          <td style="width: 85px;">
+            <input id="SwapWallets_NumberOfWalletsToCreate" 
+            style="width: 85px;padding-right: 2px;" type="number" min="0" step="1" value="0">
+          </td>
+          <td><button id="SwapWallets_button_createWallets" type="submit" class="button-49"
+              style=" margin-left: 2.0em; cursor:pointer;width: 80px;">Create now</label>
+            </td>           
+        </tr>      
+        <tr  >
+          <td style="width: 180px;"><label>Free wallets: </label></td>
+          <td style="width: 85px;"><input id="SwapWallets_NumberOfFreeWallets" 
+            style="width: 85px;padding-right: 2px;" type="number" step="1"
+            readonly="true"
+            value="0"></label></td>            
+        </tr>
+        <tr >
+          <td style="width: 180px;"><label>Used wallets: </label></td>
+          <td style="width: 85px;"><input id="SwapWallets_NumberOfUsedWallets" 
+            style="width: 85px;padding-right: 2px;" type="number" step="1"
+            readonly="true"
+            value="0"></label></td>            
+        </tr>
+        <!-- <tr >
+          <td style="width: 180px;"><label>Name: </label></td>
+          <td style="width: 150px;"><label id="sliTokenName"></label></td>            
+        </tr> -->
+             
+      </table>
+    </div>
+
+    <br />
+  </swapControl>
+</div>
+</div>
+
+<!-- #endregion Swap-Wallets settings -->
+
   </div>
 
   <script>
