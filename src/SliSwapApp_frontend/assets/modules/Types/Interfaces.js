@@ -2,37 +2,78 @@
 
 export const Dip20Interface = ({ IDL }) => {
   const TxReceipt = IDL.Variant({
-    'Ok': IDL.Nat,
-    'Err': IDL.Variant({
-      'InsufficientAllowance': IDL.Null,
-      'InsufficientBalance': IDL.Null,
-      'ErrorOperationStyle': IDL.Null,
-      'Unauthorized': IDL.Null,
-      'LedgerTrap': IDL.Null,
-      'ErrorTo': IDL.Null,
-      'Other': IDL.Text,
-      'BlockUsed': IDL.Null,
-      'AmountTooSmall': IDL.Null,
+    'Ok' : IDL.Nat,
+    'Err' : IDL.Variant({
+      'InsufficientAllowance' : IDL.Null,
+      'InsufficientBalance' : IDL.Null,
+      'ErrorOperationStyle' : IDL.Null,
+      'Unauthorized' : IDL.Null,
+      'LedgerTrap' : IDL.Null,
+      'ErrorTo' : IDL.Null,
+      'Other' : IDL.Text,
+      'BlockUsed' : IDL.Null,
+      'AmountTooSmall' : IDL.Null,
     }),
   });
-
   const Metadata = IDL.Record({
-    'fee': IDL.Nat,
-    'decimals': IDL.Nat8,
-    'owner': IDL.Principal,
-    'logo': IDL.Text,
-    'name': IDL.Text,
-    'totalSupply': IDL.Nat,
-    'symbol': IDL.Text,
+    'fee' : IDL.Nat,
+    'decimals' : IDL.Nat8,
+    'owner' : IDL.Principal,
+    'logo' : IDL.Text,
+    'name' : IDL.Text,
+    'totalSupply' : IDL.Nat,
+    'symbol' : IDL.Text,
   });
-
+  const Time = IDL.Int;
+  const TokenInfo = IDL.Record({
+    'holderNumber' : IDL.Nat,
+    'deployTime' : Time,
+    'metadata' : Metadata,
+    'historySize' : IDL.Nat,
+    'cycles' : IDL.Nat,
+    'feeTo' : IDL.Principal,
+  });
   return IDL.Service({
-    'balanceOf': IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
-    'transfer': IDL.Func([IDL.Principal, IDL.Nat], [TxReceipt], []),
-    'name': IDL.Func([], [IDL.Text], ['query']),
-    'totalSupply': IDL.Func([], [IDL.Nat], ['query']),
-    'getTokenFee': IDL.Func([], [IDL.Nat], ['query']),
-    'getMetadata': IDL.Func([], [Metadata], ['query'])
+    'allowance' : IDL.Func(
+        [IDL.Principal, IDL.Principal],
+        [IDL.Nat],
+        ['query'],
+      ),
+    'approve' : IDL.Func([IDL.Principal, IDL.Nat], [TxReceipt], []),
+    'balanceOf' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
+    'burn' : IDL.Func([IDL.Nat], [TxReceipt], []),
+    'decimals' : IDL.Func([], [IDL.Nat8], ['query']),
+    'getAllowanceSize' : IDL.Func([], [IDL.Nat], ['query']),
+    'getHolders' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat))],
+        ['query'],
+      ),
+    'getMetadata' : IDL.Func([], [Metadata], ['query']),
+    'getTokenFee' : IDL.Func([], [IDL.Nat], ['query']),
+    'getTokenInfo' : IDL.Func([], [TokenInfo], ['query']),
+    'getUserApprovals' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat))],
+        ['query'],
+      ),
+    'historySize' : IDL.Func([], [IDL.Nat], ['query']),
+    'logo' : IDL.Func([], [IDL.Text], ['query']),
+    'mint' : IDL.Func([IDL.Principal, IDL.Nat], [TxReceipt], []),
+    'name' : IDL.Func([], [IDL.Text], ['query']),
+    'setFee' : IDL.Func([IDL.Nat], [], ['oneway']),
+    'setFeeTo' : IDL.Func([IDL.Principal], [], ['oneway']),
+    'setLogo' : IDL.Func([IDL.Text], [], ['oneway']),
+    'setName' : IDL.Func([IDL.Text], [], ['oneway']),
+    'setOwner' : IDL.Func([IDL.Principal], [], ['oneway']),
+    'symbol' : IDL.Func([], [IDL.Text], ['query']),
+    'totalSupply' : IDL.Func([], [IDL.Nat], ['query']),
+    'transfer' : IDL.Func([IDL.Principal, IDL.Nat], [TxReceipt], []),
+    'transferFrom' : IDL.Func(
+        [IDL.Principal, IDL.Principal, IDL.Nat],
+        [TxReceipt],
+        [],
+      ),
   });
 };
 
@@ -561,6 +602,8 @@ export const NftInterface = ({ IDL }) => {
 
 export const SwapAppActorInterface = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
+  const Balance = IDL.Nat;
+  const Result_1 = IDL.Variant({ 'ok' : Balance, 'err' : IDL.Text });
   const Metadata = IDL.Record({
     'fee' : IDL.Nat,
     'decimals' : IDL.Nat,
@@ -581,10 +624,9 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'Admin' : IDL.Null,
     'Owner' : IDL.Null,
   });
-  const Balance = IDL.Nat;
-  const Result_1 = IDL.Variant({ 'ok' : Balance, 'err' : IDL.Text });
   return IDL.Service({
     'AddAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'GetIcrc1Balance' : IDL.Func([IDL.Principal], [Result_1], []),
     'GetListOfAdminUsers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
     'GetTokensInfos' : IDL.Func([], [TokensInfoAsResponse], ['query']),
@@ -594,8 +636,7 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'GldsIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
     'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
     'RemoveAdminUser' : IDL.Func([IDL.Text], [Result], []),
-    'ShowPrincipal' : IDL.Func([], [], []),
-    'ShowPrincipal2' : IDL.Func([], [IDL.Principal], []),
+    'SliDip20Approve' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
     'SliIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
     'SliIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
     'SliIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),

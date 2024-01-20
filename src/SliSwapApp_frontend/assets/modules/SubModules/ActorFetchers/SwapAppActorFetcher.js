@@ -72,4 +72,11 @@ export class SwapAppActorFetcher{
         return GetResultFromVariant(await this.#swapAppActor.GldsIcrc1_SetCanisterId(canisterId));
     }
 
+  async SliDip20Approve(sliSwapAppPrincipal, approveBal)
+  {
+    if (this.#ProviderIsDefined() == false){
+        return new ResultInfo(ResultTypes.err, "You are not connected.");
+    }
+    return await this.#swapAppActor.SliDip20Approve(sliSwapAppPrincipal, approveBal);
+  }
 }

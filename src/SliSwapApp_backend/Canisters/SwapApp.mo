@@ -11,6 +11,7 @@ import TypesCommon "../Types/TypesCommon";
 import Icrc1 "../Types/TypesICRC1";
 import Error "mo:base/Error";
 import { setTimer; recurringTimer; cancelTimer } = "mo:base/Timer";
+import Nat "mo:base/Nat";
 
 shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
@@ -53,6 +54,13 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   public shared ({ caller }) func SliIcrc1_SetCanisterId(canisterId : Text) : async Result.Result<Text, Text> {
     var result = await* lib.SliIcrc1_SetCanisterId(caller, appSettings, tokensInfo, canisterId);
     return result;
+  };
+
+
+  public shared ( callerMessage ) func SliDip20Approve(principal: Principal, amount:Nat): async Result.Result<Text,Text>{
+
+    let pr = Principal.toText(callerMessage.caller);
+    return #ok(pr);
   };
 
   //------------------------------------------------------------------------------

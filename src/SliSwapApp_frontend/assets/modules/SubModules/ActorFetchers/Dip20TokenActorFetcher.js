@@ -1,5 +1,7 @@
 import { Dip20Interface } from "../../Types/Interfaces";
 import { TokenBalance } from "../Token/TokenBalance";
+import { GetResultFromVariant } from "../../Utils/CommonUtils";
+import { ResultInfo, ResultTypes } from "../../Types/CommonTypes";
 
 export class Dip20TokenActorFetcher {
 
@@ -45,5 +47,24 @@ export class Dip20TokenActorFetcher {
               
         let totalSupply = await this.#internalActor.totalSupply();   
         return new TokenBalance(totalSupply, decimals);         
+    }
+
+    async TransferTokens(targetPrincipal, amount){
+
+        if (this.#internalActor == null) {
+          return;
+        }
+    
+        try
+        {         
+              let resultResponse = await this.#internalActor.transfer(targetPrincipal, amount);
+              let returnResult = GetResultFromVariant(resultResponse);
+              return returnResult;          
+        }
+        catch(error)
+        {        
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    
     }
 }

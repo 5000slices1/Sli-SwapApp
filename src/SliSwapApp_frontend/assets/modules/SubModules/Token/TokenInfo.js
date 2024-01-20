@@ -3,6 +3,8 @@ import { SpecifiedTokenInterfaceType } from "../../Types/CommonTypes";
 import { Dip20TokenActorFetcher } from "../ActorFetchers/Dip20TokenActorFetcher";
 import { Icrc1TokenActorFetcher } from "../ActorFetchers/Icrc1TokenActorFetcher";
 import { PubSub } from "../../Utils/PubSub";
+import { GetResultFromVariant } from "../../Utils/CommonUtils";
+import { ResultInfo, ResultTypes } from "../../Types/CommonTypes";
 
 export class TokenInfo {
 
@@ -84,6 +86,38 @@ export class TokenInfo {
       }
         break;
       default: return;
+    }
+
+  }
+
+
+  async TransferTokens(targetPrincipal, amount){
+
+    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+      this.#provider == null || this.#loggedInPrincipal == null) {
+      return;
+    }
+
+    try
+    {
+      switch (this.SpecifiedTokenInterfaceType) {
+
+        case SpecifiedTokenInterfaceType.Dip20Sli:
+        case SpecifiedTokenInterfaceType.Dip20Glds: {  
+          
+          let result = await this.TokenActor.TransferTokens(targetPrincipal, amount);        
+          return result;
+        }
+      
+        //Transfer for ICRC1 is not needed here in frontend. This will be done on backend side.
+        default:   
+          break;
+      
+      }
+    }
+    catch(error)
+    {
+      return new ResultInfo(ResultTypes.err, error);
     }
 
   }

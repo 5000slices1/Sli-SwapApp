@@ -9,3 +9,4 @@ install-deps:
 #	sudo apt-get install mops
 #npm install artemis-web3-adapter
 #npm i @dfinity/identity
+#npm i @dfinity/identity-secp256k1
