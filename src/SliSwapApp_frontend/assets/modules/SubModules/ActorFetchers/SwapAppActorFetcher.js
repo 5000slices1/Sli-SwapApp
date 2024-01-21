@@ -72,11 +72,38 @@ export class SwapAppActorFetcher{
         return GetResultFromVariant(await this.#swapAppActor.GldsIcrc1_SetCanisterId(canisterId));
     }
 
-  async SliDip20Approve(sliSwapAppPrincipal, approveBal)
-  {
-    if (this.#ProviderIsDefined() == false){
-        return new ResultInfo(ResultTypes.err, "You are not connected.");
-    }
-    return await this.#swapAppActor.SliDip20Approve(sliSwapAppPrincipal, approveBal);
-  }
+
+    async AddApprovalWalletSli(approvalWalletPrincipal){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.AddNewApprovedSliWallet(approvalWalletPrincipal);
+            return GetResultFromVariant(result);
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+      }
+
+      async AddApprovalWalletGlds(approvalWalletPrincipal){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.AddNewApprovedGldsWallet(approvalWalletPrincipal);
+            return GetResultFromVariant(result);
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+      }
 }

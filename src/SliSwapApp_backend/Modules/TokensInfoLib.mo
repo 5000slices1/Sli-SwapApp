@@ -10,76 +10,10 @@ import Bool "mo:base/Bool";
 import Interfaces "../Interfaces/Interfaces";
 import TypesIcrc "../Types/TypesICRC1";
 import Dip20Types "../Types/TypesDip20";
+import CommonLib "CommonLib";
 
-module {
 
-    public func SwapAppInit(creator : Principal) : T.AppSettings {
-
-        let returnValue : T.AppSettings = {
-
-            //Creator principal of the swap-app-canister-creator
-            SwapAppCreator = creator;
-            var SwapAppUiPrincipal = null;
-
-            var SwapAppAdmins = List.nil<Text>();
-        };
-
-        return returnValue;
-
-    };
-
-    public func TokensInfoInit() : T.TokensInfo {
-
-        let defaultTokenInfo : T.Metadata = {
-            canisterId = "";
-            logo = "";
-            name = "";
-            symbol = "";
-            decimals = 0;
-            fee = 0;
-        };
-
-        let resultT : T.TokensInfo = {
-            var Icrc1_Sli = defaultTokenInfo;
-            var Dip20_Sli = defaultTokenInfo;
-            var Icrc1_Glds = defaultTokenInfo;
-            var Dip20_Glds = defaultTokenInfo;
-        };
-
-    };
-
-    public func UserIsOwnerOrAdmin(appSettings : T.AppSettings, principal : Principal) : async* Bool {
-
-        //TODO:undo
-        //return true;
-
-        let userRole = GetUserRole(appSettings, principal);
-        if (userRole == #Owner or userRole == #Admin) {
-            return true;
-        };
-
-        return false;
-    };
-
-    public func GetUserRole(appSettings : T.AppSettings, principal : Principal) : T.UserRole {
-
-        if (Principal.isAnonymous(principal)) {
-            return #Anonymous;
-        };
-
-        if (principal == appSettings.SwapAppCreator) {
-            return #Owner;
-        };
-
-        let principalText = Principal.toText(principal);
-        if (
-            List.size<Text>(appSettings.SwapAppAdmins) > 0 and List.some<Text>(appSettings.SwapAppAdmins, func(n) { n == principalText })
-        ) {
-            return #Admin;
-        };
-
-        return #NormalUser;
-    };
+module{
 
     public func SliIcrc1_SetCanisterId(
         caller : Principal,
@@ -102,43 +36,7 @@ module {
         await* SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Icrc1Glds, canisterId, caller);
     };
 
-    public func AddAdminUser(caller : Principal, appSettings : T.AppSettings, principal : Text) : async* Result.Result<Text, Text> {
-
-        if (caller != appSettings.SwapAppCreator) {
-            return #err("Only owner of SwapApp can add admin user");
-        };
-        let realPrincipal = Principal.fromText(principal);
-
-        let userIsAlreadyAdminOrOwner = await* UserIsOwnerOrAdmin(appSettings, realPrincipal);
-        if (userIsAlreadyAdminOrOwner == false) {
-            appSettings.SwapAppAdmins := List.push<Text>(principal, appSettings.SwapAppAdmins);
-            return #ok("Principal was added as admin user.");
-        };
-
-        return #ok("Is already admin user or owner.");
-    };
-
-    public func RemoveAdminUser(caller : Principal, appSettings : T.AppSettings, principal : Text) : async* Result.Result<Text, Text> {
-
-        if (caller != appSettings.SwapAppCreator) {
-            return #err("Only owner of SwapApp can remove admin user");
-        };
-        let realPrincipal = Principal.fromText(principal);
-
-        let userIsAlreadyAdminOrOwner = await* UserIsOwnerOrAdmin(appSettings, realPrincipal);
-        if (userIsAlreadyAdminOrOwner == true) {
-            appSettings.SwapAppAdmins := List.filter<Text>(appSettings.SwapAppAdmins, func n { n != principal });
-            return #ok("Principal is no longer an admin user.");
-        };
-
-        return #ok("Principal was not in the admin list.");
-    };
-
-    public func GetListOfAdminUsers(appSettings : T.AppSettings) : [Text] {
-        return List.toArray<Text>(appSettings.SwapAppAdmins);
-    };
-
-    public func SetTokenMetaDataByCanisterId(
+       public func SetTokenMetaDataByCanisterId(
         appSettings : T.AppSettings,
         tokensInfo : T.TokensInfo,
         tokenType : T.SpecificTokenType,
@@ -146,7 +44,7 @@ module {
         caller : Principal,
     ) : async* Result.Result<Text, Text> {
 
-        let userIsAdminOrOwner = await* UserIsOwnerOrAdmin(appSettings, caller);
+        let userIsAdminOrOwner = await* CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
 
         if (userIsAdminOrOwner != true) {
             return #err("Only canister owner or admins can call this method");
@@ -333,5 +231,17 @@ module {
         } catch (error) {
             return #err("Error: " #Error.message(error));
         };
+    };
+
+    public func GetTokensInfos(tokensInfo : T.TokensInfo) : T.TokensInfoAsResponse {
+
+        let result : T.TokensInfoAsResponse = {
+        Icrc1_Sli = tokensInfo.Icrc1_Sli;
+        Dip20_Sli = tokensInfo.Dip20_Sli;
+        Icrc1_Glds = tokensInfo.Icrc1_Glds;
+        Dip20_Glds = tokensInfo.Dip20_Glds;
+        };
+
+        return result;
     };
 };

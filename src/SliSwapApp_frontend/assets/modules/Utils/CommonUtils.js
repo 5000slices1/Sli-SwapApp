@@ -1,6 +1,6 @@
 import { ResultInfo, ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
-import { Ed25519KeyIdentity } from '@dfinity/identity';
+//import { Ed25519KeyIdentity } from '@dfinity/identity';
 import { Secp256k1KeyIdentity } from "@dfinity/identity-secp256k1";
 
 //Returns true if the object has all the fileds included
@@ -90,19 +90,16 @@ export async function GetTokensInfos() {
 }
 
 
-export function GetRandomIdentity(){
-
-  let seed = GetRandomString(32);
-  return SeedToIdentity(seed);
+export function GetRandomIdentity() { 
+    return Secp256k1KeyIdentity.generate();
 }
-
 
 export function SeedToIdentity(seed) {
   const seedBuf = new Uint8Array(new ArrayBuffer(32));
   if (seed.length && seed.length > 0 && seed.length <= 32) {
     seedBuf.set(new TextEncoder().encode(seed));
     return Secp256k1KeyIdentity.generate(seedBuf);
-    //return Ed25519KeyIdentity.generate(seedBuf);
+    //Ed25519KeyIdentity.generate(seedBuf);
   }
   return null;
 }

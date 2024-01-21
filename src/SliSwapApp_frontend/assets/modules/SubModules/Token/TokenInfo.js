@@ -90,12 +90,11 @@ export class TokenInfo {
 
   }
 
-
   async TransferTokens(targetPrincipal, amount){
 
     if (this.CanisterId == null || this.MetaDataPresent == false ||      
       this.#provider == null || this.#loggedInPrincipal == null) {
-      return;
+        return new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
     try
@@ -120,6 +119,8 @@ export class TokenInfo {
       return new ResultInfo(ResultTypes.err, error);
     }
 
+    return new ResultInfo(ResultTypes.err, "Only Dip20 supported.");
+
   }
 
   async GetBalanceFromUsersWallet(){ 
@@ -128,6 +129,13 @@ export class TokenInfo {
     } 
 
     return await this.TokenActor.GetBalance(this.Decimals);
+  }
+
+  async GetBalanceForPrincipal(principal){ 
+    if (this.TokenActor == null){
+       return new TokenBalance(0,0);
+    } 
+    return await this.TokenActor.GetBalanceForPrincipal(principal,this.Decimals);
   }
 
   //Reset all, except CanisterId and TokenInterfaceType

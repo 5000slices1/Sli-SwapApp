@@ -2,6 +2,7 @@ import { Dip20Interface } from "../../Types/Interfaces";
 import { TokenBalance } from "../Token/TokenBalance";
 import { GetResultFromVariant } from "../../Utils/CommonUtils";
 import { ResultInfo, ResultTypes } from "../../Types/CommonTypes";
+import { Principal } from "@dfinity/principal";
 
 export class Dip20TokenActorFetcher {
 
@@ -25,11 +26,17 @@ export class Dip20TokenActorFetcher {
 
     async GetBalance(decimal) {
        
-        if (this.#internalActor == null) {
-            return new TokenBalance(0), decimal;
-        }
+        return await this.GetBalanceForPrincipal(this.#principal, decimal);   
+    }
 
-        return new TokenBalance(await this.#internalActor.balanceOf(this.#principal), decimal);
+    async GetBalanceForPrincipal(principal, decimal){
+        if (this.#internalActor == null) {
+            return new TokenBalance(0, decimal);
+        }
+      
+        let balance = await this.#internalActor.balanceOf(principal);           
+        return new TokenBalance(balance, decimal);
+
     }
 
     async GetMetadata() {
@@ -52,7 +59,7 @@ export class Dip20TokenActorFetcher {
     async TransferTokens(targetPrincipal, amount){
 
         if (this.#internalActor == null) {
-          return;
+            new ResultInfo(ResultTypes.err, "Not initialized");
         }
     
         try

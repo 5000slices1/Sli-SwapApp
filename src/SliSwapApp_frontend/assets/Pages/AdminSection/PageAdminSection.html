@@ -16,6 +16,7 @@
 </div> 
  
 
+
 <!-- #region ICRC1 tokens settings -->
   <div class="tabcontent" id="tabContentIcrc1" 
   style="max-width: 100%;width: 780px;"
@@ -158,7 +159,7 @@ style="max-width: 100%;width: 580px;"
     <br />
     <br />
     <!-- <p style="margin-top: 8px;margin-bottom: 8px;"><b>Step 1:</b></p> -->
-    <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets:</p>
+    <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets for Dip20-Sli swapping:</p>
     <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
       <table id="Table_sli" style="font-size:smaller;table-layout: fixed;">
         <tr>
@@ -166,33 +167,62 @@ style="max-width: 100%;width: 580px;"
             <label>Number of wallets to create: </label>
           </td>
           <td style="width: 85px;">
-            <input id="SwapWallets_NumberOfWalletsToCreate" 
+            <input id="sli_SwapWallets_NumberOfWalletsToCreate" 
             style="width: 85px;padding-right: 2px;" type="number" min="0" step="1" value="0">
           </td>
-          <td><button id="SwapWallets_button_createWallets" type="submit" class="button-49"
+          <td><button id="sli_SwapWallets_button_createWallets" type="submit" class="button-49"
               style=" margin-left: 2.0em; cursor:pointer;width: 80px;">Create now</label>
             </td>           
         </tr>      
-        <tr  >
+        <tr>
           <td style="width: 180px;"><label>Free wallets: </label></td>
-          <td style="width: 85px;"><input id="SwapWallets_NumberOfFreeWallets" 
+          <td style="width: 85px;"><input id="sli_SwapWallets_NumberOfFreeWallets" 
             style="width: 85px;padding-right: 2px;" type="number" step="1"
             readonly="true"
             value="0"></label></td>            
         </tr>
         <tr >
           <td style="width: 180px;"><label>Used wallets: </label></td>
-          <td style="width: 85px;"><input id="SwapWallets_NumberOfUsedWallets" 
+          <td style="width: 85px;"><input id="sli_SwapWallets_NumberOfUsedWallets" 
             style="width: 85px;padding-right: 2px;" type="number" step="1"
             readonly="true"
             value="0"></label></td>            
-        </tr>
-        <!-- <tr >
-          <td style="width: 180px;"><label>Name: </label></td>
-          <td style="width: 150px;"><label id="sliTokenName"></label></td>            
-        </tr> -->
-             
+        </tr>            
       </table>
+    </div>
+
+    </br>
+    <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+      <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets for Dip20-Glds swapping:</p>
+      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+        <table id="Table_glds" style="font-size:smaller;table-layout: fixed;">
+          <tr>
+            <td style="width: 180px;">
+              <label>Number of wallets to create: </label>
+            </td>
+            <td style="width: 85px;">
+              <input id="glds_SwapWallets_NumberOfWalletsToCreate" 
+              style="width: 85px;padding-right: 2px;" type="number" min="0" step="1" value="0">
+            </td>
+            <td><button id="glds_SwapWallets_button_createWallets" type="submit" class="button-49"
+                style=" margin-left: 2.0em; cursor:pointer;width: 80px;">Create now</label>
+              </td>           
+          </tr>      
+          <tr>
+            <td style="width: 180px;"><label>Free wallets: </label></td>
+            <td style="width: 85px;"><input id="glds_SwapWallets_NumberOfFreeWallets" 
+              style="width: 85px;padding-right: 2px;" type="number" step="1"
+              readonly="true"
+              value="0"></label></td>            
+          </tr>
+          <tr >
+            <td style="width: 180px;"><label>Used wallets: </label></td>
+            <td style="width: 85px;"><input id="glds_SwapWallets_NumberOfUsedWallets" 
+              style="width: 85px;padding-right: 2px;" type="number" step="1"
+              readonly="true"
+              value="0"></label></td>            
+          </tr>            
+        </table>
     </div>
 
     <br />
