@@ -1,5 +1,8 @@
 import { Dip20Interface } from "../../Types/Interfaces";
 import { TokenBalance } from "../Token/TokenBalance";
+import { GetResultFromVariant } from "../../Utils/CommonUtils";
+import { ResultInfo, ResultTypes } from "../../Types/CommonTypes";
+import { Principal } from "@dfinity/principal";
 
 export class Dip20TokenActorFetcher {
 
@@ -19,15 +22,21 @@ export class Dip20TokenActorFetcher {
         
         this.#principal = principal;
         this.#internalActor = await provider.createActor({ canisterId: canisterId, interfaceFactory: Dip20Interface });
-    };
+    }
 
     async GetBalance(decimal) {
+       
+        return await this.GetBalanceForPrincipal(this.#principal, decimal);   
+    }
 
+    async GetBalanceForPrincipal(principal, decimal){
         if (this.#internalActor == null) {
-            return new TokenBalance(0), decimal;
+            return new TokenBalance(0, decimal);
         }
+      
+        let balance = await this.#internalActor.balanceOf(principal);           
+        return new TokenBalance(balance, decimal);
 
-        return new TokenBalance(await this.#internalActor.balanceOf(this.#principal), decimal);
     }
 
     async GetMetadata() {
@@ -35,7 +44,7 @@ export class Dip20TokenActorFetcher {
             return null;
         }
         return await this.#internalActor.getMetadata();        
-    };
+    }
 
     async GetTotalSupply(decimals){
 
@@ -45,5 +54,24 @@ export class Dip20TokenActorFetcher {
               
         let totalSupply = await this.#internalActor.totalSupply();   
         return new TokenBalance(totalSupply, decimals);         
-    };
+    }
+
+    async TransferTokens(targetPrincipal, amount){
+
+        if (this.#internalActor == null) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+        }
+    
+        try
+        {         
+              let resultResponse = await this.#internalActor.transfer(targetPrincipal, amount);
+              let returnResult = GetResultFromVariant(resultResponse);
+              return returnResult;          
+        }
+        catch(error)
+        {        
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    
+    }
 }

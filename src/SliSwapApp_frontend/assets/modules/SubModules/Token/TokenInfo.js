@@ -3,6 +3,8 @@ import { SpecifiedTokenInterfaceType } from "../../Types/CommonTypes";
 import { Dip20TokenActorFetcher } from "../ActorFetchers/Dip20TokenActorFetcher";
 import { Icrc1TokenActorFetcher } from "../ActorFetchers/Icrc1TokenActorFetcher";
 import { PubSub } from "../../Utils/PubSub";
+import { GetResultFromVariant } from "../../Utils/CommonUtils";
+import { ResultInfo, ResultTypes } from "../../Types/CommonTypes";
 
 export class TokenInfo {
 
@@ -16,23 +18,15 @@ export class TokenInfo {
   MetaDataPresent;
   SpecifiedTokenInterfaceType;
 
-  //Token amount of logged in users wallet
-  BalanceInUserWallet;
-
-  //Total-Balance consist of all deposit-transfers into the dApp wallet from user-Wallet
-  //p.s. For each deposit into swap-app, a separate created deposit-wallet will be used. 
-  // Therefore we need to track the total deposited amount
-  TotalBalanceDepositedInsideSwapApp;
-
   #provider;
   #loggedInPrincipal;
 
   constructor(specifiedTokenInterfaceType) {
 
     this.SpecifiedTokenInterfaceType = specifiedTokenInterfaceType;
-    this.BalanceInUserWallet = new TokenBalance();
-    this.TotalBalanceDepositedInsideSwapApp = new TokenBalance();
+
     this.TransferFee = new TokenBalance();
+    this.Decimals = new TokenBalance();
     this.CanisterId = null;
     this.MetaDataPresent = false;
     this.Reset();
@@ -47,6 +41,7 @@ export class TokenInfo {
     return await this.TokenActor.GetTotalSupply(this.Decimals);   
   }
 
+  //The metadata of the token is updated
   async UpdateTokenInfo(tokenInfo){
     if (tokenInfo.hasData()){
       this.Name = tokenInfo.name;
@@ -95,14 +90,60 @@ export class TokenInfo {
 
   }
 
+  async TransferTokens(targetPrincipal, amount){
+
+    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+      this.#provider == null || this.#loggedInPrincipal == null) {
+        return new ResultInfo(ResultTypes.err, "Not initialized");
+    }
+
+    try
+    {
+      switch (this.SpecifiedTokenInterfaceType) {
+
+        case SpecifiedTokenInterfaceType.Dip20Sli:
+        case SpecifiedTokenInterfaceType.Dip20Glds: {  
+          
+          let result = await this.TokenActor.TransferTokens(targetPrincipal, amount);        
+          return result;
+        }
+      
+        //Transfer for ICRC1 is not needed here in frontend. This will be done on backend side.
+        default:   
+          break;
+      
+      }
+    }
+    catch(error)
+    {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+
+    return new ResultInfo(ResultTypes.err, "Only Dip20 supported.");
+
+  }
+
+  async GetBalanceFromUsersWallet(){ 
+    if (this.TokenActor == null){
+       return new TokenBalance(0,0);
+    } 
+
+    return await this.TokenActor.GetBalance(this.Decimals);
+  }
+
+  async GetBalanceForPrincipal(principal){ 
+    if (this.TokenActor == null){
+       return new TokenBalance(0,0);
+    } 
+    return await this.TokenActor.GetBalanceForPrincipal(principal,this.Decimals);
+  }
 
   //Reset all, except CanisterId and TokenInterfaceType
   Reset() {
-    this.BalanceInUserWallet.Reset();
-    this.TotalBalanceDepositedInsideSwapApp.Reset();
     this.TransferFee.Reset();
     this.Name = "";
     this.Symbol = "";
+    this.Decimals.Reset();
     this.Logo = null;
     this.TokenActor = null;
     this.#loggedInPrincipal = null;
@@ -113,8 +154,6 @@ export class TokenInfo {
     this.TokenActor = null;
     this.#loggedInPrincipal = null;
     this.#provider = null;
-    this.BalanceInUserWallet.Reset();
-    this.TotalBalanceDepositedInsideSwapApp.Reset();
   }
 
 }

@@ -1,5 +1,6 @@
 import { Icrc1Interface } from "../../Types/Interfaces";
 import { TokenBalance } from "../Token/TokenBalance";
+import { GetResultFromVariant } from "../../Utils/CommonUtils";
 
 export class Icrc1TokenActorFetcher {
 
@@ -23,17 +24,24 @@ export class Icrc1TokenActorFetcher {
 
     async GetBalance(decimal) {
 
+        return await this.GetBalanceForPrincipal(this.#principal, decimal);     
+    }
+
+    async GetBalanceForPrincipal(principal, decimal){
         if (this.#internalActor == null) {
             return new TokenBalance(0, decimal);
         }
-
+      
         let balance = await this.#internalActor.icrc1_balance_of({
-            owner: this.#principal,
+            owner: principal,
             subaccount: [],
         });
-
+  
         return new TokenBalance(balance, decimal);
+
     }
+
+
 
     async GetTotalSupply(decimals){
 

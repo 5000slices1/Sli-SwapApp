@@ -70,4 +70,19 @@ module{
 
     };
 
+    public type ApprovedWallets = {
+        var approvedWalletsFree:List.List<Principal>; 
+        var approvedWalletsInUse:List.List<Principal>;
+    }
+
+
+
+
+    // public type SwapDataSli = {
+
+
+
+    // };
+
+
 };

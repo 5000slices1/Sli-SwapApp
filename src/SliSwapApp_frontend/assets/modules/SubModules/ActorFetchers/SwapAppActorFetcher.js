@@ -37,7 +37,18 @@ export class SwapAppActorFetcher{
         }
         
         try{
-            return await this.#swapAppActor.GetUserRole() ;                
+            console.log("inside Swapappfetcher getuserrole");
+            console.log("SwapAppActor");
+            console.log(this.#swapAppActor);
+
+
+            let dAppPrincipalText =  CommonIdentityProvider.SwapAppPrincipalText;
+            console.log(dAppPrincipalText);
+
+            let userRole = await this.#swapAppActor.GetUserRole() ;     
+            console.log("Swapappfetcher getuserrole:");
+            console.log(userRole);     
+            return userRole;      
         }
         catch(error){
             return {'NormalUser':null};
@@ -61,4 +72,38 @@ export class SwapAppActorFetcher{
         return GetResultFromVariant(await this.#swapAppActor.GldsIcrc1_SetCanisterId(canisterId));
     }
 
+
+    async AddApprovalWalletSli(approvalWalletPrincipal){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.AddNewApprovedSliWallet(approvalWalletPrincipal);
+            return GetResultFromVariant(result);
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+      }
+
+      async AddApprovalWalletGlds(approvalWalletPrincipal){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.AddNewApprovedGldsWallet(approvalWalletPrincipal);
+            return GetResultFromVariant(result);
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+      }
 }

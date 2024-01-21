@@ -6,10 +6,18 @@ export class TokenBalance {
 
   SetDecimals(decimals){
     this.#Decimals = Number(decimals);
+    return this;
   }
   
   SetRawBalance(balanceValue) {
     this.#RawBalance = balanceValue;
+    return this;
+  }
+
+  SetBalance(amount){
+
+    this.#RawBalance = BigInt( Number(amount) * (10 ** Number(this.#Decimals)));
+    return this;
   }
 
   //Raw balance as BigInteger with 10⁸ notation

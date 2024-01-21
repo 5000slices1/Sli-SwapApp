@@ -62,6 +62,7 @@ export class WalletsProvider {
 
   }
 
+
   GetAllCanisterIds() {
     const idArray = [];
     if (this.SliConvertInfo?.SourceToken?.CanisterId != null && this.SliConvertInfo?.SourceToken?.CanisterId.length > 0) {
