@@ -4,6 +4,9 @@ import Blob "mo:base/Blob";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Principal "mo:base/Principal";
+import Time "mo:base/Time";
+import StableTrieMap "mo:StableTrieMap";
+// import StableTrieMapAccessor "../Modules/Helpers/StableTrieMapAccessor";
 
 module{
 
@@ -20,6 +23,13 @@ module{
         #NormalUser;
         #Owner;
         #Admin;
+    };
+
+
+    public type ResponseGetUsersSwapWallet = {
+        #Ok:Principal;
+        #NotExist;
+        #Err:Text;
     };
 
  
@@ -73,16 +83,31 @@ module{
     public type ApprovedWallets = {
         var approvedWalletsFree:List.List<Principal>; 
         var approvedWalletsInUse:List.List<Principal>;
-    }
+    };
 
 
+    public type SwapActionStatus ={
+        
+        #Idle:Time.Time;
+        #Started:Time.Time;
+        #Completed:Time.Time;
+    };
 
+    public type EncodedPrincipal = Blob;
 
-    // public type SwapDataSli = {
+    public type UserSwapInfoItem = {
+        
+        //The principal of the used swap-wallet. (== The wallet where the source-tokens should be transfered to)
+        swapWallet:Principal;
+        var depositActionStatus:SwapActionStatus;
+        var conversionActionStatus:SwapActionStatus;
+    };
 
+    public type UsersSwapInfo = {
+        items:StableTrieMap.StableTrieMap<EncodedPrincipal, UserSwapInfoItem>;     
+    };
 
-
-    // };
-
+    //public type StableTrieMap_SwapInfo = StableTrieMap.StableTrieMap<Principal, SwapInfo>;
+    //public type StableTrieMap_SwapInfoGlds = StableTrieMap.StableTrieMap<Principal, SwapInfo>;
 
 };

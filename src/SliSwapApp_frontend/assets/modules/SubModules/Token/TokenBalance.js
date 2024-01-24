@@ -1,7 +1,7 @@
 
 export class TokenBalance {
 
-  #RawBalance;
+  #RawValue;
   #Decimals;
 
   SetDecimals(decimals){
@@ -9,35 +9,35 @@ export class TokenBalance {
     return this;
   }
   
-  SetRawBalance(balanceValue) {
-    this.#RawBalance = balanceValue;
+  SetRawValue(balanceValue) {
+    this.#RawValue = balanceValue;
     return this;
   }
 
-  SetBalance(amount){
+  SetValue(amount){
 
-    this.#RawBalance = BigInt( Number(amount) * (10 ** Number(this.#Decimals)));
+    this.#RawValue = BigInt( Number(amount) * (10 ** Number(this.#Decimals)));
     return this;
   }
 
   //Raw balance as BigInteger with 10⁸ notation
-  GetRawBalance() {
-    return this.#RawBalance;
+  GetRawValue() {
+    return this.#RawValue;
   }
 
   //Display-Balance
-  GetBalance() {
-    let number = Math.max(Number(this.#RawBalance), 0);
+  GetValue() {
+    let number = Math.max(Number(this.#RawValue), 0);
     return number / (10 ** Number(this.#Decimals));
   }
 
   constructor(tokenBalance = 0.0,decimals = 8) {
-    this.#RawBalance = tokenBalance;
+    this.#RawValue = tokenBalance;
     this.#Decimals = Number(decimals);
   }
 
   Reset() {
-    this.#RawBalance = 0;
+    this.#RawValue = 0;
   }
 
 }

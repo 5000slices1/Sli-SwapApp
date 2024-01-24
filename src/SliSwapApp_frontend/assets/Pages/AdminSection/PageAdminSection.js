@@ -1,20 +1,13 @@
 import { CommonIdentityProvider, SwapAppActorProvider, ResultTypes, SpecifiedTokenInterfaceType } from "../../modules/Types/CommonTypes";
 import { Principal } from '@dfinity/principal';
-import { SliSwapApp_backend, createActor } from "../../../../declarations/SliSwapApp_backend";
-import { GetRandomString, GetResultFromVariant, SeedToIdentity } from "../../modules/Utils/CommonUtils";
+import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
+import { GetResultFromVariant } from "../../modules/Utils/CommonUtils";
 import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
 import { Get2DimArray, GetRandomIdentity } from "../../modules/Utils/CommonUtils";
-import { Actor, HttpAgent, makeNonceTransform} from '@dfinity/agent';
-import { Dip20Interface, SwapAppActorInterface } from "../../modules/Types/Interfaces";
-import {AuthClient} from '@dfinity/auth-client';
+import { Actor, HttpAgent} from '@dfinity/agent';
+import { Dip20Interface } from "../../modules/Types/Interfaces";
 import { GlobalDataProvider } from "../../modules/Types/CommonTypes";
 import fetch from 'isomorphic-fetch';
-
-//import fetch from 'node-fetch';
-
-// import { createAgent } from "@dfinity/utils";
-// import { createActor } from "../../../../declarations/SliSwapApp_backend";
-
 
 function showTabpage(evt, idName) {
 
@@ -122,43 +115,6 @@ async function UpdateUiFromModel(){
     await UpdateVisibilityForDynamicRows("glds", true);
 }
 
-
-// async function UpdateValues_Internal(tokenSymbol, tokenInfo, fee, totalSupply, balanceInDappWallet) {
-
-//     let hasData = tokenInfo.MetaDataPresent == true;
-//     if (hasData == false) {
-//         await UpdateVisibilityForDynamicRows(tokenSymbol, false);
-//         return;
-//     }
-
-//     document.getElementById(tokenSymbol + "-icrc1-canister-id").
-//         value = tokenInfo.CanisterId;
-
-//     document.getElementById(tokenSymbol + "TokenLogo").
-//         innerHTML = tokenInfo.Logo;
-
-//     document.getElementById(tokenSymbol + "TokenSymbol").
-//     innerHTML = tokenInfo.Symbol;
-
-//     document.getElementById(tokenSymbol + "TokenName").
-//     innerHTML = tokenInfo.Name;
-
-//     document.getElementById(tokenSymbol + "TokenDecimals").
-//     innerHTML = tokenInfo.Decimals;
-
-//     document.getElementById(tokenSymbol + "TokenTotalSupply").
-//     innerHTML = totalSupply;
-
-//     document.getElementById(tokenSymbol + "TokenTransferFee").
-//     innerHTML = fee;
-
-//     document.getElementById(tokenSymbol +"-icrc1-deposited-in-swap-app").
-//     value = balanceInDappWallet;
-//     await UpdateVisibilityForDynamicRows(tokenSymbol, true);
-// }
-
-
-
 async function UpdateValues() {
 
 
@@ -205,14 +161,15 @@ async function UpdateValues() {
         }
         var sliFee = GetResultFromVariant(await SliSwapApp_backend.SliIcrc1_GetCurrentTransferFee()).ResultValue;
         sliFee = new TokenBalance(sliFee, sliToken.Decimals);
-        return sliFee.GetBalance();
+        return sliFee.GetValue();
     };
 
     const promise_Sli2 =   async ()=> {
         if (sliToken == undefined || sliToken.MetaDataPresent != true){
             return 0.0;
         }
-        return (await sliToken.GetTotalSupply()).GetBalance();
+        let totalSupply = await sliToken.GetTotalSupply();
+        return totalSupply.GetValue();
     };
 
     const promise_Sli3 =   async ()=>  {
@@ -220,7 +177,7 @@ async function UpdateValues() {
             return 0.0;
         }
         var sliBalanceInAppWallet = await sliToken.GetBalanceForPrincipal(swapAppPrincipal);
-        return sliBalanceInAppWallet.GetBalance();
+        return sliBalanceInAppWallet.GetValue();
     };
 
 
@@ -230,14 +187,15 @@ async function UpdateValues() {
         }
         var gldsFee = GetResultFromVariant(await SliSwapApp_backend.GldsIcrc1_GetCurrentTransferFee()).ResultValue;
         gldsFee = new TokenBalance(gldsFee, gldsToken.Decimals);
-        return gldsFee.GetBalance();
+        return gldsFee.GetValue();
     };
 
     const promise_Glds2 =   async ()=>  {
         if (gldsToken == undefined || gldsToken.MetaDataPresent != true){
             return 0.0;
         }
-        return (await gldsToken.GetTotalSupply()).GetBalance();
+        let totalSupply = await gldsToken.GetTotalSupply();
+        return totalSupply.GetValue();
 
     };
 
@@ -246,7 +204,7 @@ async function UpdateValues() {
             return 0.0;
         }
         var gldsBalanceInAppWallet = await gldsToken.GetBalanceForPrincipal(swapAppPrincipal);
-        return gldsBalanceInAppWallet.GetBalance();
+        return gldsBalanceInAppWallet.GetValue();
     };
 
     const [sliFee_, sliTotalSupply_, sliBalanceInAppWallet_, gldsFee_, gldsTotalSupply_, gldsBalanceInAppWallet_] = await Promise.all(
@@ -274,43 +232,36 @@ async function UpdateValues() {
     GlobalDataProvider.ApprovedWallets_Glds_Free = numberOfApprovedGldsWallets[0];
     GlobalDataProvider.ApprovedWallets_Glds_InUse = numberOfApprovedGldsWallets[1];
     
-    console.log("Number of app sli wallets");
-    console.log(numberOfApprovedSliWallets);
     await UpdateUiFromModel();
-    // if (sliToken != undefined && sliToken.MetaDataPresent == true)
-    // {
-    //     UpdateValues_Internal("sli", sliToken, sliFee_, sliTotalSupply_,
-    //     sliBalanceInAppWallet_);
-    // }
-
-    // if (gldsToken != undefined && gldsToken.MetaDataPresent == true){
-
-    //     UpdateValues_Internal("glds", gldsToken, gldsFee_, gldsTotalSupply_,
-    //     gldsBalanceInAppWallet_);
-        
-    // }
-
 }
 
 
 async function setSliIcrcCanisterId() {
     let inputElementSliCanisterId = document.getElementById("sli-icrc1-canister-id");
     if (inputElementSliCanisterId) {
+        var canisterIdPrincipal;
+
         let canisterId = inputElementSliCanisterId.value;
         try {
-            Principal.fromText(canisterId);
+            canisterIdPrincipal = Principal.fromText(canisterId);
         } catch (error) {
             alert('This is not a valid canister-id');
             return;
         }
-        let result = await SwapAppActorProvider.SliIcrc1_SetCanisterId(canisterId);
+        
+        let result = await SwapAppActorProvider.SliIcrc1_SetCanisterId(canisterIdPrincipal);
 
         if (result.Result == ResultTypes.err) {
             alert(result.ResultText);
             return;
         }
         if (result.Result == ResultTypes.ok) {
-            UpdateValues();
+
+            await CommonIdentityProvider.WalletsProvider.UpdateTokenInfosFromBackend();
+            let icrc1SliToken = await CommonIdentityProvider.WalletsProvider.
+                GetToken(SpecifiedTokenInterfaceType.Icrc1Sli);
+            await icrc1SliToken.UpdateTokenActors();
+            UpdateValues(); 
         }
     }
 }
@@ -318,20 +269,25 @@ async function setSliIcrcCanisterId() {
 async function setGldsIcrcCanisterId() {
     let inputElementGldsCanisterId = document.getElementById("glds-icrc1-canister-id");
     if (inputElementGldsCanisterId) {
+        var canisterIdPrincipal;
         let canisterId = inputElementGldsCanisterId.value;
         try {
-            Principal.fromText(canisterId);
+            canisterIdPrincipal = Principal.fromText(canisterId);
         } catch (error) {
             alert('This is not a valid canister-id');
             return;
         }
-        let result = await SwapAppActorProvider.GldsIcrc1_SetCanisterId(canisterId);
+        let result = await SwapAppActorProvider.GldsIcrc1_SetCanisterId(canisterIdPrincipal);
        
         if (result.Result == ResultTypes.err) {
             alert(result.ResultText);
             return;
         }
         if (result.Result == ResultTypes.ok) {
+            await CommonIdentityProvider.WalletsProvider.UpdateTokenInfosFromBackend();
+            let icrc1GldsToken = await CommonIdentityProvider.WalletsProvider.
+                GetToken(SpecifiedTokenInterfaceType.Icrc1Glds);
+            await icrc1GldsToken.UpdateTokenActors();
             UpdateValues();
         }
 
@@ -396,7 +352,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
     var transferFeeBigInt = 0;
     var dip20Token = null;
     var numberOfWalletsToCreate = 0;
-    let bucketSize = 20;
+    let bucketSize = 40;
 
     switch(specifiedTokenInterfaceType)
     {
@@ -416,28 +372,21 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
         return;
     }
 
-    transferFeeBigInt = dip20Token.TransferFee.GetRawBalance();
+    transferFeeBigInt = dip20Token.TransferFee.GetRawValue();
     dip20CanisterIdToUse = dip20Token.CanisterId;
-    let approveAmount = new TokenBalance(0,dip20Token.Decimals).SetBalance(5000).GetRawBalance();
+    let approveAmount = new TokenBalance(0,dip20Token.Decimals).SetValue(5000).GetRawValue();
 
     const indexArray = Get2DimArray(numberOfWalletsToCreate, bucketSize);
-
-    console.time('doSomething');
-
- 
-
+    var updateLock = false;
     for(var z=0; z<indexArray.length; z++)
     {
         let innerArr = indexArray[z];
       
-
-        const promises = innerArr.map(async ()=>{
+        //Do in parallel (With parallel size of 'bucketSize')
+        const promises = innerArr.map(async (parallelIndex)=>{
           
             let approvalWalletIdentity = GetRandomIdentity();
             let approvalWalletPrincipal = approvalWalletIdentity.getPrincipal();
-            console.log("principal:");
-            console.log(approvalWalletPrincipal.toText()); 
-
             let principalAlreadyOccupied = await SliSwapApp_backend.ApprovedWalletsPrincipalExist(approvalWalletPrincipal);
             if (principalAlreadyOccupied == false){
                 
@@ -451,11 +400,9 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
                     const agent = new HttpAgent({    
                         fetch,        
                             identity: approvalWalletIdentity,
-                            host: hostToUse
-                    
+                            host: hostToUse                   
                     });
-                    
-            
+                               
                     let swappingWalletActor = Actor.createActor(
                         Dip20Interface, { agent: agent, canisterId: dip20CanisterIdToUse }
                     );
@@ -463,49 +410,96 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
                     // (2) Approve now transfer delegation
                     var approveResponse = GetResultFromVariant(await swappingWalletActor.approve(sliSwapAppPrincipal, approveAmount));
                     if (approveResponse.Result == ResultTypes.ok){
-                        console.log("approve was successful.");
-
+         
                         // (3) Check the allowance amount
-                        var allowanceNumber = await swappingWalletActor.allowance(approvalWalletPrincipal,  sliSwapAppPrincipal);
-                        //allowanceNumber = new TokenBalance(allowanceNumber, dip20Token.Decimals).GetBalance();
-                        console.log("allowance number:");
-                        console.log(allowanceNumber);
+                        var allowanceNumber = await swappingWalletActor.allowance(approvalWalletPrincipal,  sliSwapAppPrincipal);                     
                         if (allowanceNumber >= approveAmount){
-                            console.log("Adding now the swappingWallet into database");
-
+                          
                             var addApprovalWalletIntoDatabaseResponse;
 
+                            //(4) Add the approved wallet-principal into database in the backend
                             switch(specifiedTokenInterfaceType)
                             {
                                 case SpecifiedTokenInterfaceType.Dip20Sli:
                                     addApprovalWalletIntoDatabaseResponse = 
-                                    await SwapAppActorProvider.AddApprovalWalletSli(approvalWalletPrincipal);
-                                 
+                                    await SwapAppActorProvider.AddApprovalWalletSli(approvalWalletPrincipal);                                                                    
                                 break;
                                 case SpecifiedTokenInterfaceType.Dip20Glds:
                                     addApprovalWalletIntoDatabaseResponse = 
-                                    await SwapAppActorProvider.AddApprovalWalletGlds(approvalWalletPrincipal);
+                                    await SwapAppActorProvider.AddApprovalWalletGlds(approvalWalletPrincipal)                                  
                                 break;
                             }
 
-                            console.log("result of adding the swappingWallet into database");
-                            console.log(addApprovalWalletIntoDatabaseResponse);
+                           
                             if (addApprovalWalletIntoDatabaseResponse.Result == ResultTypes.ok){
-                                console.log("Adding approval wallet was full success.");
+
+                                try{
+
+                                    let index = parallelIndex % bucketSize;
+                                    let waitTime = (index * 150);
+                                    setTimeout(() => {
+                                        
+                                        while(updateLock == true)
+                                        {
+                                            //wait
+                                        }
+                                        updateLock = true;
+
+                                        try{
+                                            switch(specifiedTokenInterfaceType)
+                                            {
+                                                case SpecifiedTokenInterfaceType.Dip20Sli:
+                                                    {               
+                                                        let actValue = Number(document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value);
+                                                        let newValue = Number( actValue + 1);
+                                                        document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value = Number(newValue);
+                                                    }
+                                                break;
+                                                    
+                                                case SpecifiedTokenInterfaceType.Dip20Glds:
+                                                    {
+                                                        let actValue = Number(document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value);
+                                                        let newValue = Number( actValue + 1);
+                                                        document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value = Number(newValue);                                  
+                                                    }
+                                                break;
+                                                default:break;
+                                            }
+
+                                            
+                                        }
+                                        finally{
+                                            updateLock = false;
+                                        }
+                                                                       
+                                      }, waitTime);                
+                                }
+                                catch(error)
+                                {
+                                    //do nothing
+                                }                            
                             }
                         }
                     }
                 }
             }       
         });
-        //let finalAnswer = 
+  
         await Promise.all(promises);
-        //console.log(finalAnswer);
-
+       
+        setTimeout(async () => {
+            let numberOfApprovedSliWallets = await SliSwapApp_backend.GetNumberOfSliApprovedWallets();
+            let numberOfApprovedGldsWallets = await SliSwapApp_backend.GetNumberOfGldsApprovedWallets();
+        
+            GlobalDataProvider.ApprovedWallets_Sli_Free = numberOfApprovedSliWallets[0];
+            GlobalDataProvider.ApprovedWallets_Sli_InUse = numberOfApprovedSliWallets[1];
+        
+            GlobalDataProvider.ApprovedWallets_Glds_Free = numberOfApprovedGldsWallets[0];
+            GlobalDataProvider.ApprovedWallets_Glds_InUse = numberOfApprovedGldsWallets[1];
+            
+            await UpdateUiFromModel();
+        }, 1000);
     }
-
-    console.timeEnd('doSomething');
-
 } 
 
 

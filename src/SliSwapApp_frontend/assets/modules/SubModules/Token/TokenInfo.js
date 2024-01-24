@@ -35,6 +35,9 @@ export class TokenInfo {
 
   async GetTotalSupply(){
     if (this.MetaDataPresent  == false || this.TokenActor == null){
+      console.log("Return zero as totalsupply");
+      console.log(this.MetaDataPresent);
+      console.log(this.TokenActor);
       return new TokenBalance();
     }
 

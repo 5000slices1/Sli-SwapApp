@@ -129,6 +129,11 @@ export const Icrc1Interface = ({ IDL }) => {
 
 export const SwapAppActorInterface = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
+  const ResponseGetUsersSwapWallet = IDL.Variant({
+    'Ok' : IDL.Principal,
+    'Err' : IDL.Text,
+    'NotExist' : IDL.Null,
+  });
   const Balance = IDL.Nat;
   const Result_1 = IDL.Variant({ 'ok' : Balance, 'err' : IDL.Text });
   const Metadata = IDL.Record({
@@ -152,12 +157,17 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'Owner' : IDL.Null,
   });
   return IDL.Service({
-    'AddAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'AddAdminUser' : IDL.Func([IDL.Principal], [Result], []),
     'AddNewApprovedGldsWallet' : IDL.Func([IDL.Principal], [Result], []),
     'AddNewApprovedSliWallet' : IDL.Func([IDL.Principal], [Result], []),
     'ApprovedWalletsPrincipalExist' : IDL.Func(
         [IDL.Principal],
         [IDL.Bool],
+        ['query'],
+      ),
+    'GetGldsSwapWalletForPrincipal' : IDL.Func(
+        [IDL.Principal],
+        [ResponseGetUsersSwapWallet],
         ['query'],
       ),
     'GetIcrc1Balance' : IDL.Func([IDL.Principal], [Result_1], []),
@@ -172,18 +182,23 @@ export const SwapAppActorInterface = ({ IDL }) => {
         [IDL.Nat, IDL.Nat],
         ['query'],
       ),
+    'GetSliSwapWalletForPrincipal' : IDL.Func(
+        [IDL.Principal],
+        [ResponseGetUsersSwapWallet],
+        ['query'],
+      ),
     'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
     'GetTokensInfos' : IDL.Func([], [TokensInfoAsResponse], ['query']),
     'GetUserRole' : IDL.Func([], [UserRole], ['query']),
     'GldsIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
     'GldsIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
     'GldsIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
-    'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
-    'RemoveAdminUser' : IDL.Func([IDL.Text], [Result], []),
+    'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Principal], [Result], []),
+    'RemoveAdminUser' : IDL.Func([IDL.Principal], [Result], []),
     'SliIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
     'SliIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
     'SliIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
-    'SliIcrc1_SetCanisterId' : IDL.Func([IDL.Text], [Result], []),
+    'SliIcrc1_SetCanisterId' : IDL.Func([IDL.Principal], [Result], []),
   });
   
 };
