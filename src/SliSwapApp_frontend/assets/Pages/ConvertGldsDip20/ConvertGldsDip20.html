@@ -6,53 +6,75 @@
   <body>
 
 
-    <div class="container">  
-        <swapControl>
-          <b><label style="color: #430dd9;">Convert Dip20 Glds tokens</label></b>
-          <br/>
-          <br/>     
-          <p style="margin-top: 8px;margin-bottom: 8px;"><b>Step 1:</b></p>
-          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-            <p style="color: #612dee;font-size:medium;padding-bottom: 0.1em;">Deposit:</p>          
-            <table  style="font-size:smaller;table-layout: fixed;">
-              <tr>
-                <td style="width: 195px;"><label>Glds-Dip20 tokens in your wallet: </label></td>            
-                <td><input id="walletAmountOldGldsDip20" 
-                  style="margin-left: 0.2em;" type="number" readonly value="0.0"></td>
-                <td></td>            
-              </tr>
-              <tr>
-                <td><label>Amount to deposit: </label></td>            
-                <td><input pattern="[0-9]*" step="0.001" inputmode="numeric"
-                  min="0.001" id="depositAmountOldGldsDip20"
-                  style="margin-left: 0.2em;" type="number" value="0"></td>
-                <td><button  id="buttonDepositNowOldGldsDip20" class="button-49"  style="margin-left: 0.2em; cursor:pointer;" >Deposit now</label></td>            
-              </tr>
-            </table>
-          </div>
-     
-          <p style="margin-top: 28px;margin-bottom: 8px;"><b>Step 2:</b></p>
-          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-            <p style="color: #612dee;font-size:medium;padding-bottom: 0.1em;">Convert:</p>          
-            <table  style="font-size:smaller;table-layout: fixed;">
-              <tr>
-                <td style="width: 195px;"><label>Amount in deposit: </label></td>            
-                <td><input id="DepositedAmountOldGldsDip20" 
-                  style="margin-left: 0.2em;" type="number" readonly value="0.0"></td>
-                <td></td>            
-              </tr>
-              <tr>
-                <td><label>SLI ICRC1 tokens you will get: </label></td>            
-                <td><input readonly inputmode="numeric" id="number_of_ICRC1_tokens_for_depositAmountOldGldsDip20"
-                  style="margin-left: 0.2em;" type="number" value="0"></td>
-                <td><button id="convertNowOldGldsDip20ToICRC1" class="button-49"  style="margin-left: 0.2em; cursor:pointer;" >Convert now</label></td>            
-              </tr>
-            </table>
-          </div>         
-          <br/>          
-        </swapControl>
+<div class="container" id="ConvertGlds_HtmlPage">  
+    <swapControl>
+      <b><label style="color: #430dd9;">Convert Dip20 Glds tokens</label></b>
+      <br/>
+      <br/>     
+      <p style="margin-top: 8px;margin-bottom: 8px;"><b>Step 1:</b></p>
+      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+        <p style="color: #612dee;font-size:medium;padding-bottom: 0.1em;">Deposit:</p>          
+        <table  style="font-size:smaller;table-layout: fixed;">
+          <tr>
+            <td style="width: 185px;"><label>Max. depositable amount: </label></td>            
+            <td><input id="walletAmountOldGldsDip20" inputmode="numeric"
+              style="margin-left: 0.2em;width: 175px;"  type="number" readonly value="0.0"></td>
+            <td></td>            
+          </tr>
+          <tr>
+            <td><label>Amount to deposit: </label></td>            
+            <td><input pattern="[0-9]*" step="0.001" inputmode="numeric"
+              min="0.001" id="depositAmountOldGldsDip20"
+              style="margin-left: 0.2em;width: 175px;" type="number" value="0.0"></td>
+            <td><button  id="buttonDepositNowOldGldsDip20" class="button-49"  
+              style="margin-left: 0.2em; cursor:pointer;" >Deposit now</label></td>            
+          </tr>
+        </table>
       </div>
-      
-    
-    </body>
-    </html>
+ 
+      <p style="margin-top: 28px;margin-bottom: 8px;"><b>Step 2:</b></p>
+      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+        <p style="color: #612dee;font-size:medium;padding-bottom: 0.1em;">Convert:</p>          
+        <table  style="font-size:smaller;table-layout: fixed;">
+          <tr>
+            <td style="width: 185px;"><label>Amount in deposit: </label></td>            
+            <td><input id="DepositedAmountOldGldsDip20" inputmode="numeric" 
+              style="margin-left: 0.2em;width: 175px;" type="number" readonly value="0.0"></td>
+            <td></td>            
+          </tr>
+          <tr>
+            <td><label>GLDS ICRC1 tokens you will get: </label></td>            
+            <td><input readonly inputmode="numeric" id="number_of_ICRC1_tokens_for_depositAmountOldGldsDip20"
+              style="margin-left: 0.2em;width: 175px;" type="number" value="0.0"></td>
+            <td><button id="convertNowOldGldsDip20ToICRC1" class="button-49"  style="margin-left: 0.2em; cursor:pointer;" >Convert now</label></td>            
+          </tr>
+        </table>
+      </div>         
+      <br/>          
+    </swapControl>    
+  </div>
+
+  <div class="container" id="ConvertGlds_HtmlPage_convertedIcrc1" style="margin-top: 32px;">  
+    <swapControl>
+      <b><label style="color: #430dd9;">Glds ICRC1 tokens in your wallet:</label></b>
+      <br/>
+      <br/>     
+      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+                 
+        <table  style="font-size:smaller;table-layout: fixed;">
+          <tr>
+            <td style="width: 185px;"><label>Glds ICRC1 amount: </label></td>            
+            <td><input id="glds-icrc1-tokens-in-wallet" inputmode="numeric"
+              style="margin-left: 0.2em;width: 175px;"  type="number" readonly value="0.0"></td>
+            <td style="width: 80px;"></td>            
+          </tr>          
+        </table>
+      </div>
+          
+      <br/>          
+    </swapControl>    
+  </div>
+
+
+</body>
+</html>

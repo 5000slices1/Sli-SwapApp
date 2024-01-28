@@ -104,6 +104,9 @@ module{
 
         //Number of times deposit was done
         depositCount:Nat;
+
+        //The userId
+        userId:Blob;
     };
 
     public type UsersSwapInfo = {
@@ -116,7 +119,9 @@ module{
         gldsDepositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
     };
 
-    //public type StableTrieMap_SwapInfo = StableTrieMap.StableTrieMap<Principal, SwapInfo>;
-    //public type StableTrieMap_SwapInfoGlds = StableTrieMap.StableTrieMap<Principal, SwapInfo>;
+     public type ConvertState = {
+        sliConvertInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
+        gldsConvertInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
+    };
 
 };

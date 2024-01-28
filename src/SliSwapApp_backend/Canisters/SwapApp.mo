@@ -14,6 +14,8 @@ import { setTimer; recurringTimer; cancelTimer } = "mo:base/Timer";
 import Nat "mo:base/Nat";
 import Option "mo:base/Option";
 import Time "mo:base/Time";
+import Blob "mo:base/Blob";
+import Iter "mo:base/Iter";
 import WalletsLib "../Modules/WalletsLib";
 import TokensInfoLib "../Modules/TokensInfoLib";
 import InitLib "../Modules/InitLib";
@@ -45,6 +47,11 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       gldsDepositInProgress:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
   };
 
+  stable let convertState:T.ConvertState = {
+      sliConvertInProgress:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+      gldsConvertInProgress:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+  };
+ 
   stable let swapInfosSli:T.UsersSwapInfo = { 
     userSwapInfoItems = StableTrieMap.new(); 
     principalMappings = StableTrieMap.new()
@@ -55,9 +62,38 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     principalMappings = StableTrieMap.new()
   };
 
-
+ 
   //-------------------------------------------------------------------------------
   //Swap related methods
+
+   
+  public shared query ({ caller }) func GetUserIdForSli(): async  Result.Result<Blob, Text>{
+    return SwapLib.GetUserId(caller,swapInfosSli );
+  };
+
+  public shared query ({ caller }) func GetUserIdForGlds(): async  Result.Result<Blob, Text>{
+    return SwapLib.GetUserId(caller,swapInfosGlds );
+  };
+
+ 
+  public shared func ConvertOldSliDip20Tokens(userId:Blob): async  Result.Result<Text, Text>{
+    
+    let appPrincpal:Principal = Principal.fromActor(this);
+    return await SwapLib.ConvertOldDip20Tokens(userId,swapInfosSli,depositState,
+      tokensInfo.Dip20_Sli.canisterId, tokensInfo.Dip20_Sli.fee, tokensInfo.Icrc1_Sli.canisterId,
+      appPrincpal, #Dip20Sli, sliApprovedWallets);
+     
+  };
+
+    public shared func ConvertOldGldsDip20Tokens(userId:Blob): async  Result.Result<Text, Text>{
+    
+    let appPrincpal:Principal = Principal.fromActor(this);
+    return await SwapLib.ConvertOldDip20Tokens(userId,swapInfosGlds,depositState,
+      tokensInfo.Dip20_Glds.canisterId, tokensInfo.Dip20_Glds.fee, tokensInfo.Icrc1_Glds.canisterId,
+      appPrincpal, #Dip20Glds, gldsApprovedWallets);
+     
+  };
+    
   public shared query func GetSliSwapWalletForPrincipal(userPrincipal:Principal): async T.ResponseGetUsersSwapWallet{
     return SwapLib.getSwapWallet(userPrincipal, swapInfosSli);
   };
@@ -80,18 +116,17 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return await SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText,swapInfosGlds, dip20Fee);
   };
 
+
   public shared query func CanUserDepositSliDip20(principal:Principal): async Bool {
 
-    return SwapLib.CanUserDepositSliDip20(principal, depositState);
+    return SwapLib.CanUserDepositSliDip20(principal, depositState, swapInfosSli,sliApprovedWallets );
   };
 
   public shared query func CanUserDepositGldsDip20(principal:Principal): async Bool {
 
-    return SwapLib.CanUserDepositGldsDip20(principal, depositState);
+    return SwapLib.CanUserDepositGldsDip20(principal, depositState,swapInfosGlds,gldsApprovedWallets);
   };
   
-
-
   public shared ({ caller }) func DepositSliDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
 
     let swapAppPrincipal:Principal = Principal.fromActor(this);
@@ -117,37 +152,8 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return result;
   };
 
-  // public shared ({ caller }) func DepositGldsDip20Tokens(amount:Nat): async Result.Result<Text, Text>{
 
-  //   let swapAppPrincipal:Principal = Principal.fromActor(this);
-  //   let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
-  //   let dip20Fee = tokensInfo.Dip20_Glds.fee;
-  //   return await SwapLib.DepositDip20Tokens(
-  //     caller,dip20CanisterIdText,swapAppPrincipal,
-  //     swapInfosGlds, gldsApprovedWallets, depositState, amount, dip20Fee, #Dip20Glds
-  //   );
-  // };
-
-
-  
-/*
-  public func DepositDip20Tokens(usersPrincipal:Principal, dip20CanisterId:Text, swapAppPrincipal:Principal, 
-    usersSwapInfo:T.UsersSwapInfo, approvedWallets:T.ApprovedWallets ,
-    depositState:T.DepositState , amount:Nat, fee:Nat, tokenType:T.SpecificTokenType):async Result.Result<Text,Text>
-
-
-
-  */
   //-------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
 
 
 
@@ -162,7 +168,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return Principal.toText(principal);
   };
 
-
   // Only owner or admin are allowed to execute this method
   // This methods add's a new temporary swap-wallet principal 
   public shared ({ caller }) func AddNewApprovedSliWallet(principal:Principal): async Result.Result<Text, Text>{
@@ -174,7 +179,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return WalletsLib.GetNumberOfApprovedWallets(sliApprovedWallets);
   };
 
-  
     // Only owner or admin are allowed to execute this method
   // This methods add's a new temporary swap-wallet principal 
   public shared ({ caller }) func AddNewApprovedGldsWallet(principal:Principal): async Result.Result<Text, Text>{
@@ -219,15 +223,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     var result = await* TokensInfoLib.SliIcrc1_SetCanisterId(caller, appSettings, tokensInfo, principalText);
     return result;
   };
-
-
-  //  public shared ( callerMessage ) func Test(): async Result.Result<Text,Text>{
-
-  //   let actorDip20 : Interfaces.InterfaceDip20 = actor ("zzriv-cqaaa-aaaao-a2gjq-cai");
-  //   let val = await actorDip20.getAllowanceSize();
-  //   //let pr = Principal.toText(callerMessage.caller);
-  //   return #ok(Nat.toText(val));
-  // };
 
   //------------------------------------------------------------------------------
 

@@ -17,6 +17,10 @@ import Dip20Types "../Types/TypesDip20";
 import CommonLib "CommonLib";
 import StableTrieMap "mo:StableTrieMap";
 import TypesDip20 "../Types/TypesDip20";
+import Nat64 "mo:base/Nat64";
+import Int "mo:base/Nat64";
+import Nat "mo:base/Nat";
+
 
 module{
 
@@ -113,45 +117,73 @@ module{
     };
 
 
-    public func CanUserDepositSliDip20(principal:Principal, depositState:T.DepositState): Bool{
+    public func CanUserDepositSliDip20(principal:Principal, depositState:T.DepositState, 
+    usersSwapInfo:T.UsersSwapInfo,approvedWallets:T.ApprovedWallets): Bool{
         let principalBlob = Principal.toBlob(principal);
         let depositStateTime = StableTrieMap.get(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
+
 
         switch(depositStateTime){
             case (?lastDepositTime){                      
                 if (lastDepositTime + expirationDuration > Time.now()){     
                     return false;                         
-                }
-                else{
-                    return true;
                 };
             };
             case (_) {
+                // do nothing
+            };
+        };
+        let userInfo = getSwapWalletFromUserPrincipal(principal,usersSwapInfo );
+        switch(userInfo){
+            case (#NotExist){
+                if (List.size(approvedWallets.approvedWalletsFree) <=0){
+                    return false;
+                };
                 return true;
+            };
+            case (#Ok(principalValue)){
+                return true;
+            };
+            case (#Err(text)){
+                return false;
             };
         };
     };
 
-    public func CanUserDepositGldsDip20(principal:Principal, depositState:T.DepositState): Bool{
+    public func CanUserDepositGldsDip20(principal:Principal, depositState:T.DepositState, 
+    usersSwapInfo:T.UsersSwapInfo,approvedWallets:T.ApprovedWallets): Bool{
         let principalBlob = Principal.toBlob(principal);
         let depositStateTime = StableTrieMap.get(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, principalBlob);
 
+
         switch(depositStateTime){
-            case (?lastDepositTime){
-                let duration:Int = 900000000000; // 15 minutes                        
-                if (lastDepositTime + duration > Time.now()){     
+            case (?lastDepositTime){                      
+                if (lastDepositTime + expirationDuration > Time.now()){     
                     return false;                         
-                }
-                else{
-                    return true;
                 };
             };
             case (_) {
+                // do nothing
+            };
+        };
+        let userInfo = getSwapWalletFromUserPrincipal(principal,usersSwapInfo );
+        switch(userInfo){
+            case (#NotExist){
+                if (List.size(approvedWallets.approvedWalletsFree) <=0){
+                    return false;
+                };
                 return true;
+            };
+            case (#Ok(principalValue)){
+                return true;
+            };
+            case (#Err(text)){
+                return false;
             };
         };
     };
 
+ 
     public func GetDip20DepositedAmount(usersPrincipal:Principal, 
     dip20CanisterId:Text,usersSwapInfo:T.UsersSwapInfo, transferFee:Nat) : async Result.Result<Nat, Text>{
 
@@ -173,7 +205,7 @@ module{
                 depositCount:=userSwapInfoItem.depositCount;
             };
         };
-       
+        
         let actorDip20 : Interfaces.InterfaceDip20 = actor (dip20CanisterId);
         var depositedAmount = await actorDip20.balanceOf(swapWalletPrincipal);
         depositedAmount:= depositedAmount + ( depositCount * (transferFee * 2));
@@ -245,6 +277,19 @@ module{
                 swapWalletPrincipal :=swapWallet;
             };
             case (#Err(text)){
+
+                //Remove the depositing state
+                switch(tokenType){
+                    case (#Dip20Sli){
+                        StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
+                    };
+                    case (#Dip20Glds){
+                        StableTrieMap.delete(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
+                    };
+                    case (_)  { 
+                        return #err("Only DIP20 tokens are supported for deposit.")
+                    };
+                };                             
                 return #err(text);
             };
             case (#NotExist){
@@ -255,8 +300,7 @@ module{
                 //Now we need to get the swap-wallet:
                 let popResult = List.pop(approvedWallets.approvedWalletsFree);
                 approvedWallets.approvedWalletsFree:=popResult.1;
-                var swapWalletPrincipal:Principal = Principal.fromText("aaaaa-aa"); // Default principal
-
+              
                 switch(popResult.0){
                     case (?swapWalletPrincipalResult)
                     {
@@ -267,6 +311,8 @@ module{
                     };
                 };
 
+                approvedWallets.approvedWalletsInUse:= List.push(swapWalletPrincipal,approvedWallets.approvedWalletsInUse);                
+
                 //Create new user id
                 let newUserId:Blob = await Random.blob();
 
@@ -274,14 +320,14 @@ module{
                 let newEntry:T.UserSwapInfoItem = {
                     swapWallet = swapWalletPrincipal;
                     depositCount = 0;
+                    userId = newUserId;
                 };
                 StableTrieMap.put(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
                 StableTrieMap.put(usersSwapInfo.principalMappings, Blob.equal, Blob.hash, newUserId, usersPrincipal);
             };
         };
 
-        //Now do the transfer:
-        //let transferResult = await actorDip20.transfer(swapWalletPrincipal, amount);
+        //Now do the transfer:    
         var transferResult:TypesDip20.TxReceipt = #Ok(0);
 
         try{
@@ -293,8 +339,19 @@ module{
             
         };
        
-        //Remove the depositing state
-        StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
+        //Remove the depositing state        
+        switch(tokenType){
+            case (#Dip20Sli){
+                StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
+            };
+            case (#Dip20Glds){
+                StableTrieMap.delete(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
+            };
+            case (_)  { 
+                return #err("Only DIP20 tokens are supported for deposit.")
+            };
+        };                             
+
 
         switch (transferResult) {
             case (#Err (e)) {               
@@ -309,7 +366,8 @@ module{
                         let currentDepositCount = userSwapInfo.depositCount;
                         let newEntry:T.UserSwapInfoItem = {
                             swapWallet = swapWalletPrincipal;
-                            depositCount = currentDepositCount +1;                       
+                            depositCount = currentDepositCount +1;  
+                            userId = userSwapInfo.userId;                     
                         };
                         ignore StableTrieMap.replace(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
                     };
@@ -322,4 +380,212 @@ module{
         };
 
     };
+
+ 
+    public func ConvertOldDip20Tokens(userId:Blob, usersSwapInfo:T.UsersSwapInfo, 
+    depositState:T.DepositState, dip20CanisterId:Text, dip20TransferFee:Nat, icrcCanisterId:Text,
+    appPrincipal:Principal, tokenType:T.SpecificTokenType, approvedWallets:T.ApprovedWallets
+     )
+    : async  Result.Result<Text, Text>{
+        
+        //get principal from blob
+        let getPrincipalResponse = GetPrincipalFromBlob(userId, usersSwapInfo);
+        var usersPrincipal:Principal = Principal.fromText("aaaaa-aa");
+        
+        switch(getPrincipalResponse){
+            case (#ok(principalFound)){
+                usersPrincipal:=principalFound;
+            };
+            case (_){
+                return #err("Error. Probably the deposit amount is empty.");
+            };
+        };
+
+        //Check if deposit action is still taking place:
+        switch(tokenType){
+            case (#Dip20Sli){
+
+                if (CanUserDepositSliDip20(usersPrincipal,depositState, usersSwapInfo,approvedWallets) == false){
+                    return #err("Conversion of Sli is currently not possible.");
+                };
+            };
+            case (#Dip20Glds){
+
+                if (CanUserDepositGldsDip20(usersPrincipal,depositState, usersSwapInfo,approvedWallets) == false){
+                    return #err("Conversion of Glds is currently not possible.");
+                };
+            };
+            case (_){
+                return #err("Conversion only from Dip20 token allowed.");
+            };
+        };
+       
+        
+        //Get the deposit-count
+        let userInfo = getUserSwapInfoItem(usersPrincipal,usersSwapInfo );
+        var depositCount = 0;
+        var swapWallet:Principal =  Principal.fromText("aaaaa-aa");
+        switch(userInfo){
+            case (#ok(foundUserInfo)){
+                depositCount:=foundUserInfo.depositCount;
+                swapWallet:=foundUserInfo.swapWallet;
+            };
+            case (_){
+                return #err("No deposit information found");
+            };
+        };
+
+        let depositedAmountResponse = await GetDip20DepositedAmount(usersPrincipal, dip20CanisterId,
+        usersSwapInfo, dip20TransferFee);
+        var depositedAmount:Nat = 0;
+
+        switch(depositedAmountResponse){
+            case (#ok(amount)){
+                depositedAmount :=amount;
+            };
+            case (_){
+                return #err("No deposit information found");
+            };
+        };
+
+
+        let icrc1Actor:Interfaces.InterfaceICRC1 = actor(icrcCanisterId);
+        let dip20Actor:Interfaces.InterfaceDip20 = actor(dip20CanisterId);
+
+        //Get real depositedAmount
+        let realDepositedAmount:Nat =  await dip20Actor.balanceOf(swapWallet);
+
+        //Get the ICRC1 fee
+        let icrc1Fee:Nat = await icrc1Actor.icrc1_fee();
+
+
+ 
+        //transfer the tokens now
+        let transferArgs:TypesIcrc.TransferArgs = {
+
+            from_subaccount : ?TypesIcrc.Subaccount = null;
+            to : TypesIcrc.Account = {
+                owner : Principal = usersPrincipal;
+                subaccount : ?TypesIcrc.Subaccount = null;
+            };
+            amount : TypesIcrc.Balance = depositedAmount;
+            fee : ?TypesIcrc.Balance = null;
+            memo : ?Blob = null;
+
+            /// The time at which the transaction was created.
+            /// If this is set, the canister will check for duplicate transactions and reject them.
+            created_at_time : ?Nat64 = Option.make(Nat64.fromIntWrap(Time.now()));
+        };
+
+     
+        let transferResult = await icrc1Actor.icrc1_transfer(transferArgs);
+        var blockIndex:Nat = 0;
+        switch(transferResult){
+            case (#Ok(txIndex)){              
+              blockIndex:=txIndex;
+            };
+            case (#Err(transferError)){
+                return #err(debug_show(transferError));
+            };
+        };
+
+
+        //Set deposit-count now to 0
+        let principalBlob:Blob = Principal.toBlob(usersPrincipal);
+        let item = StableTrieMap.get(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob);
+        switch(item) {
+            case(?userSwapInfoItem) { 
+                    let newEntry:T.UserSwapInfoItem = {                        
+                        swapWallet:Principal = userSwapInfoItem.swapWallet;                        
+                        depositCount:Nat = 0;                        
+                        userId:Blob = userSwapInfoItem.userId;
+                    };
+                    ignore StableTrieMap.replace(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob, newEntry);                    
+                };
+            case(_) { //do nothing
+             };
+        };   
+
+
+                
+        //Transfer the old dip20 token to main app wallet
+        
+        //Get allowance value
+        //let allowanceResponse = await dip20Actor.allowance(swapWallet,appPrincipal);
+        
+        // amount-fee
+        
+       
+        if ( realDepositedAmount < dip20TransferFee)
+        {
+            return #ok("Conversion was succesfull");
+        }
+        else
+        {
+
+            let secondTransferAmount:Nat = realDepositedAmount - dip20TransferFee;
+            
+
+            let secondTransferResponse = await dip20Actor.transferFrom(swapWallet,appPrincipal,
+            secondTransferAmount );
+            switch(secondTransferResponse){
+                    case (#Ok(index)){
+                        //do nothing
+                    };
+                    case (#Err(errorDescription)){
+                        //TODO: we should mark this, so that re-convert is not possible.
+                        return #err(debug_show(errorDescription));
+                    };
+            };
+
+
+            //Now burn the old Dip20 tokens
+
+            //First get the current amount of Dip20
+            let dip20AmountInSwapApp = await dip20Actor.balanceOf(appPrincipal);
+
+            //Now burn:
+            let burnResponse = await dip20Actor.burn(dip20AmountInSwapApp);
+            switch(burnResponse){
+                case (#Ok(index)){
+                    return #ok("Conversion was succesfull");
+                };
+                case (#Err(errorDescription)){ 
+                    return #err("Burning was not sucessful");
+                }
+            }
+        };
+    };
+
+    private func GetPrincipalFromBlob(userId:Blob, 
+    usersSwapInfo:T.UsersSwapInfo): Result.Result<Principal, Text>{
+
+        let item = StableTrieMap.get(usersSwapInfo.principalMappings, Blob.equal, Blob.hash, userId);
+        switch(item){
+            case (?principalFound){
+                return #ok(principalFound);
+            };
+            case (_){
+                return #err("not found");
+            }
+        };
+    };
+
+    public func GetUserId(principal: Principal,
+    usersSwapInfo:T.UsersSwapInfo ):  Result.Result<Blob, Text>{
+
+
+        let userInfo = getUserSwapInfoItem(principal, usersSwapInfo);
+        switch(userInfo){
+            case (#ok(userInfoData)){
+                let userId = userInfoData.userId;
+                return #ok(userId);
+            };
+            case (_){
+                return #err("not found");
+            };
+
+        };
+    };
+ 
 };

@@ -82,12 +82,7 @@ export class Dip20TokenActorFetcher {
         }
     
         try
-        {         
-            console.log("Try to approve:")
-            console.log("Tragetprincipal:");
-            console.log(targetPrincipal.toText());
-            console.log("amount:");
-            console.log(amount);
+        {                         
               let resultResponse = await this.#internalActor.approve(targetPrincipal, amount);
               let returnResult = GetResultFromVariant(resultResponse);
               return returnResult;          

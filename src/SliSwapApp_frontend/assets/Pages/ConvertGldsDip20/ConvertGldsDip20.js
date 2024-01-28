@@ -1,50 +1,266 @@
-import { CommonIdentityProvider} from "../../modules/Types/CommonTypes";
-import { WalletsProvider } from "../../modules/SubModules/Wallets/WalletsProvider";
+import { CommonIdentityProvider, SpecifiedTokenInterfaceType, SwapAppActorProvider} from "../../modules/Types/CommonTypes";
 import { PubSub } from "../../modules/Utils/PubSub";
+import { SliSwapApp_backend} from "../../../../declarations/SliSwapApp_backend";
+import { GetResultFromVariant, GetCustomResultFromVariant } from "../../modules/Utils/CommonUtils";
+import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
+import { Principal } from "@dfinity/principal";
+import { ResultTypes } from "../../modules/Types/CommonTypes";
 
 function RelatedHtmlPageExist(){
-  return document.getElementById('walletAmountOldGldsDip20') != null;
-};
+    return document.getElementById('ConvertGlds_HtmlPage') != null;
+  }
 
-//TODO: make this work
-async function deposit_oldGldsTokens(){
-        
-    return;
-    var availableAmount = document.getElementById('walletAmountOldGldsDip20').valueAsNumber;  
-    var availableAmount1 = CommonIdentityProvider.WalletsProvider.DisplayBalance_SliDip20;
-    var amountToDeposit = document.getElementById('depositAmountOldGldsDip20').valueAsNumber;     
-    alert(availableAmount.toString() + " - " + availableAmount1.toString() + " - " + amountToDeposit.toString());
+
+function userIsLoggedIn(){
+    let usersIdentity = CommonIdentityProvider?.WalletsProvider?.UsersIdentity;    
+  
+    if (usersIdentity ==null || usersIdentity == undefined ){
+        return false;           
+    }
+
+    if (usersIdentity.IsConnected == true){
+        return true;           
+    }
+    return false;
 }
 
-async function IdentityChanged(args){
-         
+async function convert_deposited_oldGldsTokens(){
+    
+    try
+    {
+        if (RelatedHtmlPageExist() == false){
+            return;
+        }
+    
+        if (userIsLoggedIn() == false){
+            return;
+        }
+
+        document.getElementById('buttonDepositNowOldGldsDip20').disabled = true;
+        document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = true;
+
+        let resultUserId = await SwapAppActorProvider.GetUserIdForGlds();
+        if (resultUserId.Result != ResultTypes.ok){
+            alert(resultUserId.ResultValue);
+        }
+        
+        let userIdBlob = resultUserId.ResultValue;
+        let convertResponse = await SliSwapApp_backend.ConvertOldGldsDip20Tokens(userIdBlob);
+        let result = GetResultFromVariant(convertResponse);
+        if (result.Result != ResultTypes.ok){
+            alert(result.ResultValue);
+        }
+        await UpdateBalances();      
+    }
+    catch(error){
+        alert(error);
+    }
+    finally{
+        document.getElementById('buttonDepositNowOldGldsDip20').disabled = false;
+        document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = false;        
+    }
+}
+
+
+
+async function deposit_oldGldsTokens(){
+            
     if (RelatedHtmlPageExist() == false){
         return;
     }
 
-    let walletInfo = CommonIdentityProvider.WalletsProvider;    
-    if (walletInfo.Wallet_IsConnected == false){
-        document.getElementById('walletAmountOldGldsDip20').value = 0;           
+    if (userIsLoggedIn() == false){
+        return;
     }
-    else{
-        var depositable_amount = walletInfo.GldsDip20_Balance - walletInfo.GldsDip20_Fee;
-        depositable_amount = Math.max(depositable_amount, 0);
-        //GldsDip20_Balance
-        document.getElementById('walletAmountOldGldsDip20').value = depositable_amount
-    }    
-             
- };
+
+    try{
+
+        document.getElementById('buttonDepositNowOldGldsDip20').disabled = true;
+        document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = true;
+      
+        let userPrincipal = CommonIdentityProvider.WalletsProvider.UsersIdentity.AccountPrincipal;
+        let swapAppPrincipal = Principal.fromText(CommonIdentityProvider.SwapAppPrincipalText);
+          
+        let tokenInfo = await getTokenInfo();
+        var transferFee = tokenInfo.TransferFee.GetValue();
+
+        var balance = (await tokenInfo.GetBalanceFromUsersWallet()).GetValue();
+        balance = Math.max(balance, 0.0);
+
+        var amountToDeposit = Number(document.getElementById('depositAmountOldGldsDip20').value);
+        amountToDeposit = Math.max(amountToDeposit, 0.0);
+
+        
+
+        if (amountToDeposit < (transferFee * 3.0)){
+            alert('The deposit amount is too small. At least 0.003 is required. (Because of approval fee + transfer fee)');
+            return;
+        }
+
+        if ( balance < amountToDeposit)
+        {
+
+            alert('The deposit amount is more than you have in your wallet.' + '(Fee is:' + transferFee + "' )" + "balance: " +balance+ " amountToDeposit: " + amountToDeposit);
+            return;
+        }
+
+        let depositablePossible = await SliSwapApp_backend.CanUserDepositGldsDip20(userPrincipal);
+        if (depositablePossible == false){
+
+            alert('Deposit is currently not possible.');
+            return;
+        }
+
+        //We need to do this to ensure real 1:1 conversion will be taken place later. 
+        let realAmountToDeposit = Number(amountToDeposit - (transferFee * 2.0));
+        if (realAmountToDeposit < 0){
+            alert('The deposit amount is too small. At least 0.002 is required. (Because of approval fee + transfer fee)');
+            return;
+        }
+
+        var amountToDepositBigInt = BigInt(TokenBalance.FromNumber(realAmountToDeposit,tokenInfo.Decimals).GetRawValue());
+        let approvalAmountBigInt = BigInt(TokenBalance.FromNumber(amountToDeposit, tokenInfo.Decimals).GetRawValue());
+                 
+        let approveResult = await tokenInfo.approve(swapAppPrincipal, approvalAmountBigInt );
+
+        if (approveResult.Result != ResultTypes.ok){
+            alert('Approval was not successful.');
+            return;
+        }
+
+        //check allowance
+        //let allowanceResult = await tokenInfo.allowance(userPrincipal, swapAppPrincipal );
+                 
+        let depositResult = await SliSwapApp_backend.DepositGldsDip20Tokens(userPrincipal, amountToDepositBigInt);
+        let parsedResult = GetResultFromVariant(depositResult);
+
+        await UpdateBalances();
+
+        if (parsedResult.Result != ResultTypes.ok){
+            alert(parsedResult.ResultValue);
+        }
+    }
+    catch(error){
+        alert(error);
+    }
+    finally{
+        document.getElementById('buttonDepositNowOldGldsDip20').disabled = false;
+        document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = false;
+    }
+}
+
+async function ResetAllValues(){
+
+    if (RelatedHtmlPageExist() == false){
+        return;
+    }
+
+    document.getElementById('walletAmountOldGldsDip20').value = 0.0
+    document.getElementById('depositAmountOldGldsDip20').value = 0.0
+    document.getElementById('DepositedAmountOldGldsDip20').value = 0.0
+    document.getElementById('number_of_ICRC1_tokens_for_depositAmountOldGldsDip20').value = 0.0
+
+}
+
+async function getTokenInfo(){
+
+    if (userIsLoggedIn() == false){
+        return null;           
+    }
+    let walletInfo = CommonIdentityProvider.WalletsProvider; 
+    let tokenInfo = await walletInfo.GetToken(SpecifiedTokenInterfaceType.Dip20Glds);
+    return tokenInfo;
+}
+
+async function getIcrc1TokenInfo(){
+
+    if (userIsLoggedIn() == false){
+        return null;           
+    }
+    let walletInfo = CommonIdentityProvider.WalletsProvider; 
+    let tokenInfo = await walletInfo.GetToken(SpecifiedTokenInterfaceType.Icrc1Glds);
+    return tokenInfo;
+}
+
+
+
+async function UpdateBalances(){
+
+    if (RelatedHtmlPageExist() == false){
+        return;
+    }
+          
+    if (userIsLoggedIn() == false){
+        await ResetAllValues();
+        return;           
+    }
+
+    // let walletInfo = CommonIdentityProvider.WalletsProvider; 
+    // let tokenInfo = await walletInfo.GetToken(SpecifiedTokenInterfaceType.Dip20Glds);
+    let tokenInfo = await getTokenInfo();
+    var feeNeeded = tokenInfo.TransferFee.GetValue();
+
+    //One fee for approval and one for transfer. Therefore the fee = 3 * transferFee, because at least 0.001 must be transfered
+    feeNeeded = feeNeeded + feeNeeded + feeNeeded;
+
+    let gldsDip20TokensBalanceInUserWallet = (await tokenInfo.GetBalanceFromUsersWallet()).GetValue();
+    console.log("glds in wallet");
+    console.log(gldsDip20TokensBalanceInUserWallet);
+
+    let response = await SwapAppActorProvider.GetDepositedGldsAmount();
+    if (response.Result == ResultTypes.ok){
+        let depositedAmount =  new TokenBalance(BigInt(response.ResultValue), tokenInfo.Decimals);
+        document.getElementById('DepositedAmountOldGldsDip20').value = Number(depositedAmount.GetValue()); 
+        document.getElementById('number_of_ICRC1_tokens_for_depositAmountOldGldsDip20').value = Number(depositedAmount.GetValue()); 
+        
+    }else{
+        document.getElementById('DepositedAmountOldGldsDip20').value = 0.0;
+        document.getElementById('number_of_ICRC1_tokens_for_depositAmountOldGldsDip20').value = 0.0;
+    }
+    
+    var maxDepositableAmount = gldsDip20TokensBalanceInUserWallet;
+    if (maxDepositableAmount < feeNeeded){
+        maxDepositableAmount = 0.000;
+    }
+     
+    document.getElementById('walletAmountOldGldsDip20').value = maxDepositableAmount;
+   
+    //Set the default 'amount to deposit' value to the current maximum possible value
+    var depositableAmount = maxDepositableAmount; 
+    depositableAmount = Math.max(depositableAmount, 0);
+  
+    document.getElementById('depositAmountOldGldsDip20').value = depositableAmount;
+    document.getElementById('depositAmountOldGldsDip20').max =  depositableAmount;
+
+
+    let icrc1TokenInfo = await getIcrc1TokenInfo();
+    let gldsIcrc1TokensBalanceInUserWallet = (await icrc1TokenInfo.GetBalanceFromUsersWallet()).GetValue();
+
+    document.getElementById('glds-icrc1-tokens-in-wallet').value =  gldsIcrc1TokensBalanceInUserWallet;      
+}
+
+ 
 
 export const convertGldsDip20_init =  async function initConvertGldsDip20(){
-             
-    PubSub.unsubscribe('ConvertGldsDip20_js_UserIdentityChanged','UserIdentityChanged', IdentityChanged);
-    PubSub.subscribe('ConvertGldsDip20_js_UserIdentityChanged','UserIdentityChanged', IdentityChanged);
+            
+    PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged');
+    PubSub.subscribe('ConvertDip20_js_UserIdentityChanged','UserIdentityChanged', UpdateBalances);
 
-    let element = document.getElementById('buttonDepositNowOldGldsDip20');        
-    if (element != null){
-        element.removeEventListener('click', async ()=> {await deposit_oldGldsTokens();}, true);        
-        element.addEventListener('click', async ()=> {await deposit_oldGldsTokens();}, true);
-    }   
-    IdentityChanged("");
-  };
+    let elementDeposit = document.getElementById('buttonDepositNowOldGldsDip20');        
+    if (elementDeposit != null){
+        elementDeposit.removeEventListener('click', async ()=> {await deposit_oldGldsTokens();});        
+        elementDeposit.addEventListener('click', async ()=> {await deposit_oldGldsTokens();});
+    }
+
+
+    let elementConvert = document.getElementById('convertNowOldGldsDip20ToICRC1');        
+    if (elementConvert != null){
+        elementConvert.removeEventListener('click', async ()=> {await convert_deposited_oldGldsTokens();});        
+        elementConvert.addEventListener('click', async ()=> {await convert_deposited_oldGldsTokens();});
+    }
+   
+
+
+    await UpdateBalances();
+};
 

@@ -37,17 +37,8 @@ export class SwapAppActorFetcher{
         }
         
         try{
-            console.log("inside Swapappfetcher getuserrole");
-            console.log("SwapAppActor");
-            console.log(this.#swapAppActor);
-
-
-            let dAppPrincipalText =  CommonIdentityProvider.SwapAppPrincipalText;
-            console.log(dAppPrincipalText);
-
-            let userRole = await this.#swapAppActor.GetUserRole() ;     
-            console.log("Swapappfetcher getuserrole:");
-            console.log(userRole);     
+                               
+            let userRole = await this.#swapAppActor.GetUserRole() ;                
             return userRole;      
         }
         catch(error){
@@ -116,10 +107,7 @@ export class SwapAppActorFetcher{
           }
  
         try
-        {
-            console.log("Try to deposit now amount:");
-            console.log(amount);
-
+        {           
             let result = await this.#swapAppActor.DepositSliDip20Tokens(amount);
             return GetResultFromVariant(result);
         }
@@ -156,6 +144,60 @@ export class SwapAppActorFetcher{
         try
         {
             let result = await this.#swapAppActor.GetSliDip20DepositedAmount();
+            let parsedResult = GetResultFromVariant(result);
+             return parsedResult;
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    }
+
+    async GetDepositedGldsAmount(){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.GetGldsDip20DepositedAmount();
+            let parsedResult = GetResultFromVariant(result);
+             return parsedResult;
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    }
+
+    async GetUserIdForSli(){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.GetUserIdForSli();
+            let parsedResult = GetResultFromVariant(result);
+             return parsedResult;
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    }
+
+    async GetUserIdForGlds(){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.GetUserIdForGlds();
             let parsedResult = GetResultFromVariant(result);
              return parsedResult;
         }
