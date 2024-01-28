@@ -21,6 +21,8 @@
     align-items: center;
     margin: 0 auto;
     max-width: 100%;
+    -webkit-animation: fadeEffect 0.5s;
+    animation: fadeEffect 0.5s;
   } 
   
   nav {
@@ -128,8 +130,16 @@ tr.spaceUnder>td {
 }
 
 .button-49:active {
-  transform: scale(.95);
+  transform: scale(.8);
 }
+
+.button-49:disabled {
+  box-shadow:#fff;
+  background-image: rgba(255, 255, 255, 0.36);
+  filter: brightness(0.5);
+}
+
+
 
 
 .dropbtn {

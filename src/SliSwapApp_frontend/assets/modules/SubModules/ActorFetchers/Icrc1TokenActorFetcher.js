@@ -29,7 +29,7 @@ export class Icrc1TokenActorFetcher {
 
     async GetBalanceForPrincipal(principal, decimal){
         if (this.#internalActor == null) {
-            return new TokenBalance(0, decimal);
+            return new TokenBalance(BigInt(0), decimal);
         }
       
         let balance = await this.#internalActor.icrc1_balance_of({
@@ -46,7 +46,7 @@ export class Icrc1TokenActorFetcher {
     async GetTotalSupply(decimals){
 
         if (this.#internalActor == null) {
-            return new TokenBalance(0,decimals);
+            return new TokenBalance(BigInt(0),decimals);
         }
                     
         let totalSupply = await this.#internalActor.icrc1_total_supply();        

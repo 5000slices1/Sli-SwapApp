@@ -129,7 +129,7 @@ export const Icrc1Interface = ({ IDL }) => {
 
 export const SwapAppActorInterface = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const Result_2 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
+  const Result_3 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const ResponseGetUsersSwapWallet = IDL.Variant({
     'Ok' : IDL.Principal,
     'Err' : IDL.Text,
@@ -151,6 +151,7 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'Dip20_Glds' : Metadata,
     'Icrc1_Sli' : Metadata,
   });
+  const Result_2 = IDL.Variant({ 'ok' : IDL.Vec(IDL.Nat8), 'err' : IDL.Text });
   const UserRole = IDL.Variant({
     'Anonymous' : IDL.Null,
     'NormalUser' : IDL.Null,
@@ -166,9 +167,15 @@ export const SwapAppActorInterface = ({ IDL }) => {
         [IDL.Bool],
         ['query'],
       ),
+    'CanUserDepositGldsDip20' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Bool],
+        ['query'],
+      ),
+    'CanUserDepositSliDip20' : IDL.Func([IDL.Principal], [IDL.Bool], ['query']),
     'DepositGldsDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
     'DepositSliDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
-    'GetGldsDip20DepositedAmount' : IDL.Func([], [Result_2], []),
+    'GetGldsDip20DepositedAmount' : IDL.Func([], [Result_3], []),
     'GetGldsSwapWalletForPrincipal' : IDL.Func(
         [IDL.Principal],
         [ResponseGetUsersSwapWallet],
@@ -186,7 +193,7 @@ export const SwapAppActorInterface = ({ IDL }) => {
         [IDL.Nat, IDL.Nat],
         ['query'],
       ),
-    'GetSliDip20DepositedAmount' : IDL.Func([], [Result_2], []),
+    'GetSliDip20DepositedAmount' : IDL.Func([], [Result_3], []),    
     'GetSliSwapWalletForPrincipal' : IDL.Func(
         [IDL.Principal],
         [ResponseGetUsersSwapWallet],
@@ -194,6 +201,8 @@ export const SwapAppActorInterface = ({ IDL }) => {
       ),
     'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
     'GetTokensInfos' : IDL.Func([], [TokensInfoAsResponse], ['query']),
+    'GetUserIdForGlds' : IDL.Func([], [Result_2], ['query']),
+    'GetUserIdForSli' : IDL.Func([], [Result_2], ['query']),
     'GetUserRole' : IDL.Func([], [UserRole], ['query']),
     'GldsIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
     'GldsIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),

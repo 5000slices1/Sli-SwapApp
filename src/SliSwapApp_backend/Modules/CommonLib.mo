@@ -14,9 +14,7 @@ import Dip20Types "../Types/TypesDip20";
 module{
 
     public func UserIsOwnerOrAdmin(appSettings : T.AppSettings, principal : Principal) : async* Bool {
-
-        //TODO:undo
-        //return true;
+        
         let userRole = GetUserRole(appSettings, principal);
         if (userRole == #Owner or userRole == #Admin) {
             return true;

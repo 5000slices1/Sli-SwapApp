@@ -32,13 +32,12 @@ async function IdentityChanged(){
     labelInfo.innerHTML = "Status: connected to " + usersIdentity.Name + "</br>" + usersIdentity.AccountPrincipalText;
    }    
  
-   console.log("SwapAppActorProvider:");
-   console.log(SwapAppActorProvider);
+  await DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageStartPage); 
+
   let appSettingsButton = document.getElementById("PageAdminSection");   
   var userRole = await SwapAppActorProvider.GetUserRole();
 
-  console.log("userrole: ");
-  console.log(userRole);
+
   //---------------------
   if ( ContainsRule(userRole, 'Owner', 'Admin')){           
     appSettingsButton.style.display = "block";
@@ -49,7 +48,8 @@ async function IdentityChanged(){
   //---------------------
 
   // Enabled here only for developing/debugging purposes
-  appSettingsButton.style.display = "block";
+  //TODO:Undo
+  //appSettingsButton.style.display = "block";
                       
 }
 

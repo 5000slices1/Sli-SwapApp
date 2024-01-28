@@ -24,7 +24,7 @@ export class ResultInfo {
   Result;
   ResultValue;
 
-  constructor(result = ResultTypes.unknown, resultValue = "") {
+  constructor(result = ResultTypes.unknown, resultValue) {
     this.Result = result;
     this.ResultValue = resultValue;
   }

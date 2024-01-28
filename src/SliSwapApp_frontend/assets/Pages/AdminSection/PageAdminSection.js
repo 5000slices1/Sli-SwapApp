@@ -252,9 +252,9 @@ async function setSliIcrcCanisterId() {
         let result = await SwapAppActorProvider.SliIcrc1_SetCanisterId(canisterIdPrincipal);
 
         if (result.Result == ResultTypes.err) {
-            alert(result.ResultText);
+            alert(result.ResultValue);
             return;
-        }
+        }    
         if (result.Result == ResultTypes.ok) {
 
             await CommonIdentityProvider.WalletsProvider.UpdateTokenInfosFromBackend();
@@ -277,10 +277,13 @@ async function setGldsIcrcCanisterId() {
             alert('This is not a valid canister-id');
             return;
         }
+
+ 
         let result = await SwapAppActorProvider.GldsIcrc1_SetCanisterId(canisterIdPrincipal);
+
        
         if (result.Result == ResultTypes.err) {
-            alert(result.ResultText);
+            alert(result.ResultValue);
             return;
         }
         if (result.Result == ResultTypes.ok) {
@@ -300,8 +303,7 @@ export const admin_section_init = async function initAdminSection() {
     if (typeof admin_section_init.CommonThingsInitialized == 'undefined') {
         admin_section_init.CommonThingsInitialized = false;
     }
-
-    console.log("In admin init");
+  
     admin_section_init.CommonThingsInitialized = false;
     await RemoveButtonClickEvents();
     await AddButtonClickEvents();
@@ -349,7 +351,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
     
     let sliSwapAppPrincipal = Principal.fromText(CommonIdentityProvider.SwapAppPrincipalText);
     var dip20CanisterIdToUse = "";
-    var transferFeeBigInt = 0;
+    var transferFeeBigInt = BigInt(0);
     var dip20Token = null;
     var numberOfWalletsToCreate = 0;
     let bucketSize = 40;
@@ -374,7 +376,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
 
     transferFeeBigInt = dip20Token.TransferFee.GetRawValue();
     dip20CanisterIdToUse = dip20Token.CanisterId;
-    let approveAmount = new TokenBalance(0,dip20Token.Decimals).SetValue(5000).GetRawValue();
+    let approveAmount = TokenBalance.FromNumber(5000, dip20Token.Decimals).GetRawValue();
 
     const indexArray = Get2DimArray(numberOfWalletsToCreate, bucketSize);
     var updateLock = false;
@@ -387,6 +389,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
           
             let approvalWalletIdentity = GetRandomIdentity();
             let approvalWalletPrincipal = approvalWalletIdentity.getPrincipal();
+
             let principalAlreadyOccupied = await SliSwapApp_backend.ApprovedWalletsPrincipalExist(approvalWalletPrincipal);
             if (principalAlreadyOccupied == false){
                 
@@ -414,7 +417,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType){
                         // (3) Check the allowance amount
                         var allowanceNumber = await swappingWalletActor.allowance(approvalWalletPrincipal,  sliSwapAppPrincipal);                     
                         if (allowanceNumber >= approveAmount){
-                          
+                                                   
                             var addApprovalWalletIntoDatabaseResponse;
 
                             //(4) Add the approved wallet-principal into database in the backend
