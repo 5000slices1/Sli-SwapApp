@@ -12,6 +12,8 @@ import Error "mo:base/Error";
 import StableTrieMap "mo:StableTrieMap";
 import { setTimer; recurringTimer; cancelTimer } = "mo:base/Timer";
 import Nat "mo:base/Nat";
+import Option "mo:base/Option";
+import Time "mo:base/Time";
 import WalletsLib "../Modules/WalletsLib";
 import TokensInfoLib "../Modules/TokensInfoLib";
 import InitLib "../Modules/InitLib";
@@ -19,26 +21,39 @@ import CommonLib "../Modules/CommonLib";
 import AdminLib "../Modules/AdminLib";
 import SwapLib "../Modules/SwapLib";
 
+
 shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
   stable var wasInitialized = false;
   stable var initializeTimerId = 0;
 
-  stable var appSettings : T.AppSettings = InitLib.SwapAppInit(creator);
-  stable var tokensInfo : T.TokensInfo = InitLib.TokensInfoInit();
+  stable let appSettings : T.AppSettings = InitLib.SwapAppInit(creator);
+  stable let tokensInfo : T.TokensInfo = InitLib.TokensInfoInit();
 
-  stable var sliApprovedWallets:T.ApprovedWallets = {
-        var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
-        var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
+  stable let sliApprovedWallets:T.ApprovedWallets = {
+      var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
+      var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
   };
 
-    stable var gldsApprovedWallets:T.ApprovedWallets = {
-        var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
-        var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
+  stable let gldsApprovedWallets:T.ApprovedWallets = {
+      var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
+      var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
   };
 
-  stable var swapInfosSli:T.UsersSwapInfo = { items = StableTrieMap.new()};
-  stable var swapInfosGlds:T.UsersSwapInfo = { items = StableTrieMap.new()};
+  stable let depositState:T.DepositState = {
+      sliDepositInProgress:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+      gldsDepositInProgress:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+  };
+
+  stable let swapInfosSli:T.UsersSwapInfo = { 
+    swapWalletPrincipalPerUser = StableTrieMap.new(); 
+    principalMappings = StableTrieMap.new()
+  };
+
+  stable let swapInfosGlds:T.UsersSwapInfo = { 
+    swapWalletPrincipalPerUser = StableTrieMap.new(); 
+    principalMappings = StableTrieMap.new()
+  };
 
 
   //-------------------------------------------------------------------------------
@@ -48,9 +63,43 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   };
 
   public shared query func GetGldsSwapWalletForPrincipal(userPrincipal:Principal): async T.ResponseGetUsersSwapWallet{
-    return SwapLib.getSwapWallet(userPrincipal, swapInfosGlds);
+   return SwapLib.getSwapWallet(userPrincipal, swapInfosGlds);
   };
 
+  public shared ({ caller }) func DepositSliDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
+
+    let swapAppPrincipal:Principal = Principal.fromActor(this);
+    let dip20CanisterIdText = tokensInfo.Dip20_Sli.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Sli.fee;
+    let result = await SwapLib.DepositDip20Tokens(
+      caller, principal,dip20CanisterIdText,swapAppPrincipal,
+      swapInfosSli, sliApprovedWallets, depositState, amount, dip20Fee, #Dip20Sli
+    );
+    return result;
+  
+  };
+
+  // public shared ({ caller }) func DepositGldsDip20Tokens(amount:Nat): async Result.Result<Text, Text>{
+
+  //   let swapAppPrincipal:Principal = Principal.fromActor(this);
+  //   let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
+  //   let dip20Fee = tokensInfo.Dip20_Glds.fee;
+  //   return await SwapLib.DepositDip20Tokens(
+  //     caller,dip20CanisterIdText,swapAppPrincipal,
+  //     swapInfosGlds, gldsApprovedWallets, depositState, amount, dip20Fee, #Dip20Glds
+  //   );
+  // };
+
+
+  
+/*
+  public func DepositDip20Tokens(usersPrincipal:Principal, dip20CanisterId:Text, swapAppPrincipal:Principal, 
+    usersSwapInfo:T.UsersSwapInfo, approvedWallets:T.ApprovedWallets ,
+    depositState:T.DepositState , amount:Nat, fee:Nat, tokenType:T.SpecificTokenType):async Result.Result<Text,Text>
+
+
+
+  */
   //-------------------------------------------------------------------------------
 
 

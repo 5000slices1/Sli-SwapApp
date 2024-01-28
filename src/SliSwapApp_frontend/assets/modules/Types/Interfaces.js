@@ -165,6 +165,8 @@ export const SwapAppActorInterface = ({ IDL }) => {
         [IDL.Bool],
         ['query'],
       ),
+    'DepositGldsDip20Tokens' : IDL.Func([IDL.Nat], [Result], []),
+    'DepositSliDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
     'GetGldsSwapWalletForPrincipal' : IDL.Func(
         [IDL.Principal],
         [ResponseGetUsersSwapWallet],

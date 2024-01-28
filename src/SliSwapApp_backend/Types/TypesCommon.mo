@@ -86,25 +86,31 @@ module{
     };
 
 
-    public type SwapActionStatus ={
+    // public type ActionStatus ={
         
-        #Idle:Time.Time;
-        #Started:Time.Time;
-        #Completed:Time.Time;
-    };
+    //     #Idle:Time.Time;
+    //     #FirstTimeStarted:Time.Time;
+    //     #Started:Time.Time;
+    //     #Completed:Time.Time;
+    // };
 
     public type EncodedPrincipal = Blob;
+    public type EncodedUserId = Blob;
 
-    public type UserSwapInfoItem = {
+    // public type UserSwapInfoItem = {
         
-        //The principal of the used swap-wallet. (== The wallet where the source-tokens should be transfered to)
-        swapWallet:Principal;
-        var depositActionStatus:SwapActionStatus;
-        var conversionActionStatus:SwapActionStatus;
-    };
+    //     //The principal of the used swap-wallet. (== The wallet where the source-tokens should be transfered to)
+    //     swapWallet:Principal;
+    // };
 
     public type UsersSwapInfo = {
-        items:StableTrieMap.StableTrieMap<EncodedPrincipal, UserSwapInfoItem>;     
+        swapWalletPrincipalPerUser:StableTrieMap.StableTrieMap<EncodedPrincipal, Principal>;    
+        principalMappings: StableTrieMap.StableTrieMap<EncodedUserId, Principal>;
+    };
+
+    public type DepositState = {
+        sliDepositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
+        gldsDepositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
     };
 
     //public type StableTrieMap_SwapInfo = StableTrieMap.StableTrieMap<Principal, SwapInfo>;

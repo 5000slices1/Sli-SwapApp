@@ -74,4 +74,46 @@ export class Dip20TokenActorFetcher {
         }
     
     }
+
+    async Approve(targetPrincipal, amount){
+
+        if (this.#internalActor == null) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+        }
+    
+        try
+        {         
+            console.log("Try to approve:")
+            console.log("Tragetprincipal:");
+            console.log(targetPrincipal.toText());
+            console.log("amount:");
+            console.log(amount);
+              let resultResponse = await this.#internalActor.approve(targetPrincipal, amount);
+              let returnResult = GetResultFromVariant(resultResponse);
+              return returnResult;          
+        }
+        catch(error)
+        {        
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    
+    }
+
+    async Allowance(sourcePrincipal, targetPrincipal){
+
+        if (this.#internalActor == null) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+        }
+    
+        try
+        {         
+              let resultResponse = await this.#internalActor.allowance(sourcePrincipal,targetPrincipal);
+              return resultResponse;          
+        }
+        catch(error)
+        {        
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    
+    }
 }

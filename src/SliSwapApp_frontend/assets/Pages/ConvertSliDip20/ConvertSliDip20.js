@@ -1,7 +1,10 @@
-import { CommonIdentityProvider, SpecifiedTokenInterfaceType} from "../../modules/Types/CommonTypes";
+import { CommonIdentityProvider, SpecifiedTokenInterfaceType, SwapAppActorProvider} from "../../modules/Types/CommonTypes";
 import { PubSub } from "../../modules/Utils/PubSub";
 import { SliSwapApp_backend} from "../../../../declarations/SliSwapApp_backend";
 import { GetResultFromVariant, GetCustomResultFromVariant } from "../../modules/Utils/CommonUtils";
+import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
+import { Principal } from "@dfinity/principal";
+import { ResultTypes } from "../../modules/Types/CommonTypes";
 
 function RelatedHtmlPageExist(){
     return document.getElementById('ConvertSli_HtmlPage') != null;
@@ -9,18 +12,18 @@ function RelatedHtmlPageExist(){
 
 
 
-function getDepositableAmount(){
-    let walletInfo = CommonIdentityProvider.WalletsProvider;    
+// function getDepositableAmount(){
+//     let walletInfo = CommonIdentityProvider.WalletsProvider;    
     
-    if (walletInfo.Wallet_IsConnected == false){
-        return 0.0;
-    }
-    //SliSwapApp_backend.GetSliSwapWalletForPrincipal()
+//     if (walletInfo.Wallet_IsConnected == false){
+//         return 0.0;
+//     }
+//     //SliSwapApp_backend.GetSliSwapWalletForPrincipal()
 
-    var depositable_amount = walletInfo.SliDip20_Balance - walletInfo.SliDip20_Fee;
-    depositable_amount = Math.max(depositable_amount, 0);
-    return depositable_amount;
-}
+//     var depositable_amount = walletInfo.SliDip20_Balance - walletInfo.SliDip20_Fee;
+//     depositable_amount = Math.max(depositable_amount, 0);
+//     return depositable_amount;
+// }
 
 function userIsLoggedIn(){
     let usersIdentity = CommonIdentityProvider?.WalletsProvider?.UsersIdentity;    
@@ -60,6 +63,13 @@ async function deposit_oldSliTokens(){
         return;
     }
 
+    let userPrincipal = CommonIdentityProvider.WalletsProvider.UsersIdentity.AccountPrincipal;
+    let swapAppPrincipal = Principal.fromText(CommonIdentityProvider.SwapAppPrincipalText);
+    console.log("userPrincipal:");
+    console.log(userPrincipal.toText());
+    console.log("TargetPrincipal:");
+    console.log(swapAppPrincipal.toText());
+
     let tokenInfo = await getTokenInfo();
     var transferFee = tokenInfo.TransferFee.GetValue();
 
@@ -69,10 +79,7 @@ async function deposit_oldSliTokens(){
     var amountToDeposit = Number(document.getElementById('depositAmountOldSliDip20').value);
     amountToDeposit = Math.max(amountToDeposit, 0.0);
 
-    let swapWallet = await getSwapWalletPrincipalForLoggedInUser();
-    if (swapWallet == null){
-        transferFee = transferFee + transferFee;
-    }
+    
 
     if (amountToDeposit < transferFee){
         alert('The deposit amount is too small.');
@@ -85,48 +92,45 @@ async function deposit_oldSliTokens(){
         return;
     }
 
-    //(1) Get the deposit-adress 
-    
-
-    if (swapWallet == null){
-        //This is the first time the user is doing the deposit for the sliDip20 token. 
-        //Therefore the Swap-Wallet not exist yet.
-        //1) So we need to do 'approval' on the user-wallet with amount of the tokens wanted to deposit.
-        //2) After this we will call on backend a method, so that the tokens are deposited in the backend.
-
-        //(1) We need now to approve first
 
 
+    let amountToDepositBigInt = BigInt(TokenBalance.FromNumber(amountToDeposit,tokenInfo.Decimals).GetRawValue());
+    let transferFeesNeeded = BigInt( tokenInfo.TransferFee.GetRawValue() + tokenInfo.TransferFee.GetRawValue());
+    let approvalAmountBigInt = BigInt(amountToDepositBigInt + transferFeesNeeded);
+
+    console.log("approvalAmountBigInt");
+    console.log(approvalAmountBigInt);
+
+    let approveResult = await tokenInfo.approve(swapAppPrincipal, approvalAmountBigInt );
+    console.log("approve result");
+    console.log(approveResult);
+
+    if (approveResult.Result != ResultTypes.ok){
+        alert('Approval was not successful.');
+        return;
     }
-    else{
-        //Todo: implement
 
-    }
+    //check allowance
+    let allowanceResult = await tokenInfo.allowance(userPrincipal, swapAppPrincipal );
+    console.log("allowanceResult");
+    console.log(allowanceResult);
 
-    //SliSwapApp_backend.GetSliSwapWalletForPrincipal()
-     
-    return;
-    // await SliSwapApp_backend.GetDepositAddress();
-    // let walletInfo = CommonIdentityProvider.WalletsProvider;    
-    
-    // if (walletInfo.Wallet_IsConnected == false){
-    //     return;
-    // }
-
-    // var depositable_amount = getDepositableAmount();
-    // var depositAmount = document.getElementById('depositAmountOldSliDip20').valueAsNumber; 
-    // depositAmount = Math.min(depositAmount, 0);
-    
-    // if (depositAmount > depositable_amount){
-    //     return;        
-    // }
-
-    // if (depositAmount < walletInfo.SliDip20_Fee){
-    //     return;
-    // }
+    // let amountDep = BigInt(amountToDeposit);
+    // console.log("amountDep:");
+    // console.log(amountDep);
+    // let depositResult = await SliSwapApp_backend.DepositSliDip20Tokens(userPrincipal, amountDep);
+    let depositResult = await SliSwapApp_backend.DepositSliDip20Tokens(userPrincipal, amountToDepositBigInt);
+    //let depositResult = await SwapAppActorProvider.DepositSliDip20Tokens(amountToDepositBigInt);
+    console.log("Deposit result:");
+    console.log(depositResult);
 
 
-    //alert(availableAmount.toString() + " - " + availableAmount1.toString() + " - " + amountToDeposit.toString());
+    console.log("deposit wallet principal:");
+    let swapWallet = await getSwapWalletPrincipalForLoggedInUser();
+    console.log(swapWallet.toText());
+
+    console.log("Depost function end.");
+
 }
 
 async function ResetAllValues(){
@@ -150,7 +154,7 @@ async function getTokenInfo(){
     let walletInfo = CommonIdentityProvider.WalletsProvider; 
     let tokenInfo = await walletInfo.GetToken(SpecifiedTokenInterfaceType.Dip20Sli);
     return tokenInfo;
-};
+}
 
 async function UpdateBalances(){
 
@@ -167,19 +171,22 @@ async function UpdateBalances(){
     // let walletInfo = CommonIdentityProvider.WalletsProvider; 
     // let tokenInfo = await walletInfo.GetToken(SpecifiedTokenInterfaceType.Dip20Sli);
     let tokenInfo = await getTokenInfo();
-    let transferFee = tokenInfo.TransferFee.GetValue();
+    let feeNeeded = tokenInfo.TransferFee.GetValue();
+
+    //One fee for approval and one for transfer. Therefore the fee = 2 * transferFee
+    feeNeeded = feeNeeded + feeNeeded;
 
     let sliDip20TokensBalanceInUserWallet = (await tokenInfo.GetBalanceFromUsersWallet()).GetValue();
 
-    let swapWallet = await getSwapWalletPrincipalForLoggedInUser();
+    // let swapWallet = await getSwapWalletPrincipalForLoggedInUser();
 
-    if (swapWallet == null){
-        //If swap-wallet not exist already then we need to do approval first. (In deposit method)
-        //And approval also cost transfer-fee, therefore the fee amount doubles
-        transferFee = transferFee + transferFee;
-    }
+    // if (swapWallet == null){
+    //     //If swap-wallet not exist already then we need to do approval first. (In deposit method)
+    //     //And approval also cost transfer-fee, therefore the fee amount doubles
+    //     feeNeeded = feeNeeded + feeNeeded;
+    // }
 
-    var maxDepositableAmount = sliDip20TokensBalanceInUserWallet - transferFee;
+    var maxDepositableAmount = sliDip20TokensBalanceInUserWallet; - feeNeeded;
     maxDepositableAmount = Math.max(maxDepositableAmount, 0);
  
 

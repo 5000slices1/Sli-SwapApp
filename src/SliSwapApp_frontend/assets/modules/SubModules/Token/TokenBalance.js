@@ -22,7 +22,7 @@ export class TokenBalance {
 
   //Raw balance as BigInteger with 10⁸ notation
   GetRawValue() {
-    return this.#RawValue;
+    return BigInt(this.#RawValue);
   }
 
   //Display-Balance
@@ -31,13 +31,17 @@ export class TokenBalance {
     return number / (10 ** Number(this.#Decimals));
   }
 
-  constructor(tokenBalance = 0.0,decimals = 8) {
-    this.#RawValue = tokenBalance;
+  static FromNumber(numberValue, decimals = 8){
+    return new TokenBalance().SetDecimals(decimals).SetValue(numberValue);
+  }
+
+  constructor(tokenBalanceBigInt = 0.0,decimals = 8) {
+    this.#RawValue = tokenBalanceBigInt;
     this.#Decimals = Number(decimals);
   }
 
   Reset() {
-    this.#RawValue = 0;
+    this.#RawValue = BigInt(0);
   }
 
 }

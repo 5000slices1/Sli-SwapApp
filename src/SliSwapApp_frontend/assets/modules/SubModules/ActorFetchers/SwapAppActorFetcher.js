@@ -88,9 +88,9 @@ export class SwapAppActorFetcher{
         {
           return new ResultInfo(ResultTypes.err, error);
         }
-      }
+    }
 
-      async AddApprovalWalletGlds(approvalWalletPrincipal){
+    async AddApprovalWalletGlds(approvalWalletPrincipal){
 
         if (this.#ProviderIsDefined() == false) {
             new ResultInfo(ResultTypes.err, "Not initialized");
@@ -105,5 +105,45 @@ export class SwapAppActorFetcher{
         {
           return new ResultInfo(ResultTypes.err, error);
         }
-      }
+    }
+
+    async DepositSliDip20Tokens(amount){
+
+      
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            console.log("Try to deposit now amount:");
+            console.log(amount);
+            
+            let result = await this.#swapAppActor.DepositSliDip20Tokens(amount);
+            return GetResultFromVariant(result);
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    }
+
+
+    async DepositGldsDip20Tokens(amount){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.DepositGldsDip20Tokens(amount);
+            return GetResultFromVariant(result);
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    }
 }
