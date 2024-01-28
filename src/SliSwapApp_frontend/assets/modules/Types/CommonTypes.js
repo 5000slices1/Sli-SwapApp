@@ -31,6 +31,16 @@ export class ResultInfo {
 
 }
 
+export class CustomResultInfo {
+  Result;
+  ResultValue;
+
+  constructor(result, resultValue) {
+    this.Result = result;
+    this.ResultValue = resultValue;
+  }
+}
+
 
 export class TokenInfo {
   canisterId;
@@ -131,6 +141,8 @@ export class GlobalData {
     this.ApprovedWallets_Glds_InUse = 0;
   }
 }
+
+
 
 export const CommonIdentityProvider = new IdentiyProvider();
 export const SwapAppActorProvider = new SwapAppActorFetcher();

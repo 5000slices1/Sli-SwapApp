@@ -1,2 +1,4 @@
 [dependencies]
 base = "0.10.2"
+StableTrieMap = "https://github.com/NatLabs/StableTrieMap#main"
+itertools = "0.1.1"

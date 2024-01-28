@@ -113,7 +113,7 @@ export class IdentiyProvider {
     async Init() {
 
         this.SwapAppPrincipalText = await SliSwapApp_backend.GetSwapAppPrincipalText();
-        await this.WalletsProvider.UpdateTokenInfos();
+        await this.WalletsProvider.UpdateTokenInfosFromBackend();
         await this.ReInitConnectionObject();
         //Plug wallet is sending this event when user-identity is switched 
         window.addEventListener("updateConnection", async () => { this.OnPlugUserIdentitySwitched(); }, false);

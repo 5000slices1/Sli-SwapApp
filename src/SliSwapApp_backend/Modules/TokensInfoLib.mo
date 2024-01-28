@@ -193,8 +193,6 @@ module{
             let actorIcrc1 : Interfaces.InterfaceIcrc = actor (canisterId);
             let balance : TypesIcrc.Balance = await actorIcrc1.icrc1_balance_of(account);
 
-            Debug.print("balance:");
-            Debug.print(debug_show (balance));
             return #ok(balance);
         } catch (error) {
             return #err("Error: " #Error.message(error));

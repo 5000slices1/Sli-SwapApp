@@ -50,7 +50,7 @@ export class WalletsProvider {
   }
 
   //MetaData + canisterId of the tokens are updated
-  async UpdateTokenInfos() {
+  async UpdateTokenInfosFromBackend() {
     let tokenInfos = await GetTokensInfos();
     await this.SliConvertInfo.UpdateTokensInfos(tokenInfos.Dip20_Sli, tokenInfos.Icrc1_Sli);
     await this.GldsConvertInfo.UpdateTokensInfos(tokenInfos.Dip20_Glds, tokenInfos.Icrc1_Glds);

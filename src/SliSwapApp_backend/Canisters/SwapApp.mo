@@ -9,32 +9,147 @@ import Interfaces "../Interfaces/Interfaces";
 import TypesCommon "../Types/TypesCommon";
 import Icrc1 "../Types/TypesICRC1";
 import Error "mo:base/Error";
+import StableTrieMap "mo:StableTrieMap";
 import { setTimer; recurringTimer; cancelTimer } = "mo:base/Timer";
 import Nat "mo:base/Nat";
+import Option "mo:base/Option";
+import Time "mo:base/Time";
 import WalletsLib "../Modules/WalletsLib";
 import TokensInfoLib "../Modules/TokensInfoLib";
 import InitLib "../Modules/InitLib";
 import CommonLib "../Modules/CommonLib";
 import AdminLib "../Modules/AdminLib";
+import SwapLib "../Modules/SwapLib";
+
 
 shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
   stable var wasInitialized = false;
   stable var initializeTimerId = 0;
 
-  stable var appSettings : T.AppSettings = InitLib.SwapAppInit(creator);
-  stable var tokensInfo : T.TokensInfo = InitLib.TokensInfoInit();
+  stable let appSettings : T.AppSettings = InitLib.SwapAppInit(creator);
+  stable let tokensInfo : T.TokensInfo = InitLib.TokensInfoInit();
 
-  stable var sliApprovedWallets:T.ApprovedWallets = {
-        var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
-        var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
+  stable let sliApprovedWallets:T.ApprovedWallets = {
+      var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
+      var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
   };
 
-    stable var gldsApprovedWallets:T.ApprovedWallets = {
-        var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
-        var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
+  stable let gldsApprovedWallets:T.ApprovedWallets = {
+      var approvedWalletsFree:List.List<Principal> = List.nil<Principal>(); 
+      var approvedWalletsInUse:List.List<Principal> = List.nil<Principal>();
+  };
+
+  stable let depositState:T.DepositState = {
+      sliDepositInProgress:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+      gldsDepositInProgress:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+  };
+
+  stable let swapInfosSli:T.UsersSwapInfo = { 
+    userSwapInfoItems = StableTrieMap.new(); 
+    principalMappings = StableTrieMap.new()
+  };
+
+  stable let swapInfosGlds:T.UsersSwapInfo = { 
+    userSwapInfoItems = StableTrieMap.new(); 
+    principalMappings = StableTrieMap.new()
+  };
+
+
+  //-------------------------------------------------------------------------------
+  //Swap related methods
+  public shared query func GetSliSwapWalletForPrincipal(userPrincipal:Principal): async T.ResponseGetUsersSwapWallet{
+    return SwapLib.getSwapWallet(userPrincipal, swapInfosSli);
+  };
+
+  public shared query func GetGldsSwapWalletForPrincipal(userPrincipal:Principal): async T.ResponseGetUsersSwapWallet{
+   return SwapLib.getSwapWallet(userPrincipal, swapInfosGlds);
+  };
+
+  public shared ({ caller }) func GetSliDip20DepositedAmount(): async  Result.Result<Nat, Text>{
+
+    let dip20CanisterIdText = tokensInfo.Dip20_Sli.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Sli.fee;
+    return await SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText,swapInfosSli, dip20Fee);
+  };
+
+   public shared ({ caller }) func GetGldsDip20DepositedAmount(): async  Result.Result<Nat, Text>{
+
+    let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Glds.fee;
+    return await SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText,swapInfosGlds, dip20Fee);
+  };
+
+  public shared query func CanUserDepositSliDip20(principal:Principal): async Bool {
+
+    return SwapLib.CanUserDepositSliDip20(principal, depositState);
+  };
+
+  public shared query func CanUserDepositGldsDip20(principal:Principal): async Bool {
+
+    return SwapLib.CanUserDepositGldsDip20(principal, depositState);
   };
   
+
+
+  public shared ({ caller }) func DepositSliDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
+
+    let swapAppPrincipal:Principal = Principal.fromActor(this);
+    let dip20CanisterIdText = tokensInfo.Dip20_Sli.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Sli.fee;
+    let result = await SwapLib.DepositDip20Tokens(
+      caller, principal,dip20CanisterIdText,swapAppPrincipal,
+      swapInfosSli, sliApprovedWallets, depositState, amount, dip20Fee, #Dip20Sli
+    );
+    return result;
+  
+  };
+
+   public shared ({ caller }) func DepositGldsDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
+
+    let swapAppPrincipal:Principal = Principal.fromActor(this);
+    let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Glds.fee;
+    let result = await SwapLib.DepositDip20Tokens(
+      caller, principal,dip20CanisterIdText,swapAppPrincipal,
+      swapInfosGlds, gldsApprovedWallets, depositState, amount, dip20Fee, #Dip20Glds
+    );
+    return result;
+  };
+
+  // public shared ({ caller }) func DepositGldsDip20Tokens(amount:Nat): async Result.Result<Text, Text>{
+
+  //   let swapAppPrincipal:Principal = Principal.fromActor(this);
+  //   let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
+  //   let dip20Fee = tokensInfo.Dip20_Glds.fee;
+  //   return await SwapLib.DepositDip20Tokens(
+  //     caller,dip20CanisterIdText,swapAppPrincipal,
+  //     swapInfosGlds, gldsApprovedWallets, depositState, amount, dip20Fee, #Dip20Glds
+  //   );
+  // };
+
+
+  
+/*
+  public func DepositDip20Tokens(usersPrincipal:Principal, dip20CanisterId:Text, swapAppPrincipal:Principal, 
+    usersSwapInfo:T.UsersSwapInfo, approvedWallets:T.ApprovedWallets ,
+    depositState:T.DepositState , amount:Nat, fee:Nat, tokenType:T.SpecificTokenType):async Result.Result<Text,Text>
+
+
+
+  */
+  //-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
 
   //Returns the current user-role
   public shared query ({ caller }) func GetUserRole() : async T.UserRole {
@@ -47,23 +162,31 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return Principal.toText(principal);
   };
 
+
+  // Only owner or admin are allowed to execute this method
+  // This methods add's a new temporary swap-wallet principal 
   public shared ({ caller }) func AddNewApprovedSliWallet(principal:Principal): async Result.Result<Text, Text>{
     return await* WalletsLib.AddNewApprovedWallet(caller, appSettings,sliApprovedWallets, principal );
   };
 
- public shared query func GetNumberOfSliApprovedWallets(): async (Nat,Nat){
+  //Returns the number of 'free and in-use' temporary Sli-swap wallets
+  public shared query func GetNumberOfSliApprovedWallets(): async (Nat,Nat){
     return WalletsLib.GetNumberOfApprovedWallets(sliApprovedWallets);
   };
 
-
+  
+    // Only owner or admin are allowed to execute this method
+  // This methods add's a new temporary swap-wallet principal 
   public shared ({ caller }) func AddNewApprovedGldsWallet(principal:Principal): async Result.Result<Text, Text>{
     return await* WalletsLib.AddNewApprovedWallet(caller, appSettings,gldsApprovedWallets, principal );
   };
 
+  //Returns the number of 'free and in-use' temporary Glds-swap wallets
   public shared query func GetNumberOfGldsApprovedWallets(): async (Nat,Nat){
     return WalletsLib.GetNumberOfApprovedWallets(gldsApprovedWallets);
   };
 
+  //Returns true if swap-wallet with provided principal in the method-parameter exist 
   public shared query func ApprovedWalletsPrincipalExist(principal:Principal): async Bool{
     return WalletsLib.ApprovedWalletsPrincipalExist(principal, sliApprovedWallets,gldsApprovedWallets);
   };
@@ -71,15 +194,19 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //------------------------------------------------------------------------------
   //Sli related
 
+  //Returns the target token (sli-icrc1) canister Id
   public shared query func SliIcrc1_GetCanisterId() : async Text {
     return tokensInfo.Icrc1_Sli.canisterId;
   };
 
+  //Get the current transfer-fee for sli-icrc1 transfers initiated from/to the Swapapp-canisterId
+  //If this swapApp-canisterId is fee-whitelisted by Icrc1 token when the fee returned should be 0.0
   public shared func SliIcrc1_GetCurrentTransferFee() : async Result.Result<Icrc1.Balance, Text> {
     let canisterId = tokensInfo.Icrc1_Sli.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTransferFee(canisterId);
   };
 
+  //Get the current sli-icrc1 total supply
   public shared func SliIcrc1_GetCurrentTotalSupply() : async Result.Result<Icrc1.Balance, Text> {
     let canisterId = tokensInfo.Icrc1_Sli.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTotalSupply(canisterId);
@@ -87,8 +214,9 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   //Set the sli-icrc1-canisterId for the token that should be transfered to users during the conversion process
   //The token-Metadata is automatically retrieved and stored after the canister-id was set.
-  public shared ({ caller }) func SliIcrc1_SetCanisterId(canisterId : Text) : async Result.Result<Text, Text> {
-    var result = await* TokensInfoLib.SliIcrc1_SetCanisterId(caller, appSettings, tokensInfo, canisterId);
+  public shared ({ caller }) func SliIcrc1_SetCanisterId(canisterId : Principal) : async Result.Result<Text, Text> {
+    let principalText:Text = Principal.toText(canisterId);
+    var result = await* TokensInfoLib.SliIcrc1_SetCanisterId(caller, appSettings, tokensInfo, principalText);
     return result;
   };
 
@@ -105,15 +233,20 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   //------------------------------------------------------------------------------
   //Glds related
+
+  //Returns the target token (glds-icrc1) canister Id
   public shared query func GldsIcrc1_GetCanisterId() : async Text {
     return tokensInfo.Icrc1_Glds.canisterId;
   };
 
+  //Get the current transfer-fee for sli-icrc1 transfers initiated from/to the Swapapp-canisterId
+  //If this swapApp-canisterId is fee-whitelisted by Icrc1 token when the fee returned should be 0.0
   public shared func GldsIcrc1_GetCurrentTransferFee() : async Result.Result<Icrc1.Balance, Text> {
     let canisterId = tokensInfo.Icrc1_Glds.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTransferFee(canisterId);
   };
 
+  //Get the current glds-icrc1 total supply
   public shared func GldsIcrc1_GetCurrentTotalSupply() : async Result.Result<Icrc1.Balance, Text> {
     let canisterId = tokensInfo.Icrc1_Glds.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTotalSupply(canisterId);
@@ -121,18 +254,23 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   //Set the glds-icrc1-canisterId for the token that should be transfered to users during the conversion process
   //The token-Metadata is automatically retrieved and stored after the canister-id was set.
-  public shared ({ caller }) func GldsIcrc1_SetCanisterId(canisterId : Text) : async Result.Result<Text, Text> {
-    return await* TokensInfoLib.GldsIcrc1_SetCanisterId(caller, appSettings, tokensInfo, canisterId);
+  public shared ({ caller }) func GldsIcrc1_SetCanisterId(canisterId : Principal) : async Result.Result<Text, Text> {
+     let principalText:Text = Principal.toText(canisterId);
+    return await* TokensInfoLib.GldsIcrc1_SetCanisterId(caller, appSettings, tokensInfo, principalText);
   };
 
   //------------------------------------------------------------------------------
 
-  public shared ({ caller }) func AddAdminUser(principal : Text) : async Result.Result<Text, Text> {
-    return await* AdminLib.AddAdminUser(caller, appSettings, principal);
+  //Only the owner can call this method
+  public shared ({ caller }) func AddAdminUser(principal : Principal) : async Result.Result<Text, Text> {
+    let principalText = Principal.toText(principal);
+    return await* AdminLib.AddAdminUser(caller, appSettings, principalText);
   };
 
-  public shared ({ caller }) func RemoveAdminUser(principal : Text) : async Result.Result<Text, Text> {
-    return await* AdminLib.RemoveAdminUser(caller, appSettings, principal);
+ //Only the owner can call this method
+  public shared ({ caller }) func RemoveAdminUser(principal : Principal) : async Result.Result<Text, Text> {
+    let principalText = Principal.toText(principal);
+    return await* AdminLib.RemoveAdminUser(caller, appSettings, principalText);
   };
 
   public shared query func GetListOfAdminUsers() : async [Text] {
@@ -147,9 +285,12 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return await TokensInfoLib.IcrcGetBalance(canisterIdText, appPrincipalText);
   };
 
+  //Get token information about the source and target tokens (dip20, icrc1)
   public shared query func GetTokensInfos() : async T.TokensInfoAsResponse {
     return TokensInfoLib.GetTokensInfos(tokensInfo);
   };
+
+
 
   private func InitTokenMetaDatas() : async () {
 
@@ -180,7 +321,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     let msgArg = args.arg;
 
     //Set max allowed passed argument size to 1024 bytes,
-    //because 'Text' is provided as argument in some of the above methods.
     if (msgArg.size() > 1024) { return false };
     return true;
   };

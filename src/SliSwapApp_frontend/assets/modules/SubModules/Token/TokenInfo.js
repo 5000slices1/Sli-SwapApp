@@ -26,7 +26,7 @@ export class TokenInfo {
     this.SpecifiedTokenInterfaceType = specifiedTokenInterfaceType;
 
     this.TransferFee = new TokenBalance();
-    this.Decimals = new TokenBalance();
+    this.Decimals = 8;
     this.CanisterId = null;
     this.MetaDataPresent = false;
     this.Reset();
@@ -123,9 +123,71 @@ export class TokenInfo {
 
   }
 
+  async approve(targetPrincipal, amount){
+    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+      this.#provider == null || this.#loggedInPrincipal == null) {
+        return new ResultInfo(ResultTypes.err, "Not initialized");
+    }
+
+    try
+    {
+      switch (this.SpecifiedTokenInterfaceType) {
+
+        case SpecifiedTokenInterfaceType.Dip20Sli:
+        case SpecifiedTokenInterfaceType.Dip20Glds: {  
+          
+          let result = await this.TokenActor.Approve(targetPrincipal, amount);        
+          return result;
+        }
+   
+        default:   
+          break;
+      
+      }
+    }
+    catch(error)
+    {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+
+    return new ResultInfo(ResultTypes.err, "Only Dip20 supported.");
+  }
+
+
+  async allowance(sourcePrincipal, targetPrincipal){
+    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+      this.#provider == null || this.#loggedInPrincipal == null) {
+        return new ResultInfo(ResultTypes.err, "Not initialized");
+    }
+
+    try
+    {
+      switch (this.SpecifiedTokenInterfaceType) {
+
+        case SpecifiedTokenInterfaceType.Dip20Sli:
+        case SpecifiedTokenInterfaceType.Dip20Glds: {  
+          
+          let result = await this.TokenActor.Allowance(sourcePrincipal,targetPrincipal);        
+          return result;
+        }
+    
+        default:   
+          break;
+      
+      }
+    }
+    catch(error)
+    {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+
+    return new ResultInfo(ResultTypes.err, "Only Dip20 supported.");
+  }
+
+
   async GetBalanceFromUsersWallet(){ 
     if (this.TokenActor == null){
-       return new TokenBalance(0,0);
+       return new TokenBalance(BigInt(0),0);
     } 
 
     return await this.TokenActor.GetBalance(this.Decimals);
@@ -133,7 +195,7 @@ export class TokenInfo {
 
   async GetBalanceForPrincipal(principal){ 
     if (this.TokenActor == null){
-       return new TokenBalance(0,0);
+       return new TokenBalance(BigInt(0),0);
     } 
     return await this.TokenActor.GetBalanceForPrincipal(principal,this.Decimals);
   }
@@ -143,7 +205,7 @@ export class TokenInfo {
     this.TransferFee.Reset();
     this.Name = "";
     this.Symbol = "";
-    this.Decimals.Reset();
+    this.Decimals = 8;
     this.Logo = null;
     this.TokenActor = null;
     this.#loggedInPrincipal = null;

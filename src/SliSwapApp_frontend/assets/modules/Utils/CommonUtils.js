@@ -1,4 +1,4 @@
-import { ResultInfo, ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
+import { ResultInfo, CustomResultInfo, ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
 //import { Ed25519KeyIdentity } from '@dfinity/identity';
 import { Secp256k1KeyIdentity } from "@dfinity/identity-secp256k1";
@@ -22,6 +22,17 @@ export function createEnum(values) {
   return Object.freeze(enumObject);
 }
 
+export function GetCustomResultFromVariant(item){
+  for (var key in item) {
+    if (Object.hasOwn(item, key)) {
+
+       let resultValue = item[key];
+       return new CustomResultInfo(key, resultValue);
+    }
+}
+
+
+}
 
 export function GetResultFromVariant(item) {
 
@@ -56,7 +67,7 @@ function GetTokenInfo_Internal(obj) {
   result.canisterId = obj['canisterId'];
   result.decimals = obj['decimals'];
   result.fee.SetDecimals(result.decimals);
-  result.fee.SetRawBalance(obj['fee']);
+  result.fee.SetRawValue(obj['fee']);
 
 
   if (hasFieldsSet(obj, 'logo')) {
