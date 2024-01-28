@@ -116,4 +116,5 @@ export class Dip20TokenActorFetcher {
         }
     
     }
+
 }

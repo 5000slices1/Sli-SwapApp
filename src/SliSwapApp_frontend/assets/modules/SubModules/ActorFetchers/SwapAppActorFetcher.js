@@ -119,7 +119,7 @@ export class SwapAppActorFetcher{
         {
             console.log("Try to deposit now amount:");
             console.log(amount);
-            
+
             let result = await this.#swapAppActor.DepositSliDip20Tokens(amount);
             return GetResultFromVariant(result);
         }
@@ -146,4 +146,23 @@ export class SwapAppActorFetcher{
           return new ResultInfo(ResultTypes.err, error);
         }
     }
+
+    async GetDepositedSliAmount(){
+
+        if (this.#ProviderIsDefined() == false) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+          }
+ 
+        try
+        {
+            let result = await this.#swapAppActor.GetSliDip20DepositedAmount();
+            let parsedResult = GetResultFromVariant(result);
+             return parsedResult;
+        }
+        catch(error)
+        {
+          return new ResultInfo(ResultTypes.err, error);
+        }
+    }
+
 }

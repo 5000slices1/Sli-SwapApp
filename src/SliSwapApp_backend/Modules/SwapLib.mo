@@ -20,7 +20,7 @@ import TypesDip20 "../Types/TypesDip20";
 
 module{
 
-  
+    let expirationDuration:Int = 900000000000; // 15 minutes  
    
     public func getSwapWallet(caller:Principal,
         usersSwapInfo:T.UsersSwapInfo):T.ResponseGetUsersSwapWallet
@@ -36,177 +36,28 @@ module{
               
         let principalBlob:Blob = Principal.toBlob(principal);
 
-        let item = StableTrieMap.get(usersSwapInfo.swapWalletPrincipalPerUser, Blob.equal, Blob.hash, principalBlob);
+        let item = StableTrieMap.get(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob);
         switch(item) {
-            case(?swapWallet) { 
-                    return #Ok(swapWallet);                  
+            case(?userSwapInfoItem) { 
+                    return #Ok(userSwapInfoItem.swapWallet);                  
                 };
             case(_) { return #NotExist; };
         };       
     };
 
-    // public func AddUserSwapInfo(caller:Principal, 
-    //     usersSwapInfo:T.UsersSwapInfo, approvedWallets:T.ApprovedWallets ){
-            
-    //         // if (List.List.size(approvedWallets.approvedWalletsFree) <=0){
+    private func getUserSwapInfoItem(principal: Principal,
+    usersSwapInfo:T.UsersSwapInfo ): Result.Result<T.UserSwapInfoItem,Text> {
+              
+        let principalBlob:Blob = Principal.toBlob(principal);
 
-
-    //         // };
-
-    //         let popResult = List.pop(approvedWallets.approvedWalletsFree);
-    //         let wallet = Option.get(popResult.0, Principal.fromText("aaaaa-aa"));
-    //         //TODO: check if wallet is default-wallet or not
-
-    //         approvedWallets.approvedWalletsFree:= popResult.1;
-
-    //         let newItem:T.UserSwapInfoItem = {
-    //             swapWallet:Principal = wallet;
-    //             var depositActionStatus:T.ActionStatus = #Idle(Time.now());
-    //             var conversionActionStatus:T.ActionStatus= #Idle(Time.now());
-    //         };
-
-    //         let principalBlob:Blob = Principal.toBlob(caller);
-    //         StableTrieMap.put(usersSwapInfo.items, Blob.equal, Blob.hash, principalBlob, newItem);
-
-    // };
-
-    // public func getSwapWallet(caller:Principal,
-    // usersSwapInfo:T.UsersSwapInfo, sliApprovedWallets:T.ApprovedWallets ):async* Result.Result<Principal, Text>
-    // {
-    //     if (Principal.isAnonymous(caller)){
-    //         return #err("Call by Anonymous principal not allowed.");
-    //     };
-    //     GetApprovedWalletFromForPrincipal(caller, )
-
-    //     return #err("hello");
-    // };
-
-    // public func DepositSliDip20TokensStarted(principal:Principal, 
-    // depositState:T.DepositState, approvedWallets:T.ApprovedWallets)
-    // :async Result.Result<Text,Text>{
-        
-    //     if (Principal.isAnonymous(principal)){
-    //         return #err("Anonymous principals not supported.");
-    //     };
-
-    //     if (List.size(approvedWallets.approvedWalletsFree) <=0){
-    //         return #err("No free sli-swap-wallet available. Please inform our Team about this issue. Thanks!");
-    //     };
-
-    //     let principalBlob = Principal.toBlob(principal);
-
-    //     let depositStateTime =  StableTrieMap.get(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-    //     switch(depositStateTime){
-    //         case (?lastDepositTime){
-    //             let duration:Int = 900000000000; // 15 minutes 
-    //             let expiry = Time.now() + duration;
-    //             if (lastDepositTime < expiry){
-    //                 return #err("Deposit is still ongoing.");
-    //             }
-    //             else{
-    //                 StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-    //                 StableTrieMap.put(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
-    //                 return #ok("The state was set.");
-    //             };
-    //         };
-    //         case (_) {
-    //             StableTrieMap.put(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
-    //             return #ok("The state was set.");
-    //         };
-    //     };
-    // };
-
-
-    // private func CheckAndSetDepositSliDip20StartedState(principal:Principal, 
-    // depositState:T.DepositState):async Result.Result<Text,Text>{
-
-
-    //     let principalBlob = Principal.toBlob(principal);
-    //     let depositStateTime = StableTrieMap.get(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-
-    //     switch(depositStateTime){
-    //         case (?lastDepositTime){
-    //             let duration:Int = 900000000000; // 15 minutes 
-    //             let expiry = Time.now() + duration;
-    //             if (lastDepositTime < expiry){
-    //                 return #err("Deposit is still ongoing.");
-    //             }
-    //             else{
-    //                 StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-    //                 StableTrieMap.put(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
-    //                 return #ok("The state was set.");
-    //             };
-    //         };
-    //         case (_) {
-    //             StableTrieMap.put(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
-    //             return #ok("The state was set.");
-    //         };
-    //     };
-    // };
-
-    // public func DepositSliDip20Tokens(usersPrincipal:Principal, sliDip20CanisterId:Text, swapAppPrincipal:Principal, 
-    // usersSwapInfo:T.UsersSwapInfo, approvedWallets:T.ApprovedWallets ,
-    // depositState:T.DepositState , amount:Nat):async Result.Result<Text,Text>{
-
-    //     let usersPrincipalBlob = Principal.toBlob(usersPrincipal);
-
-    //     if (Principal.isAnonymous(usersPrincipal)){
-    //         return #err("Anonymous principals not supported.");
-    //     };
-
-    //     if (List.size(approvedWallets.approvedWalletsFree) <=0){
-    //         return #err("No free sli-swap-wallet available. Please inform our Team about this issue. Thanks!");
-    //     };
-
-    //     //First check if approval is given for at least this amount
-    //     let actorSliDip20 : Interfaces.InterfaceDip20 = actor (sliDip20CanisterId);
-    //     let allowanceAmount = await actorSliDip20.allowance(usersPrincipal,swapAppPrincipal );
-    //     if (allowanceAmount < amount){
-    //         return #err("Needed approval with the specified amount was not given.");
-    //     };
-
-    //     //If we are here then the allowance check was successful
-
-    //     //Check if the deposit was already started, and if not then the start state is set automatically
-    //     let depositStartedResponse = await CheckAndSetDepositSliDip20StartedState(usersPrincipal, depositState);
-    //     switch(depositStartedResponse){
-    //         case (#ok(okText)){
-    //             //do nothing
-    //         };
-    //         case (#err(message)){
-    //             return depositStartedResponse;
-    //         };
-    //     };
-
-    
-    //     //Now we need to get the swap-wallet:
-    //     let popResult = List.pop(approvedWallets.approvedWalletsFree);
-    //     approvedWallets.approvedWalletsFree:=popResult.1;
-    //     var swapWalletPrincipal:Principal = Principal.fromText("aaaaa-aa"); // Default principal
-
-    //     switch(popResult.0){
-    //         case (?swapWalletPrincipalResult)
-    //         {
-    //             swapWalletPrincipal:=swapWalletPrincipalResult;
-    //         };
-    //         case (_){
-    //             return #err("The asigned sli-swap-wallet cannot be used");
-    //         };
-    //     };
-
-    //     //Create new user id
-    //     let newUserId:Blob = await Random.blob();
-
-    //     //Add new entries for the user
-    //     StableTrieMap.put(usersSwapInfo.swapWalletPrincipalPerUser, Blob.equal, Blob.hash, usersPrincipalBlob, swapWalletPrincipal);
-    //     StableTrieMap.put(usersSwapInfo.principalMappings, Blob.equal, Blob.hash, newUserId, usersPrincipal);
-        
-    //     //Do the transfer:
-
-
-
-    //     return #ok("blabla");
-    // };
+        let item = StableTrieMap.get(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob);
+        switch(item) {
+            case(?userSwapInfoItem) { 
+                    return #ok(userSwapInfoItem);                  
+                };
+            case(_) { return #err("not exist"); };
+        };       
+    };
 
     private func CheckAndSetDepositSliDip20StartedState(principal:Principal, 
     depositState:T.DepositState):async Result.Result<Text,Text>{
@@ -217,11 +68,11 @@ module{
 
         switch(depositStateTime){
             case (?lastDepositTime){
-                //let duration:Int = 900000000000; // 15 minutes 
-                let duration:Int = 300000000000; // 15 minutes 
-                let expiry = Time.now() + duration;
-                if (lastDepositTime < expiry){
-                    return #err("Deposit is still ongoing.");
+                       
+                if (lastDepositTime + expirationDuration > Time.now()){     
+                    
+                    return #err("Deposit is still ongoing.");      
+                                               
                 }
                 else{
                     StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
@@ -244,9 +95,8 @@ module{
 
         switch(depositStateTime){
             case (?lastDepositTime){
-                let duration:Int = 900000000000; // 15 minutes 
-                let expiry = Time.now() + duration;
-                if (lastDepositTime < expiry){
+
+                 if (lastDepositTime + expirationDuration > Time.now()){
                     return #err("Deposit is still ongoing.");
                 }
                 else{
@@ -260,6 +110,74 @@ module{
                 return #ok("The state was set.");
             };
         };
+    };
+
+
+    public func CanUserDepositSliDip20(principal:Principal, depositState:T.DepositState): Bool{
+        let principalBlob = Principal.toBlob(principal);
+        let depositStateTime = StableTrieMap.get(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
+
+        switch(depositStateTime){
+            case (?lastDepositTime){                      
+                if (lastDepositTime + expirationDuration > Time.now()){     
+                    return false;                         
+                }
+                else{
+                    return true;
+                };
+            };
+            case (_) {
+                return true;
+            };
+        };
+    };
+
+    public func CanUserDepositGldsDip20(principal:Principal, depositState:T.DepositState): Bool{
+        let principalBlob = Principal.toBlob(principal);
+        let depositStateTime = StableTrieMap.get(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, principalBlob);
+
+        switch(depositStateTime){
+            case (?lastDepositTime){
+                let duration:Int = 900000000000; // 15 minutes                        
+                if (lastDepositTime + duration > Time.now()){     
+                    return false;                         
+                }
+                else{
+                    return true;
+                };
+            };
+            case (_) {
+                return true;
+            };
+        };
+    };
+
+    public func GetDip20DepositedAmount(usersPrincipal:Principal, 
+    dip20CanisterId:Text,usersSwapInfo:T.UsersSwapInfo, transferFee:Nat) : async Result.Result<Nat, Text>{
+
+        let usersPrincipalBlob = Principal.toBlob(usersPrincipal);
+
+        if (Principal.isAnonymous(usersPrincipal)){
+            return #err("Anonymous principals is not supported.");
+        };
+
+        let reponse = getUserSwapInfoItem(usersPrincipal,usersSwapInfo );
+        var swapWalletPrincipal:Principal = Principal.fromText("aaaaa-aa");
+        var depositCount = 0;
+        switch(reponse){
+            case (#err(text)){
+                return #err(text);
+            };
+            case (#ok(userSwapInfoItem)){
+                swapWalletPrincipal:= userSwapInfoItem.swapWallet;
+                depositCount:=userSwapInfoItem.depositCount;
+            };
+        };
+       
+        let actorDip20 : Interfaces.InterfaceDip20 = actor (dip20CanisterId);
+        var depositedAmount = await actorDip20.balanceOf(swapWalletPrincipal);
+        depositedAmount:= depositedAmount + ( depositCount * (transferFee * 2));
+        return #ok(depositedAmount);
     };
 
 
@@ -353,7 +271,11 @@ module{
                 let newUserId:Blob = await Random.blob();
 
                 //Add new entries for the user
-                StableTrieMap.put(usersSwapInfo.swapWalletPrincipalPerUser, Blob.equal, Blob.hash, usersPrincipalBlob, swapWalletPrincipal);
+                let newEntry:T.UserSwapInfoItem = {
+                    swapWallet = swapWalletPrincipal;
+                    depositCount = 0;
+                };
+                StableTrieMap.put(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
                 StableTrieMap.put(usersSwapInfo.principalMappings, Blob.equal, Blob.hash, newUserId, usersPrincipal);
             };
         };
@@ -380,10 +302,24 @@ module{
                
             };
             case (_) {
+
+                let itemToChange = StableTrieMap.get(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob);
+                switch(itemToChange){
+                    case (?userSwapInfo){
+                        let currentDepositCount = userSwapInfo.depositCount;
+                        let newEntry:T.UserSwapInfoItem = {
+                            swapWallet = swapWalletPrincipal;
+                            depositCount = currentDepositCount +1;                       
+                        };
+                        ignore StableTrieMap.replace(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
+                    };
+                    case (_){
+                        //do nothing
+                    }
+                };
                 return #ok("The deposit was successful.");
             };
         };
 
-        return #ok("The deposit was successful.");
     };
 };

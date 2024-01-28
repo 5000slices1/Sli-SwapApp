@@ -35,8 +35,8 @@ export class TokenBalance {
     return new TokenBalance().SetDecimals(decimals).SetValue(numberValue);
   }
 
-  constructor(tokenBalanceBigInt = 0.0,decimals = 8) {
-    this.#RawValue = tokenBalanceBigInt;
+  constructor(tokenBalanceBigInt = BigInt(0),decimals = 8) {
+    this.#RawValue = BigInt(tokenBalanceBigInt);
     this.#Decimals = Number(decimals);
   }
 

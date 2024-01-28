@@ -97,14 +97,17 @@ module{
     public type EncodedPrincipal = Blob;
     public type EncodedUserId = Blob;
 
-    // public type UserSwapInfoItem = {
+    public type UserSwapInfoItem = {
         
-    //     //The principal of the used swap-wallet. (== The wallet where the source-tokens should be transfered to)
-    //     swapWallet:Principal;
-    // };
+        //The principal of the used swap-wallet. (== The wallet where the source-tokens should be transfered to)
+        swapWallet:Principal;
+
+        //Number of times deposit was done
+        depositCount:Nat;
+    };
 
     public type UsersSwapInfo = {
-        swapWalletPrincipalPerUser:StableTrieMap.StableTrieMap<EncodedPrincipal, Principal>;    
+        userSwapInfoItems:StableTrieMap.StableTrieMap<EncodedPrincipal, UserSwapInfoItem>;    
         principalMappings: StableTrieMap.StableTrieMap<EncodedUserId, Principal>;
     };
 

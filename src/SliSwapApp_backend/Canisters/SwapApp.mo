@@ -46,12 +46,12 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   };
 
   stable let swapInfosSli:T.UsersSwapInfo = { 
-    swapWalletPrincipalPerUser = StableTrieMap.new(); 
+    userSwapInfoItems = StableTrieMap.new(); 
     principalMappings = StableTrieMap.new()
   };
 
   stable let swapInfosGlds:T.UsersSwapInfo = { 
-    swapWalletPrincipalPerUser = StableTrieMap.new(); 
+    userSwapInfoItems = StableTrieMap.new(); 
     principalMappings = StableTrieMap.new()
   };
 
@@ -66,6 +66,32 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
    return SwapLib.getSwapWallet(userPrincipal, swapInfosGlds);
   };
 
+  public shared ({ caller }) func GetSliDip20DepositedAmount(): async  Result.Result<Nat, Text>{
+
+    let dip20CanisterIdText = tokensInfo.Dip20_Sli.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Sli.fee;
+    return await SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText,swapInfosSli, dip20Fee);
+  };
+
+   public shared ({ caller }) func GetGldsDip20DepositedAmount(): async  Result.Result<Nat, Text>{
+
+    let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Glds.fee;
+    return await SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText,swapInfosGlds, dip20Fee);
+  };
+
+  public shared query func CanUserDepositSliDip20(principal:Principal): async Bool {
+
+    return SwapLib.CanUserDepositSliDip20(principal, depositState);
+  };
+
+  public shared query func CanUserDepositGldsDip20(principal:Principal): async Bool {
+
+    return SwapLib.CanUserDepositGldsDip20(principal, depositState);
+  };
+  
+
+
   public shared ({ caller }) func DepositSliDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
 
     let swapAppPrincipal:Principal = Principal.fromActor(this);
@@ -77,6 +103,18 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     );
     return result;
   
+  };
+
+   public shared ({ caller }) func DepositGldsDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
+
+    let swapAppPrincipal:Principal = Principal.fromActor(this);
+    let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
+    let dip20Fee = tokensInfo.Dip20_Glds.fee;
+    let result = await SwapLib.DepositDip20Tokens(
+      caller, principal,dip20CanisterIdText,swapAppPrincipal,
+      swapInfosGlds, gldsApprovedWallets, depositState, amount, dip20Fee, #Dip20Glds
+    );
+    return result;
   };
 
   // public shared ({ caller }) func DepositGldsDip20Tokens(amount:Nat): async Result.Result<Text, Text>{

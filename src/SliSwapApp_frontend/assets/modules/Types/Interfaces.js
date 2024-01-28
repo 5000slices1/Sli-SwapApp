@@ -129,6 +129,7 @@ export const Icrc1Interface = ({ IDL }) => {
 
 export const SwapAppActorInterface = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
+  const Result_2 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const ResponseGetUsersSwapWallet = IDL.Variant({
     'Ok' : IDL.Principal,
     'Err' : IDL.Text,
@@ -165,8 +166,9 @@ export const SwapAppActorInterface = ({ IDL }) => {
         [IDL.Bool],
         ['query'],
       ),
-    'DepositGldsDip20Tokens' : IDL.Func([IDL.Nat], [Result], []),
+    'DepositGldsDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
     'DepositSliDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
+    'GetGldsDip20DepositedAmount' : IDL.Func([], [Result_2], []),
     'GetGldsSwapWalletForPrincipal' : IDL.Func(
         [IDL.Principal],
         [ResponseGetUsersSwapWallet],
@@ -184,6 +186,7 @@ export const SwapAppActorInterface = ({ IDL }) => {
         [IDL.Nat, IDL.Nat],
         ['query'],
       ),
+    'GetSliDip20DepositedAmount' : IDL.Func([], [Result_2], []),
     'GetSliSwapWalletForPrincipal' : IDL.Func(
         [IDL.Principal],
         [ResponseGetUsersSwapWallet],

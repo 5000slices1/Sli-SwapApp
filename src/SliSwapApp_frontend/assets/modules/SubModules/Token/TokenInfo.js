@@ -184,9 +184,10 @@ export class TokenInfo {
     return new ResultInfo(ResultTypes.err, "Only Dip20 supported.");
   }
 
+
   async GetBalanceFromUsersWallet(){ 
     if (this.TokenActor == null){
-       return new TokenBalance(0,0);
+       return new TokenBalance(BigInt(0),0);
     } 
 
     return await this.TokenActor.GetBalance(this.Decimals);
@@ -194,7 +195,7 @@ export class TokenInfo {
 
   async GetBalanceForPrincipal(principal){ 
     if (this.TokenActor == null){
-       return new TokenBalance(0,0);
+       return new TokenBalance(BigInt(0),0);
     } 
     return await this.TokenActor.GetBalanceForPrincipal(principal,this.Decimals);
   }
