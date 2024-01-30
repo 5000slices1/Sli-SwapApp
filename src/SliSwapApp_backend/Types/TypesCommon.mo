@@ -115,13 +115,23 @@ module{
     };
 
     public type DepositState = {
-        sliDepositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
-        gldsDepositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
+        depositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;        
     };
 
      public type ConvertState = {
-        sliConvertInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
-        gldsConvertInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;
+        convertInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;        
+    };
+
+    public type CommonDataPerToken = {
+        approvedWallets:ApprovedWallets;
+        depositState:DepositState;
+        convertState:ConvertState;
+        swapInfo:UsersSwapInfo;
+    };
+
+    public type CommonData = {
+        sliData:CommonDataPerToken;
+        gldsData:CommonDataPerToken;
     };
 
 };
