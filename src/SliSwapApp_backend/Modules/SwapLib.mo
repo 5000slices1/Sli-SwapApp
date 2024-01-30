@@ -63,12 +63,12 @@ module{
         };       
     };
 
-    private func CheckAndSetDepositSliDip20StartedState(principal:Principal, 
-    depositState:T.DepositState):async Result.Result<Text,Text>{
+    private func CheckAndSetDepositDip20StartedState(principal:Principal, 
+    dataPerToken:T.CommonDataPerToken):async Result.Result<Text,Text>{
 
 
         let principalBlob = Principal.toBlob(principal);
-        let depositStateTime = StableTrieMap.get(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
+        let depositStateTime = StableTrieMap.get(dataPerToken.depositState.depositInProgress, Blob.equal, Blob.hash, principalBlob);
 
         switch(depositStateTime){
             case (?lastDepositTime){
@@ -79,111 +79,52 @@ module{
                                                
                 }
                 else{
-                    StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-                    StableTrieMap.put(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
+                    StableTrieMap.delete(dataPerToken.depositState.depositInProgress, Blob.equal, Blob.hash, principalBlob);
+                    StableTrieMap.put(dataPerToken.depositState.depositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
                     return #ok("The state was set.");
                 };
             };
             case (_) {
-                StableTrieMap.put(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
+                StableTrieMap.put(dataPerToken.depositState.depositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
                 return #ok("The state was set.");
-            };
-        };
-    };
-
-    private func CheckAndSetDepositGldsDip20StartedState(principal:Principal, 
-    depositState:T.DepositState):async Result.Result<Text,Text>{
-
-        let principalBlob = Principal.toBlob(principal);
-        let depositStateTime = StableTrieMap.get(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-
-        switch(depositStateTime){
-            case (?lastDepositTime){
-
-                 if (lastDepositTime + expirationDuration > Time.now()){
-                    return #err("Deposit is still ongoing.");
-                }
-                else{
-                    StableTrieMap.delete(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-                    StableTrieMap.put(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
-                    return #ok("The state was set.");
-                };
-            };
-            case (_) {
-                StableTrieMap.put(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, principalBlob, Time.now());
-                return #ok("The state was set.");
-            };
-        };
-    };
-
-
-    public func CanUserDepositSliDip20(principal:Principal, depositState:T.DepositState, 
-    usersSwapInfo:T.UsersSwapInfo,approvedWallets:T.ApprovedWallets): Bool{
-        let principalBlob = Principal.toBlob(principal);
-        let depositStateTime = StableTrieMap.get(depositState.sliDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-
-
-        switch(depositStateTime){
-            case (?lastDepositTime){                      
-                if (lastDepositTime + expirationDuration > Time.now()){     
-                    return false;                         
-                };
-            };
-            case (_) {
-                // do nothing
-            };
-        };
-        let userInfo = getSwapWalletFromUserPrincipal(principal,usersSwapInfo );
-        switch(userInfo){
-            case (#NotExist){
-                if (List.size(approvedWallets.approvedWalletsFree) <=0){
-                    return false;
-                };
-                return true;
-            };
-            case (#Ok(principalValue)){
-                return true;
-            };
-            case (#Err(text)){
-                return false;
-            };
-        };
-    };
-
-    public func CanUserDepositGldsDip20(principal:Principal, depositState:T.DepositState, 
-    usersSwapInfo:T.UsersSwapInfo,approvedWallets:T.ApprovedWallets): Bool{
-        let principalBlob = Principal.toBlob(principal);
-        let depositStateTime = StableTrieMap.get(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, principalBlob);
-
-
-        switch(depositStateTime){
-            case (?lastDepositTime){                      
-                if (lastDepositTime + expirationDuration > Time.now()){     
-                    return false;                         
-                };
-            };
-            case (_) {
-                // do nothing
-            };
-        };
-        let userInfo = getSwapWalletFromUserPrincipal(principal,usersSwapInfo );
-        switch(userInfo){
-            case (#NotExist){
-                if (List.size(approvedWallets.approvedWalletsFree) <=0){
-                    return false;
-                };
-                return true;
-            };
-            case (#Ok(principalValue)){
-                return true;
-            };
-            case (#Err(text)){
-                return false;
             };
         };
     };
 
  
+    public func CanUserDepositDip20(principal:Principal, dataPerToken:T.CommonDataPerToken): Bool{
+
+        let principalBlob = Principal.toBlob(principal);
+        let depositStateTime = StableTrieMap.get(dataPerToken.depositState.depositInProgress, Blob.equal, Blob.hash, principalBlob);
+
+        switch(depositStateTime){
+            case (?lastDepositTime){                      
+                if (lastDepositTime + expirationDuration > Time.now()){     
+                    return false;                         
+                };
+            };
+            case (_) {
+                // do nothing
+            };
+        };
+        let userInfo = getSwapWalletFromUserPrincipal(principal,dataPerToken.swapInfo );
+        switch(userInfo){
+            case (#NotExist){
+                if (List.size(dataPerToken.approvedWallets.approvedWalletsFree) <=0){
+                    return false;
+                };
+                return true;
+            };
+            case (#Ok(principalValue)){
+                return true;
+            };
+            case (#Err(text)){
+                return false;
+            };
+        };
+    };
+
+   
     public func GetDip20DepositedAmount(usersPrincipal:Principal, 
     dip20CanisterId:Text,usersSwapInfo:T.UsersSwapInfo, transferFee:Nat) : async Result.Result<Nat, Text>{
 
@@ -213,9 +154,9 @@ module{
     };
 
 
-    public func DepositDip20Tokens(callerPrincipal:Principal, usersPrincipal:Principal, dip20CanisterId:Text, swapAppPrincipal:Principal, 
-    usersSwapInfo:T.UsersSwapInfo, approvedWallets:T.ApprovedWallets ,
-    depositState:T.DepositState , amount:Nat, fee:Nat, tokenType:T.SpecificTokenType):async Result.Result<Text,Text>{
+    public func DepositDip20Tokens(usersPrincipal:Principal, 
+    dip20CanisterId:Text, swapAppPrincipal:Principal, dataPerToken:T.CommonDataPerToken, 
+    amount:Nat, fee:Nat):async Result.Result<Text,Text>{
 
         let usersPrincipalBlob = Principal.toBlob(usersPrincipal);
 
@@ -245,19 +186,8 @@ module{
         };
 
         //Check if the deposit was already started, and if not then the start state is set automatically
-        var depositStateResponse:Result.Result<Text,Text> = #err("nothing");
-
-        switch(tokenType){
-            case (#Dip20Sli){
-                depositStateResponse:=await CheckAndSetDepositSliDip20StartedState(usersPrincipal, depositState);
-            };
-            case (#Dip20Glds){
-                depositStateResponse:=await CheckAndSetDepositGldsDip20StartedState(usersPrincipal, depositState);
-            };
-            case (_)  { 
-                return #err("Only DIP20 tokens are supported for deposit.")
-            };
-        };
+        var depositStateResponse:Result.Result<Text,Text> = 
+            await CheckAndSetDepositDip20StartedState(usersPrincipal,dataPerToken);
 
         switch(depositStateResponse){
             case (#ok(okText)){
@@ -270,7 +200,7 @@ module{
 
 
         //Get the swapWallet-Principal, where the tokens should transfered to.
-        let swapWalletResponse = getSwapWallet(usersPrincipal, usersSwapInfo);
+        let swapWalletResponse = getSwapWallet(usersPrincipal,dataPerToken.swapInfo);
         var swapWalletPrincipal:Principal = Principal.fromText("aaaaa-aa");
         switch(swapWalletResponse){
             case (#Ok(swapWallet)){
@@ -279,27 +209,17 @@ module{
             case (#Err(text)){
 
                 //Remove the depositing state
-                switch(tokenType){
-                    case (#Dip20Sli){
-                        StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
-                    };
-                    case (#Dip20Glds){
-                        StableTrieMap.delete(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
-                    };
-                    case (_)  { 
-                        return #err("Only DIP20 tokens are supported for deposit.")
-                    };
-                };                             
+                StableTrieMap.delete(dataPerToken.depositState.depositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);                                      
                 return #err(text);
             };
             case (#NotExist){
-                if (List.size(approvedWallets.approvedWalletsFree) <=0){
+                if (List.size(dataPerToken.approvedWallets.approvedWalletsFree) <=0){
                     return #err("No free sli-swap-wallet available. Please inform our Team about this issue. Thanks!");
                 };
 
                 //Now we need to get the swap-wallet:
-                let popResult = List.pop(approvedWallets.approvedWalletsFree);
-                approvedWallets.approvedWalletsFree:=popResult.1;
+                let popResult = List.pop(dataPerToken.approvedWallets.approvedWalletsFree);
+                dataPerToken.approvedWallets.approvedWalletsFree:=popResult.1;
               
                 switch(popResult.0){
                     case (?swapWalletPrincipalResult)
@@ -311,7 +231,8 @@ module{
                     };
                 };
 
-                approvedWallets.approvedWalletsInUse:= List.push(swapWalletPrincipal,approvedWallets.approvedWalletsInUse);                
+                dataPerToken.approvedWallets.approvedWalletsInUse:= List.push(swapWalletPrincipal,
+                    dataPerToken.approvedWallets.approvedWalletsInUse);                
 
                 //Create new user id
                 let newUserId:Blob = await Random.blob();
@@ -322,8 +243,8 @@ module{
                     depositCount = 0;
                     userId = newUserId;
                 };
-                StableTrieMap.put(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
-                StableTrieMap.put(usersSwapInfo.principalMappings, Blob.equal, Blob.hash, newUserId, usersPrincipal);
+                StableTrieMap.put(dataPerToken.swapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
+                StableTrieMap.put(dataPerToken.swapInfo.principalMappings, Blob.equal, Blob.hash, newUserId, usersPrincipal);
             };
         };
 
@@ -339,20 +260,11 @@ module{
             
         };
        
-        //Remove the depositing state        
-        switch(tokenType){
-            case (#Dip20Sli){
-                StableTrieMap.delete(depositState.sliDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
-            };
-            case (#Dip20Glds){
-                StableTrieMap.delete(depositState.gldsDepositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);
-            };
-            case (_)  { 
-                return #err("Only DIP20 tokens are supported for deposit.")
-            };
-        };                             
+        //Remove the depositing state  
 
+        StableTrieMap.delete(dataPerToken.depositState.depositInProgress, Blob.equal, Blob.hash, usersPrincipalBlob);                                      
 
+                         
         switch (transferResult) {
             case (#Err (e)) {               
                 return #err(debug_show(e));
@@ -360,7 +272,7 @@ module{
             };
             case (_) {
 
-                let itemToChange = StableTrieMap.get(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob);
+                let itemToChange = StableTrieMap.get(dataPerToken.swapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob);
                 switch(itemToChange){
                     case (?userSwapInfo){
                         let currentDepositCount = userSwapInfo.depositCount;
@@ -369,7 +281,7 @@ module{
                             depositCount = currentDepositCount +1;  
                             userId = userSwapInfo.userId;                     
                         };
-                        ignore StableTrieMap.replace(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
+                        ignore StableTrieMap.replace(dataPerToken.swapInfo.userSwapInfoItems, Blob.equal, Blob.hash, usersPrincipalBlob, newEntry);
                     };
                     case (_){
                         //do nothing
@@ -382,14 +294,17 @@ module{
     };
 
  
-    public func ConvertOldDip20Tokens(userId:Blob, usersSwapInfo:T.UsersSwapInfo, 
-    depositState:T.DepositState, dip20CanisterId:Text, dip20TransferFee:Nat, icrcCanisterId:Text,
-    appPrincipal:Principal, tokenType:T.SpecificTokenType, approvedWallets:T.ApprovedWallets
-     )
+    public func ConvertOldDip20Tokens(userId:Blob, dataPerToken:T.CommonDataPerToken,dip20CanisterId:Text, 
+        dip20TransferFee:Nat, icrcCanisterId:Text,appPrincipal:Principal)
     : async  Result.Result<Text, Text>{
         
+
+        let icrc1Actor:Interfaces.InterfaceICRC1 = actor(icrcCanisterId);
+        let dip20Actor:Interfaces.InterfaceDip20 = actor(dip20CanisterId);
+
+
         //get principal from blob
-        let getPrincipalResponse = GetPrincipalFromBlob(userId, usersSwapInfo);
+        let getPrincipalResponse = GetPrincipalFromBlob(userId,dataPerToken.swapInfo);
         var usersPrincipal:Principal = Principal.fromText("aaaaa-aa");
         
         switch(getPrincipalResponse){
@@ -402,27 +317,12 @@ module{
         };
 
         //Check if deposit action is still taking place:
-        switch(tokenType){
-            case (#Dip20Sli){
-
-                if (CanUserDepositSliDip20(usersPrincipal,depositState, usersSwapInfo,approvedWallets) == false){
-                    return #err("Conversion of Sli is currently not possible.");
-                };
-            };
-            case (#Dip20Glds){
-
-                if (CanUserDepositGldsDip20(usersPrincipal,depositState, usersSwapInfo,approvedWallets) == false){
-                    return #err("Conversion of Glds is currently not possible.");
-                };
-            };
-            case (_){
-                return #err("Conversion only from Dip20 token allowed.");
-            };
+        if (CanUserDepositDip20(usersPrincipal,dataPerToken) == false){
+                    return #err("Conversion is currently not possible.");
         };
-       
-        
+                       
         //Get the deposit-count
-        let userInfo = getUserSwapInfoItem(usersPrincipal,usersSwapInfo );
+        let userInfo = getUserSwapInfoItem(usersPrincipal,dataPerToken.swapInfo );
         var depositCount = 0;
         var swapWallet:Principal =  Principal.fromText("aaaaa-aa");
         switch(userInfo){
@@ -436,7 +336,7 @@ module{
         };
 
         let depositedAmountResponse = await GetDip20DepositedAmount(usersPrincipal, dip20CanisterId,
-        usersSwapInfo, dip20TransferFee);
+        dataPerToken.swapInfo, dip20TransferFee);
         var depositedAmount:Nat = 0;
 
         switch(depositedAmountResponse){
@@ -449,16 +349,13 @@ module{
         };
 
 
-        let icrc1Actor:Interfaces.InterfaceICRC1 = actor(icrcCanisterId);
-        let dip20Actor:Interfaces.InterfaceDip20 = actor(dip20CanisterId);
+
 
         //Get real depositedAmount
         let realDepositedAmount:Nat =  await dip20Actor.balanceOf(swapWallet);
 
         //Get the ICRC1 fee
         let icrc1Fee:Nat = await icrc1Actor.icrc1_fee();
-
-
  
         //transfer the tokens now
         let transferArgs:TypesIcrc.TransferArgs = {
@@ -492,7 +389,7 @@ module{
 
         //Set deposit-count now to 0
         let principalBlob:Blob = Principal.toBlob(usersPrincipal);
-        let item = StableTrieMap.get(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob);
+        let item = StableTrieMap.get(dataPerToken.swapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob);
         switch(item) {
             case(?userSwapInfoItem) { 
                     let newEntry:T.UserSwapInfoItem = {                        
@@ -500,7 +397,7 @@ module{
                         depositCount:Nat = 0;                        
                         userId:Blob = userSwapInfoItem.userId;
                     };
-                    ignore StableTrieMap.replace(usersSwapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob, newEntry);                    
+                    ignore StableTrieMap.replace(dataPerToken.swapInfo.userSwapInfoItems, Blob.equal, Blob.hash, principalBlob, newEntry);                    
                 };
             case(_) { //do nothing
              };
