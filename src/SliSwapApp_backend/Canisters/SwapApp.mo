@@ -47,10 +47,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return SwapLib.GetUserId(caller,commonData.gldsData.swapInfo);
   };
 
-  // public shared func TransferSliIcrc1Tokens(userId:Blob): async  Result.Result<Text, Text>{
-
-
-  // };
  
   public shared func ConvertOldSliDip20Tokens(userId:Blob): async  Result.Result<Text, Text>{
     
@@ -249,11 +245,12 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   };
 
 
+  //Get Balance from App-Wallet main account (default subaccount (==null) is used)
   public shared func GetIcrc1Balance(canisterId:Principal): async Result.Result<Icrc1.Balance, Text>{
     
     let canisterIdText = Principal.toText(canisterId);
     let appPrincipalText = Principal.toText(Principal.fromActor(this));
-    return await TokensInfoLib.IcrcGetBalance(canisterIdText, appPrincipalText);
+    return await TokensInfoLib.IcrcGetBalance(canisterIdText, appPrincipalText, null);
   };
 
   //Get token information about the source and target tokens (dip20, icrc1)

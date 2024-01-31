@@ -20,6 +20,7 @@ import TypesDip20 "../Types/TypesDip20";
 import Nat64 "mo:base/Nat64";
 import Int "mo:base/Nat64";
 import Nat "mo:base/Nat";
+import TokensInfoLib "TokensInfoLib";
 
 
 module{
@@ -63,6 +64,38 @@ module{
         };       
     };
 
+
+    private func GetProgressStartedTime(encodedPrincipal:Blob, progressItem:StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time>): Result.Result<Time.Time, Text>{
+
+        let result = StableTrieMap.get(progressItem, Blob.equal, Blob.hash, encodedPrincipal);
+        switch(result){
+            case (?theTime){
+                return #ok(theTime);
+            };
+            case (_){
+                return #err("not found");
+            };
+        };
+    };
+
+    private func IsProgressStateSet(fromResponse:Result.Result<Time.Time, Text>): Bool{
+
+         switch(fromResponse){
+            case (#ok(theTime)){
+                return true;
+            };
+            case (_){
+                return false;
+            };
+        };
+    };
+
+    // private func IsSomeConversionStillOnProgress(encodedPrincipal:Blob, dataPerToken:T.CommonDataPerToken){
+    //     var result = GetProgressStartedTime(encodedPrincipal, dataPerToken.convertState.convertInProgress);
+
+
+    // };
+
     private func CheckAndSetDepositDip20StartedState(principal:Principal, 
     dataPerToken:T.CommonDataPerToken):async Result.Result<Text,Text>{
 
@@ -90,7 +123,6 @@ module{
             };
         };
     };
-
  
     public func CanUserDepositDip20(principal:Principal, dataPerToken:T.CommonDataPerToken): Bool{
 
@@ -124,7 +156,6 @@ module{
         };
     };
 
-   
     public func GetDip20DepositedAmount(usersPrincipal:Principal, 
     dip20CanisterId:Text,usersSwapInfo:T.UsersSwapInfo, transferFee:Nat) : async Result.Result<Nat, Text>{
 
@@ -152,8 +183,7 @@ module{
         depositedAmount:= depositedAmount + ( depositCount * (transferFee * 2));
         return #ok(depositedAmount);
     };
-
-
+  
     public func DepositDip20Tokens(usersPrincipal:Principal, 
     dip20CanisterId:Text, swapAppPrincipal:Principal, dataPerToken:T.CommonDataPerToken, 
     amount:Nat, fee:Nat):async Result.Result<Text,Text>{
@@ -292,8 +322,83 @@ module{
         };
 
     };
-
  
+    private func GetNewSubAccount(dataPerToken:T.CommonDataPerToken):async* TypesIcrc.Subaccount{
+        
+        //Create new subaccount blob
+        var subAccount:Blob = await Random.blob();
+                         
+        //We need to check if this subAccount already in use. And if yes, then 
+        if (StableTrieMap.size(dataPerToken.convertState.temporarySubaccounts) > 0){
+            
+            let usedSubAccountsIter = StableTrieMap.vals(dataPerToken.convertState.temporarySubaccounts);
+            var exist = true;
+            while(exist == true){
+
+                var subAccountWasFound = false;
+                for(item in usedSubAccountsIter){
+
+                    if (Blob.equal(item, subAccount) == true){
+                        subAccountWasFound:=true;
+                        subAccount:= await Random.blob();
+                    }
+                };
+
+                if (subAccountWasFound == false){
+                    exist := false;
+                }
+            };            
+        };
+
+        return subAccount;
+    };
+
+
+    private func PrepareAndTransferTheIcrc1TokensIntoSwapAppSubAccount(usersPrincipal:Principal, dataPerToken:T.CommonDataPerToken, 
+    icrcCanisterId:Text):async* Result.Result<Text,Text>{
+
+        let usersPrincipalAsText:Text = Principal.toText(usersPrincipal);
+        let icrc1Actor:Interfaces.InterfaceICRC1 = actor(icrcCanisterId);
+        let encodedPrincipal:T.EncodedPrincipal = Principal.toBlob(usersPrincipal);
+
+        let conversionIsStillonProgress = IsProgressStateSet(GetProgressStartedTime(encodedPrincipal, 
+            dataPerToken.convertState.convertInProgress));
+
+        if (conversionIsStillonProgress == true){
+            return #err("Conversion is still on progress");
+        };
+
+        //Create and add/update new subAccount
+        
+        let subAccount:TypesIcrc.Subaccount = await* GetNewSubAccount(dataPerToken);
+        
+        //Get the current amount on this SubAccount (Just in case there are tokens in it)
+        //And we want to this before setting/chaning the conversion-state, just in case this step will fail
+        let optionalSubAccount = Option.make(subAccount);
+        let balanceOnSubAccountResponse = await TokensInfoLib.IcrcGetBalance(icrcCanisterId, usersPrincipalAsText,optionalSubAccount);
+        var balanceOnSubAccount:Nat = 0;
+        switch(balanceOnSubAccountResponse){
+            case (#ok(amount)){
+                balanceOnSubAccount:=amount;
+            };
+            case (_){
+                balanceOnSubAccount:=0;
+            };
+        };
+
+        //Now save the used subAccount for the current conversion process 
+        StableTrieMap.put(dataPerToken.convertState.temporarySubaccounts,Blob.equal, Blob.hash,encodedPrincipal,subAccount );
+        
+        //Set the two conversion-states
+        StableTrieMap.put(dataPerToken.convertState.convertInProgress, Blob.equal, Blob.hash, encodedPrincipal, Time.now());
+        StableTrieMap.put(dataPerToken.convertState.transferToSubaccountStarted, Blob.equal, Blob.hash, encodedPrincipal, Time.now());
+        
+   
+
+
+        return #ok("blabla");
+    };
+
     public func ConvertOldDip20Tokens(userId:Blob, dataPerToken:T.CommonDataPerToken,dip20CanisterId:Text, 
         dip20TransferFee:Nat, icrcCanisterId:Text,appPrincipal:Principal)
     : async  Result.Result<Text, Text>{
@@ -316,7 +421,7 @@ module{
             };
         };
 
-        //Check if deposit action is still taking place:
+        //Check if deposit action is not currently taking place and that enough free swap-wallets are available
         if (CanUserDepositDip20(usersPrincipal,dataPerToken) == false){
                     return #err("Conversion is currently not possible.");
         };
@@ -453,6 +558,9 @@ module{
             }
         };
     };
+
+
+
 
     private func GetPrincipalFromBlob(userId:Blob, 
     usersSwapInfo:T.UsersSwapInfo): Result.Result<Principal, Text>{
