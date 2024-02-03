@@ -22,7 +22,7 @@ import InitLib "../Modules/InitLib";
 import CommonLib "../Modules/CommonLib";
 import AdminLib "../Modules/AdminLib";
 import SwapLib "../Modules/SwapLib";
-
+import Cycles "mo:base/ExperimentalCycles";
 
 shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
@@ -32,128 +32,173 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   stable let appSettings : T.AppSettings = InitLib.SwapAppInit(creator);
   stable let tokensInfo : T.TokensInfo = InitLib.TokensInfoInit();
 
-  stable let commonData:T.CommonData = InitLib.InitCommonData();
-  
+  stable let commonData : T.CommonData = InitLib.InitCommonData();
+
+  let minimumCycles : Nat = 2000000000;
+  let minimumAboveThresholdNeeded : Nat = 1000000;
 
   //-------------------------------------------------------------------------------
   //Swap related methods
 
-   
-  public shared query ({ caller }) func GetUserIdForSli(): async  Result.Result<Blob, Text>{
-    return SwapLib.GetUserId(caller,commonData.sliData.swapInfo );
+  public shared query ({ caller }) func GetUserIdForSli() : async Result.Result<Blob, Text> {
+
+    return SwapLib.GetUserId(caller, commonData.sliData.swapInfo);
   };
 
-  public shared query ({ caller }) func GetUserIdForGlds(): async  Result.Result<Blob, Text>{
-    return SwapLib.GetUserId(caller,commonData.gldsData.swapInfo);
+  public shared query ({ caller }) func GetUserIdForGlds() : async Result.Result<Blob, Text> {
+
+    return SwapLib.GetUserId(caller, commonData.gldsData.swapInfo);
   };
 
- 
-  public shared func ConvertOldSliDip20Tokens(userId:Blob): async  Result.Result<Text, Text>{
-    
-    let appPrincpal:Principal = Principal.fromActor(this);
-    return await* SwapLib.ConvertOldDip20Tokens(userId,commonData.sliData,tokensInfo.Dip20_Sli.canisterId,
-     tokensInfo.Dip20_Sli.fee, tokensInfo.Icrc1_Sli.canisterId,appPrincpal);
-     
+  public shared func ConvertOldSliDip20Tokens(userId : Blob) : async Result.Result<Text, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+    let appPrincpal : Principal = Principal.fromActor(this);
+    return await* SwapLib.ConvertOldDip20Tokens(
+      userId,
+      commonData.sliData,
+      tokensInfo.Dip20_Sli.canisterId,
+      tokensInfo.Dip20_Sli.fee,
+      tokensInfo.Icrc1_Sli.canisterId,
+      appPrincpal,
+    );
+
   };
 
-    public shared func ConvertOldGldsDip20Tokens(userId:Blob): async  Result.Result<Text, Text>{
-    
-    let appPrincpal:Principal = Principal.fromActor(this);
+  public shared func ConvertOldGldsDip20Tokens(userId : Blob) : async Result.Result<Text, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
 
-    return await* SwapLib.ConvertOldDip20Tokens(userId,commonData.gldsData,tokensInfo.Dip20_Glds.canisterId,
-     tokensInfo.Dip20_Glds.fee, tokensInfo.Icrc1_Glds.canisterId,appPrincpal);         
+    let appPrincpal : Principal = Principal.fromActor(this);
+
+    return await* SwapLib.ConvertOldDip20Tokens(
+      userId,
+      commonData.gldsData,
+      tokensInfo.Dip20_Glds.canisterId,
+      tokensInfo.Dip20_Glds.fee,
+      tokensInfo.Icrc1_Glds.canisterId,
+      appPrincpal,
+    );
   };
-    
-  public shared query func GetSliSwapWalletForPrincipal(userPrincipal:Principal): async T.ResponseGetUsersSwapWallet{
+
+  public shared query func GetSliSwapWalletForPrincipal(userPrincipal : Principal) : async T.ResponseGetUsersSwapWallet {
+
     return SwapLib.getSwapWallet(userPrincipal, commonData.sliData.swapInfo);
   };
 
-  public shared query func GetGldsSwapWalletForPrincipal(userPrincipal:Principal): async T.ResponseGetUsersSwapWallet{   
-   return SwapLib.getSwapWallet(userPrincipal, commonData.gldsData.swapInfo);
+  public shared query func GetGldsSwapWalletForPrincipal(userPrincipal : Principal) : async T.ResponseGetUsersSwapWallet {
+
+    return SwapLib.getSwapWallet(userPrincipal, commonData.gldsData.swapInfo);
   };
 
-  public shared ({ caller }) func GetSliDip20DepositedAmount(): async  Result.Result<Nat, Text>{
+  public shared ({ caller }) func GetSliDip20DepositedAmount() : async Result.Result<Nat, Text> {
 
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let dip20CanisterIdText = tokensInfo.Dip20_Sli.canisterId;
     let dip20Fee = tokensInfo.Dip20_Sli.fee;
-    let result = await* SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText,commonData.sliData.swapInfo, dip20Fee);
-    switch(result){
-      case (#ok(amount)){
+    let result = await* SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText, commonData.sliData.swapInfo, dip20Fee);
+    switch (result) {
+      case (#ok(amount)) {
         return #ok(amount.0);
       };
-      case (_){
+      case (_) {
         return #err("Could not get the amount.");
       };
     };
 
   };
 
-   public shared ({ caller }) func GetGldsDip20DepositedAmount(): async  Result.Result<Nat, Text>{
+  public shared ({ caller }) func GetGldsDip20DepositedAmount() : async Result.Result<Nat, Text> {
 
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
-    let dip20Fee = tokensInfo.Dip20_Glds.fee;    
-    let result = await* SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText,commonData.gldsData.swapInfo, dip20Fee);
-    switch(result){
-      case (#ok(amount)){
+    let dip20Fee = tokensInfo.Dip20_Glds.fee;
+    let result = await* SwapLib.GetDip20DepositedAmount(caller, dip20CanisterIdText, commonData.gldsData.swapInfo, dip20Fee);
+    switch (result) {
+      case (#ok(amount)) {
         return #ok(amount.0);
       };
-      case (_){
+      case (_) {
         return #err("Could not get the amount.");
       };
     };
   };
 
+  public shared query func CanUserDepositSliDip20(principal : Principal) : async Result.Result<Text, Text> {
 
-  public shared query func CanUserDepositSliDip20(principal:Principal): async Result.Result<Text,Text> {
-
-    let result: (Bool, Result.Result<Text,Text>) = SwapLib.CanUserDepositDip20(principal, commonData.sliData );
-    if (result.0 == true){
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+    let result : (Bool, Result.Result<Text, Text>) = SwapLib.CanUserDepositDip20(principal, commonData.sliData);
+    if (result.0 == true) {
       return #ok("Deposit is possible");
     } else {
       return result.1;
     };
   };
 
-  public shared query func CanUserDepositGldsDip20(principal:Principal):  async Result.Result<Text,Text>  {
+  public shared query func CanUserDepositGldsDip20(principal : Principal) : async Result.Result<Text, Text> {
 
-    let result: (Bool, Result.Result<Text,Text>) = SwapLib.CanUserDepositDip20(principal, commonData.gldsData);
-     if (result.0 == true){
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+    let result : (Bool, Result.Result<Text, Text>) = SwapLib.CanUserDepositDip20(principal, commonData.gldsData);
+    if (result.0 == true) {
       return #ok("Deposit is possible");
-    } else{
+    } else {
       return result.1;
     };
   };
-  
-  public shared func DepositSliDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
 
-    let swapAppPrincipal:Principal = Principal.fromActor(this);
+  public shared func DepositSliDip20Tokens(principal : Principal, amount : Nat) : async Result.Result<Text, Text> {
+
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+
+    let swapAppPrincipal : Principal = Principal.fromActor(this);
     let dip20CanisterIdText = tokensInfo.Dip20_Sli.canisterId;
     let dip20Fee = tokensInfo.Dip20_Sli.fee;
     let result = await* SwapLib.DepositDip20Tokens(
-      principal,dip20CanisterIdText,swapAppPrincipal,
-      commonData.sliData,amount, dip20Fee
+      principal,
+      dip20CanisterIdText,
+      swapAppPrincipal,
+      commonData.sliData,
+      amount,
+      dip20Fee,
     );
     return result;
-  
+
   };
 
-   public shared func DepositGldsDip20Tokens(principal:Principal, amount:Nat): async Result.Result<Text, Text>{
+  public shared func DepositGldsDip20Tokens(principal : Principal, amount : Nat) : async Result.Result<Text, Text> {
 
-    let swapAppPrincipal:Principal = Principal.fromActor(this);
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+
+    let swapAppPrincipal : Principal = Principal.fromActor(this);
     let dip20CanisterIdText = tokensInfo.Dip20_Glds.canisterId;
-    let dip20Fee = tokensInfo.Dip20_Glds.fee;  
+    let dip20Fee = tokensInfo.Dip20_Glds.fee;
     let result = await* SwapLib.DepositDip20Tokens(
-      principal,dip20CanisterIdText,swapAppPrincipal,
-      commonData.gldsData,amount, dip20Fee
+      principal,
+      dip20CanisterIdText,
+      swapAppPrincipal,
+      commonData.gldsData,
+      amount,
+      dip20Fee,
     );
 
     return result;
   };
-
 
   //-------------------------------------------------------------------------------
-
-
 
   //Returns the current user-role
   public shared query ({ caller }) func GetUserRole() : async T.UserRole {
@@ -162,36 +207,47 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   //Returns the principal (==canisterId) of this dApp
   public shared query func GetSwapAppPrincipalText() : async Text {
+
     let principal : Principal = Principal.fromActor(this);
     return Principal.toText(principal);
   };
 
   // Only owner or admin are allowed to execute this method
-  // This methods add's a new temporary swap-wallet principal 
-  public shared ({ caller }) func AddNewApprovedSliWallet(principal:Principal): async Result.Result<Text, Text>{
-    return await* WalletsLib.AddNewApprovedWallet(caller, appSettings,commonData.sliData.approvedWallets, principal );
+  // This methods add's a new temporary swap-wallet principal
+  public shared ({ caller }) func AddNewApprovedSliWallet(principal : Principal) : async Result.Result<Text, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+    return await* WalletsLib.AddNewApprovedWallet(caller, appSettings, commonData.sliData.approvedWallets, principal);
   };
 
   //Returns the number of 'free and in-use' temporary Sli-swap wallets
-  public shared query func GetNumberOfSliApprovedWallets(): async (Nat,Nat){
+  public shared query func GetNumberOfSliApprovedWallets() : async (Nat, Nat) {
+
     return WalletsLib.GetNumberOfApprovedWallets(commonData.sliData.approvedWallets);
   };
 
-    // Only owner or admin are allowed to execute this method
-  // This methods add's a new temporary swap-wallet principal 
-  public shared ({ caller }) func AddNewApprovedGldsWallet(principal:Principal): async Result.Result<Text, Text>{
-    return await* WalletsLib.AddNewApprovedWallet(caller, appSettings,commonData.gldsData.approvedWallets, principal );
+  // Only owner or admin are allowed to execute this method
+  // This methods add's a new temporary swap-wallet principal
+  public shared ({ caller }) func AddNewApprovedGldsWallet(principal : Principal) : async Result.Result<Text, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+    return await* WalletsLib.AddNewApprovedWallet(caller, appSettings, commonData.gldsData.approvedWallets, principal);
   };
 
   //Returns the number of 'free and in-use' temporary Glds-swap wallets
-  public shared query func GetNumberOfGldsApprovedWallets(): async (Nat,Nat){
+  public shared query func GetNumberOfGldsApprovedWallets() : async (Nat, Nat) {
     return WalletsLib.GetNumberOfApprovedWallets(commonData.gldsData.approvedWallets);
   };
 
-  //Returns true if swap-wallet with provided principal in the method-parameter exist 
-  public shared query func ApprovedWalletsPrincipalExist(principal:Principal): async Bool{
-    return WalletsLib.ApprovedWalletsPrincipalExist(principal, 
-    commonData.sliData.approvedWallets, commonData.gldsData.approvedWallets);
+  //Returns true if swap-wallet with provided principal in the method-parameter exist
+  public shared query func ApprovedWalletsPrincipalExist(principal : Principal) : async Bool {
+    return WalletsLib.ApprovedWalletsPrincipalExist(
+      principal,
+      commonData.sliData.approvedWallets,
+      commonData.gldsData.approvedWallets,
+    );
   };
 
   //------------------------------------------------------------------------------
@@ -205,12 +261,19 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //Get the current transfer-fee for sli-icrc1 transfers initiated from/to the Swapapp-canisterId
   //If this swapApp-canisterId is fee-whitelisted by Icrc1 token when the fee returned should be 0.0
   public shared func SliIcrc1_GetCurrentTransferFee() : async Result.Result<Icrc1.Balance, Text> {
+
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let canisterId = tokensInfo.Icrc1_Sli.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTransferFee(canisterId);
   };
 
   //Get the current sli-icrc1 total supply
   public shared func SliIcrc1_GetCurrentTotalSupply() : async Result.Result<Icrc1.Balance, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let canisterId = tokensInfo.Icrc1_Sli.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTotalSupply(canisterId);
   };
@@ -218,7 +281,10 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //Set the sli-icrc1-canisterId for the token that should be transfered to users during the conversion process
   //The token-Metadata is automatically retrieved and stored after the canister-id was set.
   public shared ({ caller }) func SliIcrc1_SetCanisterId(canisterId : Principal) : async Result.Result<Text, Text> {
-    let principalText:Text = Principal.toText(canisterId);
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+    let principalText : Text = Principal.toText(canisterId);
     var result = await* TokensInfoLib.SliIcrc1_SetCanisterId(caller, appSettings, tokensInfo, principalText);
     return result;
   };
@@ -236,12 +302,18 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //Get the current transfer-fee for sli-icrc1 transfers initiated from/to the Swapapp-canisterId
   //If this swapApp-canisterId is fee-whitelisted by Icrc1 token when the fee returned should be 0.0
   public shared func GldsIcrc1_GetCurrentTransferFee() : async Result.Result<Icrc1.Balance, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let canisterId = tokensInfo.Icrc1_Glds.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTransferFee(canisterId);
   };
 
   //Get the current glds-icrc1 total supply
   public shared func GldsIcrc1_GetCurrentTotalSupply() : async Result.Result<Icrc1.Balance, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let canisterId = tokensInfo.Icrc1_Glds.canisterId;
     return await TokensInfoLib.IcrcGetCurrentTotalSupply(canisterId);
   };
@@ -249,7 +321,10 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //Set the glds-icrc1-canisterId for the token that should be transfered to users during the conversion process
   //The token-Metadata is automatically retrieved and stored after the canister-id was set.
   public shared ({ caller }) func GldsIcrc1_SetCanisterId(canisterId : Principal) : async Result.Result<Text, Text> {
-     let principalText:Text = Principal.toText(canisterId);
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+    let principalText : Text = Principal.toText(canisterId);
     return await* TokensInfoLib.GldsIcrc1_SetCanisterId(caller, appSettings, tokensInfo, principalText);
   };
 
@@ -257,12 +332,18 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   //Only the owner can call this method
   public shared ({ caller }) func AddAdminUser(principal : Principal) : async Result.Result<Text, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let principalText = Principal.toText(principal);
     return await* AdminLib.AddAdminUser(caller, appSettings, principalText);
   };
 
- //Only the owner can call this method
+  //Only the owner can call this method
   public shared ({ caller }) func RemoveAdminUser(principal : Principal) : async Result.Result<Text, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
     let principalText = Principal.toText(principal);
     return await* AdminLib.RemoveAdminUser(caller, appSettings, principalText);
   };
@@ -271,10 +352,12 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return AdminLib.GetListOfAdminUsers(appSettings);
   };
 
-
   //Get Balance from App-Wallet main account (default subaccount (==null) is used)
-  public shared func GetIcrc1Balance(canisterId:Principal): async Result.Result<Icrc1.Balance, Text>{
-    
+  public shared func GetIcrc1Balance(canisterId : Principal) : async Result.Result<Icrc1.Balance, Text> {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return #err("Not enough free Cycles available");
+    };
+
     let canisterIdText = Principal.toText(canisterId);
     let appPrincipalText = Principal.toText(Principal.fromActor(this));
     return await* TokensInfoLib.IcrcGetBalance(canisterIdText, appPrincipalText, null);
@@ -285,7 +368,26 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return TokensInfoLib.GetTokensInfos(tokensInfo);
   };
 
+  // Deposit cycles into this canister.
+  public shared func deposit_cycles() : async () {
+    let amount = Cycles.available();
+    let accepted = Cycles.accept(amount);
+    assert (accepted == amount);
+  };
 
+  public shared query func cycles_balance() : async Nat {
+    Cycles.balance();
+  };
+
+  private func cycles_required_available() : Nat {
+    let cycles : Nat = Cycles.balance();
+    if (cycles < minimumCycles) {
+      return 0;
+    };
+
+    let required_available : Nat = cycles - minimumCycles;
+    return required_available;
+  };
 
   private func InitTokenMetaDatas() : async () {
 
