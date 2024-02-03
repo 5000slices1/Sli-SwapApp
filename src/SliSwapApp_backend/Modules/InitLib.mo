@@ -74,6 +74,14 @@ private func InitAndReturnCommonDataPerToken() : T.CommonDataPerToken {
 
     let convertStateItem : T.ConvertState = {
         convertInProgress : StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+
+        transferToSubaccountStarted : StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+        transferFromSubaccountStarted : StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+        //transferDip20ToAppWalletStarted : StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+        //burningOfDipTokensStarted: StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();
+        transferAndBurnDip20Tokens:StableTrieMap.StableTrieMap<Blob,T.TransferAndBurnDip20Info> = StableTrieMap.new();  
+        temporarySubaccounts: StableTrieMap.StableTrieMap<T.EncodedPrincipal, T.SubAccountInfo> = StableTrieMap.new();   
+
     };
 
     let swapInfoItem : T.UsersSwapInfo = {

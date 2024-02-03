@@ -6,7 +6,6 @@ import Text "mo:base/Text";
 import Principal "mo:base/Principal";
 import Time "mo:base/Time";
 import StableTrieMap "mo:StableTrieMap";
-// import StableTrieMapAccessor "../Modules/Helpers/StableTrieMapAccessor";
 
 module{
 
@@ -30,6 +29,13 @@ module{
         #Ok:Principal;
         #NotExist;
         #Err:Text;
+    };
+
+     public type ResponseConversion = {
+        #ok:Text;
+        #err:Text;
+        #depositOnProgress:Text;
+        #convertionOnProgress:Text;
     };
 
  
@@ -84,19 +90,10 @@ module{
         var approvedWalletsFree:List.List<Principal>; 
         var approvedWalletsInUse:List.List<Principal>;
     };
-
-
-    // public type ActionStatus ={
-        
-    //     #Idle:Time.Time;
-    //     #FirstTimeStarted:Time.Time;
-    //     #Started:Time.Time;
-    //     #Completed:Time.Time;
-    // };
-
+   
     public type EncodedPrincipal = Blob;
     public type EncodedUserId = Blob;
-
+    
     public type UserSwapInfoItem = {
         
         //The principal of the used swap-wallet. (== The wallet where the source-tokens should be transfered to)
@@ -109,17 +106,63 @@ module{
         userId:Blob;
     };
 
+ 
+
     public type UsersSwapInfo = {
         userSwapInfoItems:StableTrieMap.StableTrieMap<EncodedPrincipal, UserSwapInfoItem>;    
         principalMappings: StableTrieMap.StableTrieMap<EncodedUserId, Principal>;
     };
 
     public type DepositState = {
-        depositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;        
+        depositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;         
+    };
+
+    public type SubAccountInfo = {
+        subAccount:Blob;
+        initialIcrc1BalanceAmount:Nat;
+        icrc1Fee:Nat;
+        depositedDip20AmountToConsider:Nat;
+        depositedDip20RealAmount:Nat;
+        dip20SwapWallet:Principal;
+        dip20TransferFee:Nat;
+        dip20CanisterId:Text;
+        conversionId:Blob;
+        
+    };
+
+    public type TransferAndBurnDip20Info = {
+        depositedDip20AmountToConsider:Nat;
+        depositedDip20RealAmount:Nat;
+        dip20SwapWallet:Principal;
+        dip20TransferFee:Nat;
+        dip20CanisterId:Text;
+        conversionId:Blob;
+        createdAt:Time.Time;
+
     };
 
      public type ConvertState = {
+
         convertInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;        
+
+        //Detailed convert states splitted up by individual steps:
+
+        //Transfer ICRC1 tokens from app-wallet to individual subaccount started info
+        transferToSubaccountStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
+
+        //Transfer ICRC1 tokens from individual subaccount to users wallet started.
+        transferFromSubaccountStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
+
+        //The transfer of the deposited Dip20 tokens into app-wallet is started
+        //transferDip20ToAppWalletStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
+        transferAndBurnDip20Tokens:StableTrieMap.StableTrieMap<Blob,TransferAndBurnDip20Info>;
+        //This is the status for the last step, where the tokens will be burned
+        //burningOfDipTokensStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, StartedStateInfo>; 
+
+        //The temporary subaccount that will be used for the target-token transfers
+        //When all above steps are completed, the entry will be removed from this entry
+        temporarySubaccounts:StableTrieMap.StableTrieMap<EncodedPrincipal, SubAccountInfo>; 
+        
     };
 
     public type CommonDataPerToken = {
