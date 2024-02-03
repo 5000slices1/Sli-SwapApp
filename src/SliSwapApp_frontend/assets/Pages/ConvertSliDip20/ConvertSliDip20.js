@@ -14,37 +14,6 @@ var userIdBlob = "";
 
 
 
-async function UpdateUserId(){
-
-    if (PageExistAndUserIsLoggedIn() == false) {
-        return false;
-    }
-
-    let resultUserId = await SwapAppActorProvider.GetUserIdForSli();
-        if (resultUserId.Result != ResultTypes.ok) {
-            alert(resultUserId.ResultValue);
-            return false;
-    }
-
-    //Update now the userId value
-    userIdBlob = resultUserId.ResultValue;
-}
-
-
-async function TransferIcrc1TokensIntoUserWallet(){
-
-
-}
-
-async function convert_deposited_oldSliTokens2() {
-    let resultWasOk = await UpdateUserId();
-    if (resultWasOk == false){
-        return;
-    }
-
-
-
-}
 
 async function convert_deposited_oldSliTokens() {
 
@@ -130,10 +99,11 @@ async function deposit_oldSliTokens() {
             return;
         }
 
-        let depositablePossible = await SliSwapApp_backend.CanUserDepositSliDip20(userPrincipal);
-        if (depositablePossible == false) {
+        let depositablePossibleResponse = GetResultFromVariant(await SliSwapApp_backend.CanUserDepositSliDip20(userPrincipal));
 
-            alert('Deposit is currently not possible.');
+        if (depositablePossibleResponse.Result == false) {
+
+            alert( depositablePossibleResponse.ResultValue);
             return;
         }
 

@@ -181,7 +181,7 @@ module{
         return resultMeta;
     };
 
-    public func IcrcGetBalance(canisterId : Text, principalText : Text, optionalSubAccount:?TypesIcrc.Subaccount) : async Result.Result<TypesIcrc.Balance, Text> {
+    public func IcrcGetBalance(canisterId : Text, principalText : Text, optionalSubAccount:?TypesIcrc.Subaccount) : async* Result.Result<TypesIcrc.Balance, Text> {
 
         try {
             let principal : Principal = Principal.fromText(principalText);

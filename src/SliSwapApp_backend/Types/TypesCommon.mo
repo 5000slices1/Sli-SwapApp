@@ -31,6 +31,13 @@ module{
         #Err:Text;
     };
 
+     public type ResponseConversion = {
+        #ok:Text;
+        #err:Text;
+        #depositOnProgress:Text;
+        #convertionOnProgress:Text;
+    };
+
  
     //Contains Token static data (except fee, but fee is ignored 
     //for ICRC1 and instead used from 'TokensDynamicInfoAsResponse')
@@ -110,6 +117,30 @@ module{
         depositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;         
     };
 
+    public type SubAccountInfo = {
+        subAccount:Blob;
+        initialIcrc1BalanceAmount:Nat;
+        icrc1Fee:Nat;
+        depositedDip20AmountToConsider:Nat;
+        depositedDip20RealAmount:Nat;
+        dip20SwapWallet:Principal;
+        dip20TransferFee:Nat;
+        dip20CanisterId:Text;
+        conversionId:Blob;
+        
+    };
+
+    public type TransferAndBurnDip20Info = {
+        depositedDip20AmountToConsider:Nat;
+        depositedDip20RealAmount:Nat;
+        dip20SwapWallet:Principal;
+        dip20TransferFee:Nat;
+        dip20CanisterId:Text;
+        conversionId:Blob;
+        createdAt:Time.Time;
+
+    };
+
      public type ConvertState = {
 
         convertInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;        
@@ -123,14 +154,14 @@ module{
         transferFromSubaccountStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
 
         //The transfer of the deposited Dip20 tokens into app-wallet is started
-        transferDip20ToAppWalletStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
-        
+        //transferDip20ToAppWalletStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
+        transferAndBurnDip20Tokens:StableTrieMap.StableTrieMap<Blob,TransferAndBurnDip20Info>;
         //This is the status for the last step, where the tokens will be burned
-        burningOfDipTokensStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
+        //burningOfDipTokensStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, StartedStateInfo>; 
 
         //The temporary subaccount that will be used for the target-token transfers
         //When all above steps are completed, the entry will be removed from this entry
-        temporarySubaccounts:StableTrieMap.StableTrieMap<EncodedPrincipal, Blob>; 
+        temporarySubaccounts:StableTrieMap.StableTrieMap<EncodedPrincipal, SubAccountInfo>; 
         
     };
 
