@@ -3,22 +3,44 @@
 #This makefile is not ready yet
 
 install-deps:
-#dfx upgrade
-# So we have at least version 0.15.3 installed, because of Regions bugfix
 
-#npm update
+ifeq (, $(shell which curl))
+	@echo No curl is installed, curl will be installed now.... 
+	@sudo apt-get install curl -y
+endif
 
-#npm install --save dotenv 
-#npm i @dfinity/ledger-icp
-#npm i @dfinity/agent @dfinity/candid @dfinity/principal @dfinity/utils @dfinity/nns-proto
-#	sudo apt-get install mops
-#npm install artemis-web3-adapter
-#npm i @dfinity/identity
-#npm i @dfinity/identity-secp256k1
-#npm i crypto-browserify
-#npm i browserify-zlib
-#npm i @dfinity/auth-client
-#npm install --save isomorphic-fetch
+ifeq (,$(shell which $(HOME)/bin/dfx))	
+	@echo No dfx is installed, dfx will be installed now....
+	curl -fsSL https://internetcomputer.org/install.sh -o install_dfx.sh
+	chmod +x install_dfx.sh
+	./install_dfx.sh
+	rm install_dfx.sh
+	@echo   
+	@echo   
+	@echo Please reopen terminal window and execute again 'make install-deps'
+	@echo because terminal needs to be restarted after DFX was installed.
+	@echo -> The error-message you can ignore.
+	@exit 127
+endif
+	
+ifeq (, $(shell which nodejs))
+	sudo apt install nodejs -y
+endif
 
-#not needed (?)
-#npm i node-fetch
+ifeq (, $(shell which npm))
+	sudo apt install npm -y
+endif
+
+ifeq (, $(shell which mops))
+	sudo npm i -g ic-mops
+endif
+
+# So we have at least version 0.15.3 of dfx installed, because of Regions bugfix
+	dfx upgrade
+
+	npm update
+	npm i @dfinity/ledger-icp
+	npm i @dfinity/agent @dfinity/candid @dfinity/principal @dfinity/utils @dfinity/nns-proto
+	npm i artemis-web3-adapter @dfinity/identity @dfinity/identity-secp256k1 crypto-browserify
+	npm i browserify-zlib @dfinity/auth-client
+	npm install --save isomorphic-fetch
