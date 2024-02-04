@@ -71,6 +71,7 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
 
   stable var entries = {
     var usedSubAccounts:List.List<TypesHistory.UsedSubAccount> = List.nil<TypesHistory.UsedSubAccount>();
+    
     //usedSubAccounts:HistoryItem = getNewHistoryItem();
   };
 
@@ -124,7 +125,8 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
 
 
 
- 
+
+
 
   // Internal representation uses two regions, working together.
   stable var state = {

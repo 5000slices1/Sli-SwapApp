@@ -22,12 +22,15 @@ If you see this message: <br/>
 
     Then you need to reopen the terminal window and execute 'make install-deps' **again**. The reason is that the installed DFX tool can only be used after new terminal window is opened.<br/>
 
-5) The swap-App cannot be used with local instance. It must be deployed to the ic network.<br/>
+5) Start dfx service
+     ```dfx start --background --clean ```<br/>
+
+6) The swap-App cannot be used with local instance. It must be deployed to the ic network.<br/>
     ```dfx deploy --network ic```
 
-6) The swap-App has an admin-page. And only logged-in owner or admin can see and use this page.<br/>    Therefore you can assign a principal as admin user. Example:<br/>
+7) The swap-App has an admin-page. And only logged-in owner or admin can see and use this page.<br/>    Therefore you can assign a principal as admin user. Example:<br/>
     ```
-    dfx canister call SliSwapApp_backend AddAdminUser 'principal "l7ktz-3mnic-6dgyl-dnop5-wrbjo-ihmjg-eav32-fchhz-kfasq-la34v-gae"' 
+    dfx canister call --network ic SliSwapApp_backend AddAdminUser 'principal "l7ktz-3mnic-6dgyl-dnop5-wrbjo-ihmjg-eav32-fchhz-kfasq-la34v-gae"'
     ```
 
     <br/> Please note: In the next chapter we will create as administrator many intermediate swap-wallets. Therefore it is best to not use admin principal where Plug-Wallet is associated, because else you would have to click away many openend windows (by PlugWallet) during this process.
