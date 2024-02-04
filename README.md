@@ -16,9 +16,9 @@ App for swapping Dip20 SLICE tokens to the new ICRC1 SLI token
 4) Execute 'make install-deps' to install all needed dependencies <br/>
 ```make install-deps```<br/><br/>
 If you see this message: <br/>
-````
-Please reopen terminal window and execute again make install-deps because terminal needs to be restarted after DFX was installed. make: *** [makefile:20: install-deps] Error 127
-````
+    ````
+    Please reopen terminal window and execute again make install-deps   because terminal needs to be restarted after DFX was installed.   make: *** [makefile:20: install-deps] Error 127
+    ````
 
 Then you need to reopen the terminal window and execute 'make install-deps' **again**. The reason is that the installed DFX tool can only be used after new terminal window is opened.<br/>
 
