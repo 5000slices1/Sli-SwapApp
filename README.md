@@ -1,5 +1,5 @@
 # Sli-SwapApp
-App for swapping Dip20 SLICE tokens to the new ICRC1 SLI token
+App for swapping Dip20 standard ($SLI & $GLDS) tokens to ICRC1 standard
 
 
 ## Using this repository
