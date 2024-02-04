@@ -47,8 +47,9 @@ If you see this message: <br/>
    - (3) Click on 'Apply change' and wait 2-3 minutes until the Token-data is shown.
    - (4) and (5) Do the same for the other ICRC1 token that will be exchanged for GLDS-Dip20 tokens.
    - Now these two ICRC1 tokens needs to be transfered to the Sli-Swap-app backend canister-Id (==principal address).<br/>
-     This principal-adress is shown on step (6) in the below screenshot.<br/>
-![Alt text](setup_icrc1_tokens.png)
+     This principal-adress is shown on step (6) in the below screenshot.
+
+    ![Alt text](setup_icrc1_tokens.png)
 
 
 3) For each user a intermediate wallet is used to deposit the Dip20 tokens. Therefore we need
