@@ -56,7 +56,7 @@ If you see this message: <br/>
    to create these wallets first. <br/>
    Please navigate now to the second tabpage 'Swap-wallets'. <br/>
 
-    ![Alt text](createSwapWallets.png)
+    ![Alt text](CreateTheSwapWallets.png)
     
 
     Here we can insert how many swap-wallets we want to create (1) and then with button-click (2) we will create these wallets. For every created wallet an canister-call to 'approval' will be done. And each call costs the token amount of transfer-fee. In other words: For every wallet you create 0.001 of Sli (or Glds) tokens will be used from your current logged-in wallet.
