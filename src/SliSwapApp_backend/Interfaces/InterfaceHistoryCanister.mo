@@ -2,7 +2,7 @@
 
 module{
 
-public type InterfaceHistoryCanister = actor{
+public type InterfaceArchive= actor{
 
 
 };

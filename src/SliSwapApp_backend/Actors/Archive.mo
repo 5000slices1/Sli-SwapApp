@@ -13,15 +13,17 @@ import Nat "mo:base/Nat";
 import Hash "mo:base/Hash";
 import Result "mo:base/Result";
 import Cycles "mo:base/ExperimentalCycles";
-import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
+//import ExperimentalStableMemory "mo:base/ExperimentalStableMemory";
 import List "mo:base/List";
 import Time "mo:base/Time";
 import Interfaces "../Interfaces/Interfaces";
-import TypesHistory "../Types/TypesHistory";
 import TypesDip20 "../Types/TypesDip20";
+import TypesArchive "../Types/TypesArchive";
+import TypesCommon "../Types/TypesCommon";
+import StableTrieMap "mo:StableTrieMap";
 
 
-shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async Interfaces.InterfaceHistory = this{
+shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interfaces.InterfaceArchive= this{
 
   // Index of saved log entry.
   public type Index = Nat64;
@@ -37,8 +39,8 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
   //----------------------------------------------------------------
   //helper functions
 
-  private func getNewHistoryItem():HistoryItem{
-    let result:HistoryItem = {
+  private func getNewHistoryItem():ArchiveItem{
+    let result:ArchiveItem = {
         bytes = Region.new();
         var bytes_count : Nat64 = 0;
         elems = Region.new ();
@@ -47,11 +49,11 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
     return result;
   };
 
-  private func getSize(item:HistoryItem) : async Nat64 {
+  private func getSize(item:ArchiveItem) : async Nat64 {
       item.elems_count;
   };
 
-  private func getBlobByIndex(item:HistoryItem, index : Index) : async Blob {
+  private func getBlobByIndex(item:ArchiveItem, index : Index) : async Blob {
     assert index < item.elems_count;
     let pos = Region.loadNat64(item.elems, index * elem_size);
     let size = Region.loadNat64(item.elems, index * elem_size + 8);
@@ -61,7 +63,7 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
   //----------------------------------------------------------------
 
 
-  public type HistoryItem = {
+  public type ArchiveItem = {
     bytes:Region;
     var bytes_count : Nat64;
 
@@ -70,7 +72,11 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
   };
 
   stable var entries = {
-    var usedSubAccounts:List.List<TypesHistory.UsedSubAccount> = List.nil<TypesHistory.UsedSubAccount>();
+    var usedSubAccounts:List.List<TypesArchive.UsedSubAccount> = List.nil<TypesArchive.UsedSubAccount>();
+    
+    deposits:ArchiveItem = getNewHistoryItem();
+    deposits_BoundIndizes:StableTrieMap.StableTrieMap<TypesCommon.EncodedPrincipal, TypesArchive.ArchiveIndexLimits> = StableTrieMap.new();
+
     
     //usedSubAccounts:HistoryItem = getNewHistoryItem();
   };
@@ -79,7 +85,7 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
   //History of SubAccount
   public shared func SubAccount_Add(subAccount:Blob){
     
-    let newEntry:TypesHistory.UsedSubAccount = {
+    let newEntry:TypesArchive.UsedSubAccount = {
       subAccount:Blob = subAccount;
       createdAt:Time.Time = Time.now();
     };
@@ -87,14 +93,14 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
   };
 
   public shared func SubAccount_Delete(subAccount:Blob){
-    entries.usedSubAccounts:= List.filter<TypesHistory.UsedSubAccount>(entries.usedSubAccounts, func n {Blob.equal(subAccount, n.subAccount) == false });
+    entries.usedSubAccounts:= List.filter<TypesArchive.UsedSubAccount>(entries.usedSubAccounts, func n {Blob.equal(subAccount, n.subAccount) == false });
   };
 
   public shared query func SubAccount_Count():async Nat{
     return List.size(entries.usedSubAccounts);
   };
 
-  public shared query func SubAccount_GetItems(from:Nat, to:Nat): async [TypesHistory.UsedSubAccount]{
+  public shared query func SubAccount_GetItems(from:Nat, to:Nat): async [TypesArchive.UsedSubAccount]{
     let length =  List.size(entries.usedSubAccounts);
     if (from >=length ){
       return [];
@@ -102,7 +108,7 @@ shared ({ caller = swapApp_canisterId }) actor class HistoryCanister() : async I
     var newTo:Nat = to;
     newTo := Nat.min(to, length-1);
 
-    var resultAsList:List.List<TypesHistory.UsedSubAccount> = List.nil<TypesHistory.UsedSubAccount>();
+    var resultAsList:List.List<TypesArchive.UsedSubAccount> = List.nil<TypesArchive.UsedSubAccount>();
     for (index in Iter.range(from, newTo)) {
       let itemOrNull = List.get(entries.usedSubAccounts, index);
       switch(itemOrNull){
