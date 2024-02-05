@@ -277,3 +277,32 @@ footer {
   border: 1px solid #000000;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.25);
 }
+
+ul.social_icon {
+  float: center;
+  padding-top: 6px;
+}
+
+ul.social_icon li {
+  display: inline-block;
+  padding-right: 20px;
+}
+
+ul.social_icon li:last-child {
+  padding-right: 0;
+}
+
+ul.social_icon li a {
+  color: #fefeff;
+  display: inline-block;
+  text-align: center;
+  line-height: 33px;
+  border-radius: 100%;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+ul.social_icon li a:hover {
+  color: #6dcff6;
+  transition: ease-in all 0.7s;
+}
