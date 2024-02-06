@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="max-height: 600px;">
 
 <head>
 
@@ -11,97 +11,115 @@
   <link type="text/css" rel="stylesheet" href="main.css" />
 
   <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- <script type="text/javascript" src="/src/SliSwapApp_frontend/src/index.js"></script> -->
 
 </head>
 
 <body>
-  <main>
-    <header style="min-width: 800px;">
-      <div class="container" >
-        <table style="width: 100%;min-width: 450px;">
-          <td align="left" style="width:80px">
-            <img src="appIcons/5000SlicesIcon3.png"width="75" height="75" 
-            style="margin-right: 12px;min-width: 75px; min-height: 75px;"
-              alt="5000 Slices Swap-App" />
-          </td>
-          <td align="left" style="width:auto; min-width: 200px">
-            <b>
-              <!-- <img src="logo2.svg" alt="DFINITY logo" /> -->
-              <p style="font-size: large;min-width: 350;">5000 Slices Swap-App</p>
-            </b>
-          </td>
-          <td align="right">
-            <div style="align-content: flex-end;">
-            <table>
-              <td>
-                <label id="labelWalletConnectionStatus" style="margin-right: 22px;font-size: 0.8em;
-                color: rgb(40, 40, 211);font-weight: bold;
+  <div>
+    <div style="position: fixed;z-index: 50;  left: -10px; width: 100%; height:130px; background-color: #0e0f27;">
+
+    </div>
+  <header style="z-index: 51; min-width: 800px;width: 100%;position: fixed;margin-top: 16px;">
+
+    <table style="width: 100%;min-width: 450px;">
+      <td align="left" style="width:80px">
+        <img src="appIcons/5000SlicesIcon.png" width="75" height="75"
+          style="margin-right: 12px;min-width: 75px; min-height: 75px;" alt="5000 Slices Swap-App" />
+      </td>
+      <td align="left" style="width:auto; min-width: 200px">
+        <b>
+          <p style="margin-top:24px; font-size: large;min-width: 350; color:rgb(187, 187, 187)">5000 Slices Swap-App</p>
+        </b>
+      </td>
+      <td align="right">
+        <div style="align-content: flex-end;margin-top: 12px;">
+          <table>
+            <td>
+              <div style="margin-top: 6px;">
+              <label id="labelWalletConnectionStatus" style="margin-right: 22px;font-size: 0.8em;
+                color: rgb(40, 40, 211);font-weight: bold; vertical-align: middle; 
                 "></label>
               </td>
-              <td>
-                <!-- #region Wallet Connection Control -->
-                <div class="dropdown">
-                  <button id="buttonWalletDropDown" style="border-radius: 6px;height:35px;width:120px" type="submit" class="dropbtn">Wallet
-                    Connection</button>
-      
-                  <div id="dropDownWalletMenu" class="dropdown-content" style="padding: 3px;margin-right: -2px;                                    
-                  background-color: hsl(40, 86%, 75%);box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);border-radius: 0.8em;">
-      
-                    <table>
-                      <tr class="spaceUnder">
-                        <button id="loginStoic" type="submit" class="button-dropdownmenu">
-                          <img src="appIcons/stoic.png" width="22px" height="22px" style="float: left;margin-left: 4px;" />
-                          <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Stoic</div>
-                        </button>
-                      </tr>
-      
-                      <tr class="spaceUnder">
-                        <button id="loginPlug" type="submit" class="button-dropdownmenu">
-                          <img src="appIcons/plug.jpg" width="22px" height="22px" style="float: left;margin-left: 4px;" />
-                          <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Plug</div>
-                        </button>
-                      </tr>
-                      <tr>
-                        <button id="logout" type="submit" class="button-dropdownmenu">
-      
-                          <div style="margin: auto;text-align: right;margin-right: 10px;  margin-top: 0px;">Log out</div>
-                        </button>
-                      </tr>
-                    </table>
-                  </div>
+              <td>    
+            <td>
+              <!-- #region Wallet Connection Control -->
+              <div class="dropdown">
+                <button id="buttonWalletDropDown" style="border-radius: 6px;
+                height:35px;width:120px" type="submit"
+                  class="dropbtn">Wallet
+                  Connection</button>
+
+                <div id="dropDownWalletMenu" class="dropdown-content"
+                  style="padding: 3px 3px 3px 6px; position: fixed; width: 180px;
+                  left: 100%; 
+                   margin-left: -210px; margin-top: 70px;                                 
+                  background-color: hsl(249, 32%, 8%);box-shadow: 0 0 10px 0 rgba(242, 241, 241, 0.3);border-radius: 0.8em;">
+
+                  <table>
+                    <tr class="spaceUnder">
+                      <button id="loginStoic" type="submit" class="button-dropdownmenu">
+                        <img src="appIcons/stoic.png" width="22px" height="22px"
+                          style="float: left;margin-left: 4px;" />
+                        <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Stoic</div>
+                      </button>
+                    </tr>
+
+                    <tr class="spaceUnder">
+                      <button id="loginPlug" type="submit" class="button-dropdownmenu">
+                        <img src="appIcons/plug.jpg" width="22px" height="22px" style="float: left;margin-left: 4px;" />
+                        <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Plug</div>
+                      </button>
+                    </tr>
+                    <tr>
+                      <button id="logout" type="submit" class="button-dropdownmenu">
+
+                        <div style="margin: auto;text-align: right;margin-right: 10px;  margin-top: 0px;">Log out</div>
+                      </button>
+                    </tr>
+                  </table>
                 </div>
-                  <!-- #endregion Wallet Connection Control -->
-              </td>
+              </div>
+              <!-- #endregion Wallet Connection Control -->
+            </td>
 
-            </table>
-          </div>          
-          </td>
-        </table>                       
-      </div>
-    </header>
+          </table>
+        </div>
+      </td>
+    </table>
 
-    <table style="margin-left: -6px;margin-top:12px;width: 100%;height:100%">
+  </header>
+ </div>
+
+
+  <div style="left: 0px;position: block; ">
+    <table style="margin-left: -4px; padding-top: 140px;  width: 100%;min-height: 750px;">
 
       <!-- #region Left side navigation Controls -->
-      <td style="height: 100%;width: 100px;">
-        <div style="min-height: 600px;background-color: #f5ba13;
+      <td style="width: 100px;">
+        <div style="min-height: 450px;background-color: #0e0f27;
         border-radius: 8px;
-            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);padding: 12px;
-            font-size: 0.7em;height: 100%;width: 200px;
-            ">     
-            <button type="submit" class="button-navigation" id="PageStartPage">Start Page</button>
+            box-shadow: 0 0 10px 0 rgb(255, 254, 254);padding: 12px;
+            font-size: 0.7em;width: 200px;
+            ">
+          <button type="submit" class="button-navigation" id="PageStartPage" style="color: rgb(143, 143, 143);">Start
+            Page</button>
 
-            <button type="submit" class="button-navigation" id="PageConvertSliDip20">Convert 'Sli Dip20 tokens'</button>
-  
-            <button type="submit" class="button-navigation" id="PageConvertGldsDip20">Convert 'Glds Dip20
-              tokens'</button>
-  
-            <button type="submit" class="button-navigation" id="PageHistorySwapTransactions">History of
-              Swap-transactions</button>
-  
-            <button type="submit" class="button-navigation" id="PageAdminSection" style="display: none;">Admin
-              section</button>
+          <button type="submit" class="button-navigation" id="PageConvertSliDip20"
+            style="color: rgb(143, 143, 143);">Convert 'Sli Dip20 tokens'</button>
+
+          <button type="submit" class="button-navigation" id="PageConvertGldsDip20"
+            style="color: rgb(143, 143, 143);">Convert 'Glds Dip20
+            tokens'</button>
+
+          <button type="submit" class="button-navigation" id="PageHistorySwapTransactions"
+            style="color: rgb(143, 143, 143);">History of
+            Swap-transactions</button>
+
+          <button type="submit" class="button-navigation" id="PageAdminSection"
+            style="display: none;color: white;">Admin
+            section</button>
 
         </div>
       </td>
@@ -109,7 +127,7 @@
 
       <!-- #region Dynamically added Html contents -->
 
-      <td style="vertical-align: top; padding-left: 22px;">
+      <td style="vertical-align: top; padding-left: 32px;position: relative;">
         <div mainContentPageId="PageConvertSliDip20" html-source="/Pages/ConvertSliDip20/ConvertSliDip20.html"></div>
 
         <div mainContentPageId="PageConvertGldsDip20" html-source="/Pages/ConvertGldsDip20/ConvertGldsDip20.html"></div>
@@ -118,13 +136,38 @@
         <div mainContentPageId="PageAdminSection" html-source="/Pages/AdminSection/PageAdminSection.html"></div>
         <div mainContentPageId="PageHistorySwapTransactions" html-source=""></div>
 
-        <!-- #endregion Dynamically added Html contents -->        
+        <!-- #endregion Dynamically added Html contents -->
       </td>
 
     </table>
+  </div>
+
+  <footer class="footer" style="margin-left: 8px;margin-right: -8px; width:100%;">
+    <div>
+
+      Join Community: <a style="color:rgb(172, 101, 15);" target="_blank"
+        href="https://oc.app/community/ovkev-xiaaa-aaaar-asorq-cai/channel/333479041001113364768524958478479859764/?ref=tzol4-lqaaa-aaaaf-aanaq-cai">OpenChat</a>
+      <div class="col-sm-5">
+        <ul class="social_icon text_align_right d_none">
+          <li> <a target="_blank" href="https://www.facebook.com/mysliceinfo"><i class="fa fa-facebook-f"></i></a></li>
+          <li> <a target="_blank" href="https://twitter.com/info_slice"><i class="fa fa-twitter"></i></a></li>
+          <li> <a target="_blank" href="https://www.youtube.com/channel/UCErWBRjdOWo_hmHNqb4yxDg"><i
+                class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
+          <li> <a target="_blank" href="https://github.com/5000slices1/Sli-SwapApp"><i class="fa fa-github"
+                aria-hidden="true"></i></a></li>
+          <li> <a target="_blank" href="https://t.me/mysliceinfo"><i class="fa fa-telegram" aria-hidden="true"></i></a>
+          </li>
+          <li> <a target="_blank" href="https://www.instagram.com/5000slices"><i class="fa fa-instagram"
+                aria-hidden="true"></i></a></li>
+
+        </ul>
+      </div>
+    </div>
+    
+  </footer>
 
 
-  </main>
+
 </body>
 
 </html>

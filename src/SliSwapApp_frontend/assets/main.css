@@ -5,11 +5,11 @@
 }
 .main {
     display: flex;
-  }
-  
-  .main > h1 {
+  } 
+   
+  /* .main > h1 {
     flex: 1;
-  }
+  } */
 
   table {
     border-collapse: separate; 
@@ -36,29 +36,32 @@
 
 html {
     font-family: "Montserrat", sans-serif;
-    height: 100%;
+    /* height: 100%; */
+    scroll-behavior: smooth;
 }
+
 header {
-    background-color: #f5ba13;
+    background-color: #0e0f27;
     margin: auto 0px;
     margin-top: 12px;
     padding: 8px 32px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px 0 rgba(255, 255, 255, 0.3);
     border-radius: 0.6em;  
+    width: 100%;
+    
   }
 
 header h1 {
-    color: #fff;
+    color: #c0c0c0;
     font-family: "McLaren", cursive;
     font-weight: 200;
-  }
-
+}
 swapControl {
   /* background-color: hsl(40, 86%, 75%); */
-  background-color:  #f5ba13;
+  background-color:  #090917;;
   /* margin: auto -16px; */
   padding: 16px 32px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px 0 rgba(248, 248, 248, 0.3);
   border-radius: 0.8em;
 }
 
@@ -66,23 +69,36 @@ input {
   text-align: right;     
 }
 
-/* body {
-    font-family: "Montserrat", sans-serif;
-    font-size: 1.5rem;
-} */
 body {
+ 
+  
   font-family: "Montserrat", sans-serif;  
     /* background: #eee; */
-    background-color: #f1c480;
+    background-color:#0f0e1c;
     /* background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); */
     padding: 0 16px;
     height: 100%;
+    display: block;
+    min-height: 100%;
+    min-width: 100%;
   }
-img {
+
+
+  .header {
+    height: 120px;
+  } 
+  
+  .main-content {
+    top:0px;
+    background-color: green;
+  }  
+
+  img {
     max-width: 50vw;
     max-height: 25vw;
-    display: block;
+    display: inline;
     margin: auto;
+   
 }
 
 form {
@@ -99,14 +115,6 @@ tr.spaceUnder>td {
   padding-bottom: 8em;
 }
 
- 
-
-/* button[type="submit"] {
-    padding: 5px 20px;
-    margin: 10px auto;
-    float: left;
-} */
-
 
 
 .button-49 {
@@ -120,7 +128,7 @@ tr.spaceUnder>td {
   font-weight: 600;
 
   color: #fff;
-  box-shadow: rgba(32, 27, 92, 0.8) 0px 0px 0px 1px, rgba(255, 255, 255, 0.7) 0 0 3px 0 inset, 0 1px 2px 0 rgba(0, 0, 0, .5);
+  box-shadow: rgba(243, 243, 243, 0.8) 0px 0px 0px 1px, rgba(255, 255, 255, 0.7) 0 0 3px 0 inset, 0 1px 2px 0 rgba(241, 241, 241, 0.5);
 
   background-image: radial-gradient(53% 87% at 44% 90%, rgba(255, 255, 255, 0.36) 0%, transparent 100%), linear-gradient(80deg, #5044E5 0%, #430dd9 100%);
 }
@@ -138,9 +146,6 @@ tr.spaceUnder>td {
   background-image: rgba(255, 255, 255, 0.36);
   filter: brightness(0.5);
 }
-
-
-
 
 .dropbtn {
   background-color: #04AA6D;
@@ -187,25 +192,29 @@ tr.spaceUnder>td {
 
 .button-dropdownmenu[type="submit"] {
   float: left;height:35px;width: 160px;
-  margin: 4px;cursor: pointer;border-radius:6px; background-color: #eba925;
-  border-color: #e3a20c;
+  margin: 4px;cursor: pointer;border-radius:6px; background-color: #04032d;
+  border-color: #24213b;
+  color: rgb(222, 218, 218);
 }
 
 
 .button-dropdownmenu:hover {
   filter: brightness(1.1);
-  background-color: #eaab2c;
+  background-color: #04032d;
 }
 
 
 .button-navigation[type="submit"]{
 
-  border-radius: 6px;background-color: rgb(231, 155, 56);margin-bottom: 16px;width: 180px;
-  height: 50px;cursor: pointer;border-color: #161817;
+  border-radius: 6px;background-color: #110d2e;margin-bottom: 16px;width: 180px;
+  height: 50px;cursor: pointer;border-color: #878688;
+}
+.button-navigation{
+  color: rgb(0, 0, 0);
 }
 
 .button-navigation:hover {
-  filter: brightness(1.1);background-color:rgb(234, 175, 59);
+  filter: brightness(1.1);background-color:#19600b;
 }
 
 
@@ -218,9 +227,9 @@ tr.spaceUnder>td {
   border-color: #161817;
   /* background-color: #f1f1f1; */
   border-radius: 6px;
-  background-color:rgb(234, 175, 59);
+  background-color:#04032d;
   margin-bottom: 16px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px 0 rgba(255, 253, 253, 0.3);
   border-radius: 0.8em;
   /* width: 180px; */
 }
@@ -239,12 +248,12 @@ tr.spaceUnder>td {
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-  background-color: rgb(231, 155, 56);
+  background-color: rgb(12, 5, 34);
 }
 
 /* Create an active/current tablink class */
 .tab button.active {
-  background-color: rgb(231, 155, 56);
+  background-color: rgb(236, 236, 236);
 }
 
 /* Style the tab content */
@@ -265,3 +274,53 @@ tr.spaceUnder>td {
   from {opacity: 0;}
   to {opacity: 1;}
 }
+
+footer {
+  background-color: #0d0d21;
+  padding: 10px;
+  color: #ffffff;
+  border: 1px solid #000000;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.25);
+  z-index: 10; 
+  position:fixed;
+  bottom:0;
+  left:0;
+}
+
+
+ul.social_icon {
+  float: center;
+  padding-top: 6px;
+}
+
+ul.social_icon li {
+  display: inline-block;
+  padding-right: 20px;
+}
+
+ul.social_icon li:last-child {
+  padding-right: 0;
+}
+
+ul.social_icon li a {
+  color: #fefeff;
+  display: inline-block;
+  text-align: center;
+  line-height: 33px;
+  border-radius: 100%;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+ul.social_icon li a:hover {
+  color: #6dcff6;
+  transition: ease-in all 0.7s;
+}
+
+td, th {
+  vertical-align:top;
+  }
+
+
+  
+
