@@ -23,17 +23,11 @@ ifeq (,$(shell which $(HOME)/bin/dfx))
 	@exit 127
 endif
 	
-ifeq (, $(shell which nodejs))
+
 	sudo apt install nodejs -y
-endif
-
-ifeq (, $(shell which npm))
 	sudo apt install npm -y
-endif
-
-ifeq (, $(shell which mops))
 	sudo npm i -g ic-mops
-endif
+
 
 # So we have at least version 0.15.3 of dfx installed, because of Regions bugfix
 	dfx upgrade
