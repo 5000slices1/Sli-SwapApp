@@ -40,8 +40,7 @@ If you see this message: <br/>
     dfx canister call --network ic SliSwapApp_backend archive_set_canisterId 'principal "<archive-canisterId>"'
     ```
     <br/>
-    Where <archive-canisterId> is the archive canister-Id
-
+    
 
 ## Setting up the Swap-App
 
