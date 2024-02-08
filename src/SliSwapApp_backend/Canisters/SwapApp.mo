@@ -471,7 +471,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     };
 
     try {
-      await autoTopUpArchiveCanisterCycles();
+      await autoBurnAvailableDip20Tokens();
     } catch (error) {
     };
   };
