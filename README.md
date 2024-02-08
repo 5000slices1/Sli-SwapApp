@@ -35,6 +35,12 @@ If you see this message: <br/>
 
     <br/> Please note: In the next chapter we will create as administrator many intermediate swap-wallets. Therefore it is best to not use admin principal where Plug-Wallet is associated, because else you would have to click away many openend windows (by PlugWallet) during this process.
 
+8) The SwapApp needs to know the created archive-canisterID.
+    ```
+    dfx canister call --network ic SliSwapApp_backend archive_set_canisterId 'principal "<archive-canisterId>"'
+    ```
+    <br/>
+    Where <archive-canisterId> is the archive canister-Id
 
 
 ## Setting up the Swap-App

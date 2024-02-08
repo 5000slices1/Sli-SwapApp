@@ -35,14 +35,15 @@ module {
         conversionId:Blob;
         depositIds:List.List<Blob>; 
         userPrincipal:Principal;
+        time:Time.Time;
     };
 
         public type ArchivedConversionCompleted= {
         tokenType:TypesCommon.SpecificTokenType;
         amount:Nat;
         conversionId:Blob;
-        depositIds:List.List<Blob>; 
         userPrincipal:Principal;
+        time:Time.Time;
     };
 
     // public type ArchiveIndexLimits = {

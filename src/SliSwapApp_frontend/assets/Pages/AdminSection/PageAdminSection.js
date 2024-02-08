@@ -312,29 +312,16 @@ export const admin_section_init = async function initAdminSection() {
 
     var element = document.getElementById('set-sli-icrc1-canister-id');
     if (element != null) {
-
         element.removeEventListener('click', async () => { await setSliIcrcCanisterId(); }, true);
-
-        //TODO: UNDO
-        if (false && this.SliIcrcCanisterIdWasSet() == true) {
-            element.disabled = true;
-        }
-        else {
-            element.disabled = false;
-            element.addEventListener('click', async () => { await setSliIcrcCanisterId(); }, true);
-        }
+        element.disabled = false;
+        element.addEventListener('click', async () => { await setSliIcrcCanisterId(); }, true);
     }
 
     element = document.getElementById('set-glds-icrc1-canister-id');
     if (element != null) {
         element.removeEventListener('click', async () => { await setGldsIcrcCanisterId(); }, true);
-        if (false && this.GldsIcrcCanisterIdWasSet() == true) {
-            element.disabled = true;
-        }
-        else {
-            element.disabled = false;
-            element.addEventListener('click', async () => { await setGldsIcrcCanisterId(); }, true);
-        }
+        element.disabled = false;
+        element.addEventListener('click', async () => { await setGldsIcrcCanisterId(); }, true);
     }
 
     admin_section_init.CommonThingsInitialized = true;

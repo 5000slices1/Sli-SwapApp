@@ -443,7 +443,7 @@ module{
 
     private func PrepareAndTransferTheIcrc1TokensIntoSwapAppSubAccount(usersPrincipal:Principal, dataPerToken:T.CommonDataPerToken, 
     icrcCanisterId:Text, dip20CanisterId:Text, dip20TransferFee:Nat, swapAppCanisterId:Principal,
-    archive:InterfaceHistoryCanister.ArchiveData
+    archive:InterfaceHistoryCanister.ArchiveData, specifiedTokenType:TypesCommon.SpecificTokenType
     ):async* T.ResponseConversion{
 
         let usersPrincipalAsText:Text = Principal.toText(usersPrincipal);
@@ -620,6 +620,8 @@ module{
             conversionId:Blob = await Random.blob();
         };
 
+        let conversionIdCreated:Blob = subAccountInfo.conversionId;
+
         StableTrieMap.put(dataPerToken.convertState.temporarySubaccounts,Blob.equal, Blob.hash,encodedPrincipal,subAccountInfo );
         
         StableTrieMap.put(dataPerToken.convertState.convertInProgress, Blob.equal, Blob.hash, encodedPrincipal, Time.now());
@@ -637,19 +639,45 @@ module{
         };
         //---------------------------------------------------------------------------------------------------
 
-
         //---------------------------------------------------------------------------------------------------
         // Save conversion start into archive.
-        
 
+        try{
+                let depositIdsOrNull = StableTrieMap.get(dataPerToken.depositState.depositIds, Blob.equal, Blob.hash, encodedPrincipal);    
+                var depositIds:List.List<Blob> = List.nil<Blob>();
+
+                switch(depositIdsOrNull) {
+                    case(?value) { 
+                        depositIds:=value;
+                    };
+                    case(null) { };
+                };
+
+                let depositStartedItem:TypesArchive.ArchivedConversionStarted = {
+                    tokenType:TypesCommon.SpecificTokenType = specifiedTokenType;
+                    amount:Nat = depositAmountToConsider;
+                    conversionId:Blob = conversionIdCreated;
+                    depositIds:List.List<Blob> = depositIds; 
+                    userPrincipal:Principal = usersPrincipal;
+                    time:Time.Time = Time.now();
+                };
+
+                StableTrieMap.delete(dataPerToken.depositState.depositIds, Blob.equal, Blob.hash, encodedPrincipal);
+                ignore await archive.canister.conversion_Started_Add(depositStartedItem);
+        }
+        catch(error)
+        {
+            StableTrieMap.delete(dataPerToken.depositState.depositIds, Blob.equal, Blob.hash, encodedPrincipal);
+        };
         //---------------------------------------------------------------------------------------------------
 
 
         //---------------------------------------------------------------------------------------------------
         //Now start the transfer of ICRC1 tokens from swap-app main-wallet to swapApp Subaccount:
 
+       
         let icrc1AmountPlusFees = depositAmountToConsider + icrc1Fee; 
- 
+
         //transfer the tokens now into subAccount
         let transferArgs:TypesIcrc.TransferArgs = {
 
@@ -750,7 +778,9 @@ module{
 
 
     private func TransferIcrc1ToUserWalletAndBurnOldDip20(usersPrincipal:Principal, dataPerToken:T.CommonDataPerToken,
-    icrcCanisterId:Text,appPrincipal:Principal): async* T.ResponseConversion{
+    icrcCanisterId:Text,appPrincipal:Principal,  archive:InterfaceHistoryCanister.ArchiveData, 
+    specifiedTokenType:TypesCommon.SpecificTokenType
+    ): async* T.ResponseConversion{
          
         let encodedPrincipal:Blob = Principal.toBlob(usersPrincipal);
         let usersPrincipalText = Principal.toText(usersPrincipal);
@@ -933,13 +963,32 @@ module{
             return #err("Conversion failed in step 'transferToUserWallet->icrc1_transfer'. Error-message: "#debug_show(Error.message(error)));
         };
     
+        //Save the completed state
+        try{
+
+            let depositCompletedItem:TypesArchive.ArchivedConversionCompleted = {
+                tokenType:TypesCommon.SpecificTokenType = specifiedTokenType;
+                amount:Nat = subAccountInfo.depositedDip20AmountToConsider;
+                conversionId:Blob = subAccountInfo.conversionId;
+                userPrincipal:Principal = usersPrincipal;
+                time:Time.Time = Time.now();
+            };
+            ignore await archive.canister.conversion_Completed_Add(depositCompletedItem);
+            await archive.canister.subAccount_Delete(subAccountInfo.subAccount);
+
+        }
+        catch(error){
+            //ignore, if archive item cannot be added there is nothing we can do now
+        };
+       
         return #ok("The transfer of ICRC1 tokens from subAccount into users-wallet was started.");
     };
   
 
     //This method is called when initiated by the user from the front-end
     public func ConvertOldDip20Tokens(userId:Blob, dataPerToken:T.CommonDataPerToken,dip20CanisterId:Text, 
-        dip20TransferFee:Nat, icrcCanisterId:Text,appPrincipal:Principal)
+        dip20TransferFee:Nat, icrcCanisterId:Text,appPrincipal:Principal, archive:InterfaceHistoryCanister.ArchiveData,
+        specificTokenType:TypesCommon.SpecificTokenType)
     : async*  Result.Result<Text, Text>{
 
         //get principal from blob
@@ -965,7 +1014,7 @@ module{
         if (secondStepAlreadyStarted == false){
             
             response := await* PrepareAndTransferTheIcrc1TokensIntoSwapAppSubAccount(usersPrincipal, dataPerToken, icrcCanisterId,
-            dip20CanisterId,dip20TransferFee, appPrincipal);
+            dip20CanisterId,dip20TransferFee, appPrincipal, archive, specificTokenType);
             var result = ResponseConversion(response);
             if (result.0 == false){
                 return result.1;
@@ -974,7 +1023,7 @@ module{
 
         //Step 2
         response := await* TransferIcrc1ToUserWalletAndBurnOldDip20(usersPrincipal, dataPerToken, 
-        icrcCanisterId, appPrincipal);
+        icrcCanisterId, appPrincipal, archive, specificTokenType);
         let result = ResponseConversion(response);
         if (result.0 == false){
             return result.1;
@@ -996,10 +1045,7 @@ module{
             };
             case (#convertionOnProgress(text)){
                 return (false,#err("Conversion still progressing: " # text));
-            };
-            case (#maxRetriesOccured(number)){
-                return (false,#err("Maximum number of retries achieved."));
-            };
+            };          
         };
     };
 

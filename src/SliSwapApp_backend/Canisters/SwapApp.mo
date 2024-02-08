@@ -28,23 +28,26 @@ import Archive "../Actors/Archive";
 
 shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
-  stable var wasInitialized = false;
-  stable var initializeTimerId = 0;
+  stable var wasInitialized : Bool = false;
+  stable var initializeTimerId : Nat = 0;
+  stable var backgroundActivitiesTimerId : Nat = 1;
+  stable let backgroundActivitesTimerTickSeconds : Nat = 24 * 60 * 60; //daily
 
   stable let appSettings : T.AppSettings = InitLib.SwapAppInit(creator);
   stable let tokensInfo : T.TokensInfo = InitLib.TokensInfoInit();
 
   stable let commonData : T.CommonData = InitLib.InitCommonData();
 
-  stable let archive:InterfaceHistoryCanister.ArchiveData = {
-    var canister:InterfaceHistoryCanister.InterfaceArchive = actor ("aaaaa-aa");
+  stable let archive : InterfaceHistoryCanister.ArchiveData = {
+    var canister : InterfaceHistoryCanister.InterfaceArchive = actor ("aaaaa-aa");
   };
 
-  stable var archiveCanisterId:Principal = Principal.fromText("aaaaa-aa");
-  stable var archiveCanisterIdWasSet:Bool = false;
+  stable var archiveCanisterId : Principal = Principal.fromText("aaaaa-aa");
+  stable var archiveCanisterIdWasSet : Bool = false;
 
-  let minimumCycles : Nat = 2000000000;
-  let minimumAboveThresholdNeeded : Nat = 1000000;
+  let minimumCycles : Nat = 4_000_000_000;
+  let archiveTopUpCyclesAmount : Nat = 1_000_000_000;
+  let minimumAboveThresholdNeeded : Nat = 1_000_000;
 
   //-------------------------------------------------------------------------------
   //Swap related methods
@@ -71,6 +74,8 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       tokensInfo.Dip20_Sli.fee,
       tokensInfo.Icrc1_Sli.canisterId,
       appPrincpal,
+      archive,
+      #Dip20Sli,
     );
 
   };
@@ -89,6 +94,8 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       tokensInfo.Dip20_Glds.fee,
       tokensInfo.Icrc1_Glds.canisterId,
       appPrincpal,
+      archive,
+      #Dip20Glds,
     );
   };
 
@@ -182,7 +189,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       amount,
       dip20Fee,
       archive,
-      #Dip20Sli
+      #Dip20Sli,
     );
     return result;
 
@@ -205,7 +212,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       amount,
       dip20Fee,
       archive,
-      #Dip20Glds
+      #Dip20Glds,
     );
 
     return result;
@@ -392,44 +399,44 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     Cycles.balance();
   };
 
-  public shared func archive_cycles_balance():async Nat{
+  public shared func archive_cycles_balance() : async Nat {
     return await archive.canister.cycles_available();
   };
 
-  public shared query ({ caller }) func archive_get_canisterId():async Result.Result<Principal,Text>{
-    let userIsOwnerOrAdmin =  CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
-    if (userIsOwnerOrAdmin == false){
+  public shared query ({ caller }) func archive_get_canisterId() : async Result.Result<Principal, Text> {
+    let userIsOwnerOrAdmin = CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
+    if (userIsOwnerOrAdmin == false) {
       return #err("You need to be owner or admin.");
     };
 
     return #ok(archiveCanisterId);
   };
 
-  public shared ({ caller }) func archive_set_canisterId(principal:Principal):async Result.Result<Text,Text>{
-      let userIsOwnerOrAdmin =  CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
-      if (userIsOwnerOrAdmin == false){
-        return #err("You need to be owner or admin.");
-      };
+  public shared ({ caller }) func archive_set_canisterId(principal : Principal) : async Result.Result<Text, Text> {
+    let userIsOwnerOrAdmin = CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
+    if (userIsOwnerOrAdmin == false) {
+      return #err("You need to be owner or admin.");
+    };
 
-      if (archiveCanisterIdWasSet == true){
-        return #err("The archive canister ID was already set.");
+    if (archiveCanisterIdWasSet == true) {
+      return #err("The archive canister ID was already set.");
 
-      };
-      let principalText:Text = Principal.toText(principal);
-      archive.canister:= actor(principalText);
-      archiveCanisterId:=principal;
+    };
+    let principalText : Text = Principal.toText(principal);
+    archive.canister := actor (principalText);
+    archiveCanisterId := principal;
 
-      let swapAppCanisterId = Principal.fromActor(this);
-      let result = await archive.canister.setSwapAppCanisterId(swapAppCanisterId);
-      switch(result) {
-        case(#ok(text)) {
-            archiveCanisterIdWasSet:=true;
-            return result;
-          };
-        case(#err(text)) {
-          return #err(text);
-         };
+    let swapAppCanisterId = Principal.fromActor(this);
+    let result = await archive.canister.setSwapAppCanisterId(swapAppCanisterId);
+    switch (result) {
+      case (#ok(text)) {
+        archiveCanisterIdWasSet := true;
+        return result;
       };
+      case (#err(text)) {
+        return #err(text);
+      };
+    };
   };
 
   private func cycles_required_available() : Nat {
@@ -450,10 +457,75 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       ignore await* TokensInfoLib.SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Dip20Glds, "7a6j3-uqaaa-aaaao-a2g5q-cai", creator);
       cancelTimer(initializeTimerId);
       wasInitialized := true;
-      
+
       Debug.print("Initialization completed sucessfully");
     } catch (error) {
-      Debug.print("Error. " #debug_show(Error.message(error)));
+      Debug.print("Error. " #debug_show (Error.message(error)));
+    };
+  };
+
+  private func backgroundTimerTickFunction() : async () {
+    try {
+      await autoTopUpArchiveCanisterCycles();
+    } catch (error) {
+    };
+
+    try {
+      await autoTopUpArchiveCanisterCycles();
+    } catch (error) {
+    };
+  };
+
+  private func autoBurnAvailableDip20Tokens() : async () {
+    if (cycles_required_available() < minimumAboveThresholdNeeded) {
+      return;
+    };
+
+    let myPrincipal = Principal.fromActor(this);
+
+    try {
+
+      let actorSliDip20 : Interfaces.InterfaceDip20 = actor (tokensInfo.Dip20_Sli.canisterId);
+      var amount = await actorSliDip20.balanceOf(myPrincipal);
+      if (amount > tokensInfo.Dip20_Sli.fee) {
+        ignore await actorSliDip20.burn(amount);
+      };
+    } catch (error) {
+
+    };
+
+    try {
+
+      let actorGldsDip20 : Interfaces.InterfaceDip20 = actor (tokensInfo.Dip20_Glds.canisterId);
+      var amount = await actorGldsDip20.balanceOf(myPrincipal);
+      if (amount > tokensInfo.Dip20_Glds.fee) {
+        ignore await actorGldsDip20.burn(amount);
+      };
+    } catch (error) {
+
+    };
+  };
+
+  private func autoTopUpArchiveCanisterCycles() : async () {
+
+    try {
+
+      if (archiveCanisterIdWasSet == false) {
+        return;
+      };
+
+      if (cycles_required_available() < minimumAboveThresholdNeeded) {
+        return;
+      };
+
+      let cyclesOnArchive : Nat = await archive.canister.cycles_available();
+      if (cyclesOnArchive < archiveTopUpCyclesAmount) {
+        Cycles.add(archiveTopUpCyclesAmount);
+        await archive.canister.deposit_cycles();
+      };
+
+    } catch (error) {
+      //do nothing
     };
 
   };
@@ -469,6 +541,13 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       },
     );
   };
+
+  backgroundActivitiesTimerId := recurringTimer(
+    #seconds backgroundActivitesTimerTickSeconds,
+    func() : async () {
+      await backgroundTimerTickFunction();
+    },
+  );
 
   system func inspect(args : { caller : Principal; arg : Blob }) : Bool {
     let caller = args.caller;

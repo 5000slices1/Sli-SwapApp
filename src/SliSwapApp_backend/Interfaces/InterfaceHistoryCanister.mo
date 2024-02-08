@@ -25,6 +25,20 @@ module{
         deposit_Get_Items: shared query (from:Nat, count:Nat) -> async Result.Result<[TypesArchive.ArchivedDeposit], Text>;
         deposit_Add: shared (depositItem:TypesArchive.ArchivedDeposit) -> async Result.Result<Text, Text>;
 
+        conversion_Started_Total_Count: shared query () -> async Nat64;
+        conversion_Started_FromPrincipal_Count: shared query (principal:Principal) -> async Nat64;
+        conversion_Started_Indizes_For_Principal: shared query (principal:Principal) -> async Result.Result<[Nat64], Text>;
+        conversion_Started_Get_Item_By_Index: shared query (index:Nat64) -> async Result.Result<TypesArchive.ArchivedConversionStarted, Text>;
+        conversion_Started_Get_Items: shared query (from:Nat, count:Nat) -> async Result.Result<[TypesArchive.ArchivedConversionStarted], Text>;
+        conversion_Started_Add: shared (item:TypesArchive.ArchivedConversionStarted) -> async Result.Result<Text, Text>;
+
+        conversion_Completed_Total_Count: shared query () -> async Nat64;
+        conversion_Completed_FromPrincipal_Count: shared query (principal:Principal) -> async Nat64;
+        conversion_Completed_Indizes_For_Principal: shared query (principal:Principal) -> async Result.Result<[Nat64], Text>;
+        conversion_Completed_Get_Item_By_Index: shared query (index:Nat64) -> async Result.Result<TypesArchive.ArchivedConversionCompleted, Text>;
+        conversion_Completed_Get_Items: shared query (from:Nat, count:Nat) -> async Result.Result<[TypesArchive.ArchivedConversionCompleted], Text>;
+        conversion_Completed_Add: shared (item:TypesArchive.ArchivedConversionCompleted) -> async Result.Result<Text, Text>;
+
         cycles_available:shared query () -> async Nat;
         deposit_cycles:shared () -> async ();
         getArchiveCanisterId:shared query ()-> async Principal;
