@@ -16,14 +16,14 @@ module{
 
 
 
-        public func AddAdminUser(caller : Principal, appSettings : T.AppSettings, principal : Text) : async* Result.Result<Text, Text> {
+    public func AddAdminUser(caller : Principal, appSettings : T.AppSettings, principal : Text) : async* Result.Result<Text, Text> {
 
         if (caller != appSettings.SwapAppCreator) {
             return #err("Only owner of SwapApp can add admin user");
         };
         let realPrincipal = Principal.fromText(principal);
 
-        let userIsAlreadyAdminOrOwner = await* CommonLib.UserIsOwnerOrAdmin(appSettings, realPrincipal);
+        let userIsAlreadyAdminOrOwner = CommonLib.UserIsOwnerOrAdmin(appSettings, realPrincipal);
         if (userIsAlreadyAdminOrOwner == false) {
             appSettings.SwapAppAdmins := List.push<Text>(principal, appSettings.SwapAppAdmins);
             return #ok("Principal was added as admin user.");
@@ -39,7 +39,7 @@ module{
         };
         let realPrincipal = Principal.fromText(principal);
 
-        let userIsAlreadyAdminOrOwner = await* CommonLib.UserIsOwnerOrAdmin(appSettings, realPrincipal);
+        let userIsAlreadyAdminOrOwner =  CommonLib.UserIsOwnerOrAdmin(appSettings, realPrincipal);
         if (userIsAlreadyAdminOrOwner == true) {
             appSettings.SwapAppAdmins := List.filter<Text>(appSettings.SwapAppAdmins, func n { n != principal });
             return #ok("Principal is no longer an admin user.");

@@ -114,7 +114,8 @@ module{
     };
 
     public type DepositState = {
-        depositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;         
+        depositInProgress:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>;        
+        depositIds: StableTrieMap.StableTrieMap<EncodedPrincipal, List.List<Blob>>; 
     };
 
     public type SubAccountInfo = {
@@ -153,12 +154,8 @@ module{
         //Transfer ICRC1 tokens from individual subaccount to users wallet started.
         transferFromSubaccountStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
 
-        //The transfer of the deposited Dip20 tokens into app-wallet is started
-        //transferDip20ToAppWalletStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, Time.Time>; 
         transferAndBurnDip20Tokens:StableTrieMap.StableTrieMap<Blob,TransferAndBurnDip20Info>;
-        //This is the status for the last step, where the tokens will be burned
-        //burningOfDipTokensStarted:StableTrieMap.StableTrieMap<EncodedPrincipal, StartedStateInfo>; 
-
+  
         //The temporary subaccount that will be used for the target-token transfers
         //When all above steps are completed, the entry will be removed from this entry
         temporarySubaccounts:StableTrieMap.StableTrieMap<EncodedPrincipal, SubAccountInfo>; 

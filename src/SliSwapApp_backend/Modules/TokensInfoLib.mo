@@ -44,7 +44,7 @@ module{
         caller : Principal,
     ) : async* Result.Result<Text, Text> {
 
-        let userIsAdminOrOwner = await* CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
+        let userIsAdminOrOwner =  CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
 
         if (userIsAdminOrOwner != true) {
             return #err("Only canister owner or admins can call this method");

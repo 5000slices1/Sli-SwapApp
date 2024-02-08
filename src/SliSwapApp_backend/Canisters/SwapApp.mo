@@ -23,6 +23,8 @@ import CommonLib "../Modules/CommonLib";
 import AdminLib "../Modules/AdminLib";
 import SwapLib "../Modules/SwapLib";
 import Cycles "mo:base/ExperimentalCycles";
+import InterfaceHistoryCanister "../Interfaces/InterfaceHistoryCanister";
+import Archive "../Actors/Archive";
 
 shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
@@ -33,6 +35,13 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   stable let tokensInfo : T.TokensInfo = InitLib.TokensInfoInit();
 
   stable let commonData : T.CommonData = InitLib.InitCommonData();
+
+  stable let archive:InterfaceHistoryCanister.ArchiveData = {
+    var canister:InterfaceHistoryCanister.InterfaceArchive = actor ("aaaaa-aa");
+  };
+
+  stable var archiveCanisterId:Principal = Principal.fromText("aaaaa-aa");
+  stable var archiveCanisterIdWasSet:Bool = false;
 
   let minimumCycles : Nat = 2000000000;
   let minimumAboveThresholdNeeded : Nat = 1000000;
@@ -172,6 +181,8 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       commonData.sliData,
       amount,
       dip20Fee,
+      archive,
+      #Dip20Sli
     );
     return result;
 
@@ -193,6 +204,8 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       commonData.gldsData,
       amount,
       dip20Fee,
+      archive,
+      #Dip20Glds
     );
 
     return result;
@@ -218,7 +231,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     if (cycles_required_available() < minimumAboveThresholdNeeded) {
       return #err("Not enough free Cycles available");
     };
-    return await* WalletsLib.AddNewApprovedWallet(caller, appSettings, commonData.sliData.approvedWallets, principal);
+    return WalletsLib.AddNewApprovedWallet(caller, appSettings, commonData.sliData.approvedWallets, principal);
   };
 
   //Returns the number of 'free and in-use' temporary Sli-swap wallets
@@ -233,7 +246,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     if (cycles_required_available() < minimumAboveThresholdNeeded) {
       return #err("Not enough free Cycles available");
     };
-    return await* WalletsLib.AddNewApprovedWallet(caller, appSettings, commonData.gldsData.approvedWallets, principal);
+    return WalletsLib.AddNewApprovedWallet(caller, appSettings, commonData.gldsData.approvedWallets, principal);
   };
 
   //Returns the number of 'free and in-use' temporary Glds-swap wallets
@@ -379,6 +392,46 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     Cycles.balance();
   };
 
+  public shared func archive_cycles_balance():async Nat{
+    return await archive.canister.cycles_available();
+  };
+
+  public shared query ({ caller }) func archive_get_canisterId():async Result.Result<Principal,Text>{
+    let userIsOwnerOrAdmin =  CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
+    if (userIsOwnerOrAdmin == false){
+      return #err("You need to be owner or admin.");
+    };
+
+    return #ok(archiveCanisterId);
+  };
+
+  public shared ({ caller }) func archive_set_canisterId(principal:Principal):async Result.Result<Text,Text>{
+      let userIsOwnerOrAdmin =  CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
+      if (userIsOwnerOrAdmin == false){
+        return #err("You need to be owner or admin.");
+      };
+
+      if (archiveCanisterIdWasSet == true){
+        return #err("The archive canister ID was already set.");
+
+      };
+      let principalText:Text = Principal.toText(principal);
+      archive.canister:= actor(principalText);
+      archiveCanisterId:=principal;
+
+      let swapAppCanisterId = Principal.fromActor(this);
+      let result = await archive.canister.setSwapAppCanisterId(swapAppCanisterId);
+      switch(result) {
+        case(#ok(text)) {
+            archiveCanisterIdWasSet:=true;
+            return result;
+          };
+        case(#err(text)) {
+          return #err(text);
+         };
+      };
+  };
+
   private func cycles_required_available() : Nat {
     let cycles : Nat = Cycles.balance();
     if (cycles < minimumCycles) {
@@ -389,26 +442,30 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return required_available;
   };
 
-  private func InitTokenMetaDatas() : async () {
+  private func initTokenMetaDatas() : async () {
 
     try {
+
       ignore await* TokensInfoLib.SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Dip20Sli, "zzriv-cqaaa-aaaao-a2gjq-cai", creator);
       ignore await* TokensInfoLib.SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Dip20Glds, "7a6j3-uqaaa-aaaao-a2g5q-cai", creator);
       cancelTimer(initializeTimerId);
       wasInitialized := true;
-
+      
+      Debug.print("Initialization completed sucessfully");
     } catch (error) {
-      //do nothing...
+      Debug.print("Error. " #debug_show(Error.message(error)));
     };
 
   };
 
-  wasInitialized := false;
+  //TODO:UNDO
+  //wasInitialized := false;
+
   if (wasInitialized == false) {
     initializeTimerId := setTimer(
       #seconds 1,
       func() : async () {
-        await InitTokenMetaDatas();
+        await initTokenMetaDatas();
       },
     );
   };

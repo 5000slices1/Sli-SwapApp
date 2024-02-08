@@ -69,7 +69,8 @@ private func InitAndReturnCommonDataPerToken() : T.CommonDataPerToken {
     };
 
     let depositStateItem: T.DepositState = {
-        depositInProgress : StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();            
+        depositInProgress : StableTrieMap.StableTrieMap<T.EncodedPrincipal, Time.Time> = StableTrieMap.new();  
+        depositIds:StableTrieMap.StableTrieMap<T.EncodedPrincipal, List.List<Blob>> = StableTrieMap.new();     
     };
 
     let convertStateItem : T.ConvertState = {

@@ -21,6 +21,10 @@ import Nat64 "mo:base/Nat64";
 import Int "mo:base/Nat64";
 import Nat "mo:base/Nat";
 import TokensInfoLib "TokensInfoLib";
+import InterfaceHistoryCanister "../Interfaces/InterfaceHistoryCanister";
+import TypesArchive "../Types/TypesArchive";
+import TypesCommon "../Types/TypesCommon";
+
 
 module{
 
@@ -234,7 +238,7 @@ module{
   
     public func DepositDip20Tokens(usersPrincipal:Principal, 
     dip20CanisterId:Text, swapAppPrincipal:Principal, dataPerToken:T.CommonDataPerToken, 
-    amount:Nat, fee:Nat):async* Result.Result<Text,Text>{
+    amount:Nat, fee:Nat,archive:InterfaceHistoryCanister.ArchiveData, tokenType:TypesCommon.SpecificTokenType):async* Result.Result<Text,Text>{
 
         let usersPrincipalBlob = Principal.toBlob(usersPrincipal);
 
@@ -321,6 +325,46 @@ module{
             };
         };
 
+
+        //Create depositId and save it
+        let newDepositId:Blob = await Random.blob();
+        let depositIdsOrNull = StableTrieMap.get(dataPerToken.depositState.depositIds, Blob.equal, Blob.hash, usersPrincipalBlob);
+        var depositIdList:List.List<Blob> = List.nil<Blob>();
+
+        switch(depositIdsOrNull){
+            case (?foundDepositList){
+                 depositIdList:= List.push(newDepositId,foundDepositList);
+            };
+            case (_){
+                depositIdList:= List.push(newDepositId,depositIdList);
+            };
+        };
+
+        StableTrieMap.put(dataPerToken.depositState.depositIds, Blob.equal, Blob.hash, usersPrincipalBlob,depositIdList);
+
+        let archiveDepositItem:TypesArchive.ArchivedDeposit = {
+            tokenType:TypesCommon.SpecificTokenType = tokenType;
+            amount:Nat = amount + (2 * fee);
+            realAmount:Nat = amount;
+            from:Principal = usersPrincipal;
+            to:Principal = swapWalletPrincipal;
+            depositId:Blob = newDepositId;
+            time:Time.Time = Time.now();
+        };
+
+        try{
+            let depositItemAddResult = await archive.canister.deposit_Add(archiveDepositItem);
+            switch(depositItemAddResult) {
+                case(#ok(text)) { 
+                    //do nothing  
+                };
+                case(#err(text)) { return #err(text); };
+            };
+        }catch(error){
+            //ignore error
+            return #err(Error.message(error));
+        };
+       
         //Now do the transfer:    
         var transferResult:TypesDip20.TxReceipt = #Ok(0);
 
@@ -398,7 +442,9 @@ module{
 
 
     private func PrepareAndTransferTheIcrc1TokensIntoSwapAppSubAccount(usersPrincipal:Principal, dataPerToken:T.CommonDataPerToken, 
-    icrcCanisterId:Text, dip20CanisterId:Text, dip20TransferFee:Nat, swapAppCanisterId:Principal):async* T.ResponseConversion{
+    icrcCanisterId:Text, dip20CanisterId:Text, dip20TransferFee:Nat, swapAppCanisterId:Principal,
+    archive:InterfaceHistoryCanister.ArchiveData
+    ):async* T.ResponseConversion{
 
         let usersPrincipalAsText:Text = Principal.toText(usersPrincipal);
         let icrc1Actor:Interfaces.InterfaceICRC1 = actor(icrcCanisterId);
@@ -579,6 +625,23 @@ module{
         StableTrieMap.put(dataPerToken.convertState.convertInProgress, Blob.equal, Blob.hash, encodedPrincipal, Time.now());
         StableTrieMap.put(dataPerToken.convertState.transferToSubaccountStarted, Blob.equal, Blob.hash, encodedPrincipal, Time.now());
         
+        //---------------------------------------------------------------------------------------------------
+
+
+        //---------------------------------------------------------------------------------------------------
+        // Save subAccount into archive.
+        try{
+            await archive.canister.subAccount_Add(subAccount);
+        }catch(error){
+            //Do nothing in case of error. The used subaccount in the archive is only a nice to have feature.
+        };
+        //---------------------------------------------------------------------------------------------------
+
+
+        //---------------------------------------------------------------------------------------------------
+        // Save conversion start into archive.
+        
+
         //---------------------------------------------------------------------------------------------------
 
 

@@ -16,6 +16,10 @@
         "dist/SliSwapApp_frontend/"
       ],
       "type": "assets"
+    },
+    "SliSwapApp_archive": {
+      "main": "src/SliSwapApp_backend/Actors/Archive.mo",
+      "type": "motoko"
     }
   },
   "defaults": {
