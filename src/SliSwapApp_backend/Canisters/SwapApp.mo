@@ -48,6 +48,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   let minimumCycles : Nat = 4_000_000_000;
   let archiveTopUpCyclesAmount : Nat = 1_000_000_000;
   let minimumAboveThresholdNeeded : Nat = 1_000_000;
+  var swapAppPrincipal = Principal.fromText("aaaaa-aa");
 
   //-------------------------------------------------------------------------------
   //Swap related methods
@@ -420,8 +421,11 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
     if (archiveCanisterIdWasSet == true) {
       return #err("The archive canister ID was already set.");
-
     };
+
+    //we also need to use this
+    swapAppPrincipal := Principal.fromActor(this);
+
     let principalText : Text = Principal.toText(principal);
     archive.canister := actor (principalText);
     archiveCanisterId := principal;
@@ -464,29 +468,15 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     };
   };
 
-  private func backgroundTimerTickFunction() : async () {
-    try {
-      await autoTopUpArchiveCanisterCycles();
-    } catch (error) {
-    };
-
-    try {
-      await autoBurnAvailableDip20Tokens();
-    } catch (error) {
-    };
-  };
-
   private func autoBurnAvailableDip20Tokens() : async () {
     if (cycles_required_available() < minimumAboveThresholdNeeded) {
       return;
     };
 
-    let myPrincipal = Principal.fromActor(this);
-
     try {
 
       let actorSliDip20 : Interfaces.InterfaceDip20 = actor (tokensInfo.Dip20_Sli.canisterId);
-      var amount = await actorSliDip20.balanceOf(myPrincipal);
+      var amount = await actorSliDip20.balanceOf(swapAppPrincipal);
       if (amount > tokensInfo.Dip20_Sli.fee) {
         ignore await actorSliDip20.burn(amount);
       };
@@ -497,7 +487,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     try {
 
       let actorGldsDip20 : Interfaces.InterfaceDip20 = actor (tokensInfo.Dip20_Glds.canisterId);
-      var amount = await actorGldsDip20.balanceOf(myPrincipal);
+      var amount = await actorGldsDip20.balanceOf(swapAppPrincipal);
       if (amount > tokensInfo.Dip20_Glds.fee) {
         ignore await actorGldsDip20.burn(amount);
       };
@@ -528,6 +518,16 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       //do nothing
     };
 
+  };
+
+  private func backgroundTimerTickFunction() : async () {
+    try {
+      await autoTopUpArchiveCanisterCycles();
+    } catch (error) {};
+
+    try {
+      await autoBurnAvailableDip20Tokens();
+    } catch (error) {};
   };
 
   //TODO:UNDO
