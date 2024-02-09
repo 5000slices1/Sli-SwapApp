@@ -2,7 +2,7 @@ import { pageIds, pageIdValues } from "../Types/CommonTypes";
 import { convertSliDip20_init } from "../../Pages/ConvertSliDip20/ConvertSliDip20";
 import { convertGldsDip20_init } from "../../Pages/ConvertGldsDip20/ConvertGldsDip20";
 import { admin_section_init } from "../../Pages/AdminSection/PageAdminSection";
-
+import { historyTransactions_init } from "../../Pages/ArchivedTransactions/PageHistorySwapTransactions";
 
 async function init_javascript_code(tagValue){
 
@@ -19,6 +19,10 @@ async function init_javascript_code(tagValue){
             break;
             case pageIdValues.PageAdminSection:{              
               await admin_section_init();
+            }
+            break;
+            case pageIdValues.PageHistorySwapTransactions:{
+              await historyTransactions_init();
             }
             break;
             default:

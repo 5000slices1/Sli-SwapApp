@@ -476,19 +476,9 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
 
   //--------------------------------------------------------------------
 
+  //This function is only for developing purposes
   public shared func Clear() : async Result.Result<Text, Text> {
-    // let depositItem:TypesArchive.ArchivedDeposit = {
-    //   tokenType:TypesCommon.SpecificTokenType = #Dip20Sli;
-    //     amount:Nat = 500;
-    //     realAmount:Nat = 500;
-    //     from:Principal = Principal.fromText("aaaaa-aa");
-    //     to:Principal = Principal.fromText("aaaaa-aa");
-    //     depositId:Blob = await Random.blob();
-    //     time:Time.Time = Time.now();
-    // };
-    // return await deposit_Add(depositItem);
     return #ok("did nothing.");
-
   };
 
   /// Deposit cycles into this archive canister.

@@ -6,32 +6,20 @@ import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
 import { Principal } from "@dfinity/principal";
 import { ResultTypes } from "../../modules/Types/CommonTypes";
 
-function RelatedHtmlPageExist() {
-    return document.getElementById('ConvertGlds_HtmlPage') != null;
-}
 
 
-function userIsLoggedIn() {
-    let usersIdentity = CommonIdentityProvider?.WalletsProvider?.UsersIdentity;
+var gldsDepositOrConvertionIsOnProgress = false;
+var gldsUserIdBlob = "";
 
-    if (usersIdentity == null || usersIdentity == undefined) {
-        return false;
-    }
-
-    if (usersIdentity.IsConnected == true) {
-        return true;
-    }
-    return false;
-}
+//#region conversion
 
 async function convert_deposited_oldGldsTokens() {
 
-    try {
-        if (RelatedHtmlPageExist() == false) {
-            return;
-        }
 
-        if (userIsLoggedIn() == false) {
+
+    try {
+        
+        if (PageExistAndUserIsLoggedIn() == false) {
             return;
         }
 
@@ -44,8 +32,8 @@ async function convert_deposited_oldGldsTokens() {
             return;
         }
 
-        let userIdBlob = resultUserId.ResultValue;
-        let convertResponse = await SliSwapApp_backend.ConvertOldGldsDip20Tokens(userIdBlob);
+        gldsUserIdBlob = resultUserId.ResultValue;
+        let convertResponse = await SliSwapApp_backend.ConvertOldGldsDip20Tokens(gldsUserIdBlob);
         await UpdateBalances();
         let result = GetResultFromVariant(convertResponse);
         if (result.Result != ResultTypes.ok) {
@@ -62,19 +50,24 @@ async function convert_deposited_oldGldsTokens() {
     }
 }
 
+//#endregion
 
+//#region Deposit Dip20 tokens
 
 async function deposit_oldGldsTokens() {
 
-    if (RelatedHtmlPageExist() == false) {
+    if (PageExistAndUserIsLoggedIn() == false) {
         return;
     }
-
-    if (userIsLoggedIn() == false) {
+    
+    if (gldsDepositOrConvertionIsOnProgress == true){
+        alert('Not possible. Deposit or Convertion is still on progres...');
         return;
     }
 
     try {
+       
+        gldsDepositOrConvertionIsOnProgress = true;
 
         document.getElementById('buttonDepositNowOldGldsDip20').disabled = true;
         document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = true;
@@ -104,10 +97,11 @@ async function deposit_oldGldsTokens() {
             return;
         }
 
-        let depositablePossible = await SliSwapApp_backend.CanUserDepositGldsDip20(userPrincipal);
-        if (depositablePossible == false) {
+        let depositablePossibleResponse = GetResultFromVariant(await SliSwapApp_backend.CanUserDepositGldsDip20(userPrincipal));
 
-            alert('Deposit is currently not possible.');
+        if (depositablePossibleResponse.Result == false) {
+
+            alert( depositablePossibleResponse.ResultValue);
             return;
         }
 
@@ -128,7 +122,7 @@ async function deposit_oldGldsTokens() {
             return;
         }
 
-        let depositResult = await SliSwapApp_backend.DepositGldsDip20Tokens(userPrincipal, amountToDepositBigInt);
+        let depositResult = await SliSwapApp_backend.DepositGldsDip20Tokens(userPrincipal, amountToDepositBigInt);       
         let parsedResult = GetResultFromVariant(depositResult);
 
         await UpdateBalances();
@@ -143,7 +137,44 @@ async function deposit_oldGldsTokens() {
     finally {
         document.getElementById('buttonDepositNowOldGldsDip20').disabled = false;
         document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = false;
+        gldsDepositOrConvertionIsOnProgress = false;
     }
+}
+
+//#endregion Deposit Dip20 tokens
+
+//#region Helper functions 
+
+
+function PageExistAndUserIsLoggedIn(){
+
+    if (RelatedHtmlPageExist()== false){
+        return false;
+    }
+
+    if (userIsLoggedIn() == false){
+        return false;
+    }
+
+    return true;
+}
+
+function RelatedHtmlPageExist() {
+    return document.getElementById('ConvertGlds_HtmlPage') != null;
+}
+
+
+function userIsLoggedIn() {
+    let usersIdentity = CommonIdentityProvider?.WalletsProvider?.UsersIdentity;
+
+    if (usersIdentity == null || usersIdentity == undefined) {
+        return false;
+    }
+
+    if (usersIdentity.IsConnected == true) {
+        return true;
+    }
+    return false;
 }
 
 async function ResetAllValues() {
@@ -199,8 +230,7 @@ async function UpdateBalances() {
     feeNeeded = feeNeeded + feeNeeded + feeNeeded;
 
     let gldsDip20TokensBalanceInUserWallet = (await tokenInfo.GetBalanceFromUsersWallet()).GetValue();
-    console.log("glds in wallet");
-    console.log(gldsDip20TokensBalanceInUserWallet);
+
 
     let response = await SwapAppActorProvider.GetDepositedGldsAmount();
     if (response.Result == ResultTypes.ok) {
@@ -234,10 +264,13 @@ async function UpdateBalances() {
     document.getElementById('glds-icrc1-tokens-in-wallet').value = gldsIcrc1TokensBalanceInUserWallet;
 }
 
+//#endregion Helper functions 
 
+//#region Init
 
 export const convertGldsDip20_init = async function initConvertGldsDip20() {
 
+    gldsDepositOrConvertionIsOnProgress = false;
     PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged');
     PubSub.subscribe('ConvertDip20_js_UserIdentityChanged', 'UserIdentityChanged', UpdateBalances);
 
@@ -258,4 +291,7 @@ export const convertGldsDip20_init = async function initConvertGldsDip20() {
 
     await UpdateBalances();
 };
+
+
+//#endregion Init
 
