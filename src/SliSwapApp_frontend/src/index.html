@@ -13,7 +13,6 @@
   <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- <script type="text/javascript" src="/src/SliSwapApp_frontend/src/index.js"></script> -->
-
 </head>
 
 <body>
@@ -94,14 +93,22 @@
 
 
   <div style="left: 0px;position: block; ">
-    <table style="margin-left: -4px; padding-top: 140px;  width: 100%;min-height: 750px;">
+    <table style="margin-left: -4px; padding-top: 140px;  
+    width: 100%;min-height: 350px;max-height: 400px;">
 
       <!-- #region Left side navigation Controls -->
-      <td style="width: 100px;">
-        <div style="min-height: 450px;background-color: #0e0f27;
+      <td style="width: 220px;">
+
+        <!-- This placeholder is needed, please do not delete -->
+        <div style="width: 220px;height:0.01px;background-color: transparent"> 
+           
+        </div>
+        <div style="min-height: 240px;background-color: #0e0f27;
         border-radius: 8px;
-            box-shadow: 0 0 10px 0 rgb(255, 254, 254);padding: 12px;
-            font-size: 0.7em;width: 200px;
+            box-shadow: 0 0 10px 0 rgb(255, 254, 254);
+            padding-left: 12px;padding-right: 12px;padding-top: 16px; padding-bottom: 0px;
+            font-size: 0.7em;width: 205px;
+            position: fixed;
             ">
           <button type="submit" class="button-navigation" id="PageStartPage" style="color: rgb(143, 143, 143);">Start
             Page</button>
@@ -120,29 +127,32 @@
           <button type="submit" class="button-navigation" id="PageAdminSection"
             style="display: none;color: rgb(143, 143, 143);">Admin
             section</button>
-
         </div>
       </td>
       <!-- #endregion Left side navigation Controls -->
 
       <!-- #region Dynamically added Html contents -->
 
-      <td style="vertical-align: top; padding-left: 32px;position: relative;">
-        <div mainContentPageId="PageConvertSliDip20" html-source="/Pages/ConvertSliDip20/ConvertSliDip20.html"></div>
+      <td style="vertical-align: top; 
+      ">
+      <div id="mainpage_main_content_div" >
 
-        <div mainContentPageId="PageConvertGldsDip20" html-source="/Pages/ConvertGldsDip20/ConvertGldsDip20.html"></div>
+        
+        <td style="padding-left: 0px;position: relative;">
+          <div mainContentPageId="PageConvertSliDip20" html-source="/Pages/ConvertSliDip20/ConvertSliDip20.html"></div>
 
-        <div mainContentPageId="PageStartPage" html-source="/Pages/StartPage/StartPage.html"></div>
-        <div mainContentPageId="PageAdminSection" html-source="/Pages/AdminSection/PageAdminSection.html"></div>
-        <div mainContentPageId="PageHistorySwapTransactions" html-source="/Pages/ArchivedTransactions/PageHistorySwapTransactions.html"></div>
+          <div mainContentPageId="PageConvertGldsDip20" html-source="/Pages/ConvertGldsDip20/ConvertGldsDip20.html"></div>
 
-        <!-- #endregion Dynamically added Html contents -->
+          <div mainContentPageId="PageStartPage" html-source="/Pages/StartPage/StartPage.html"></div>
+          <div mainContentPageId="PageAdminSection" html-source="/Pages/AdminSection/PageAdminSection.html"></div>
+          <div mainContentPageId="PageHistorySwapTransactions" html-source="/Pages/ArchivedTransactions/PageHistorySwapTransactions.html"></div>
+          <!-- #endregion Dynamically added Html contents -->
       </td>
 
     </table>
   </div>
 
-  <footer class="footer" style="margin-left: 8px;margin-right: -8px; width:100%;">
+  <footer id="mainpage_footer" class="footer" style="margin-left: 8px;margin-right: -8px; width:100%;">
     <div>
 
       Join Community: <a style="color:rgb(172, 101, 15);" target="_blank"

@@ -224,15 +224,21 @@ async function UpdateBalances() {
     }
 
     let tokenInfo = await getTokenInfo();
+    let icrc1TokenInfo = await getIcrc1TokenInfo();
+
     var feeNeeded = tokenInfo.TransferFee.GetValue();
 
     //One fee for approval and one for transfer. Therefore the fee = 3 * transferFee, because at least 0.001 must be transfered
     feeNeeded = feeNeeded + feeNeeded + feeNeeded;
 
-    let gldsDip20TokensBalanceInUserWallet = (await tokenInfo.GetBalanceFromUsersWallet()).GetValue();
+    let [firstResult, secondResult, response] = await Promise.all([tokenInfo.GetBalanceFromUsersWallet(), 
+        icrc1TokenInfo.GetBalanceFromUsersWallet(), SwapAppActorProvider.GetDepositedGldsAmount()]);
 
+        let gldsDip20TokensBalanceInUserWallet = firstResult.GetValue();
+        let gldsIcrc1TokensBalanceInUserWallet = secondResult.GetValue();
 
-    let response = await SwapAppActorProvider.GetDepositedGldsAmount();
+        
+    // let response = await SwapAppActorProvider.GetDepositedGldsAmount();
     if (response.Result == ResultTypes.ok) {
         let depositedAmount = new TokenBalance(BigInt(response.ResultValue), tokenInfo.Decimals);
         document.getElementById('DepositedAmountOldGldsDip20').value = Number(depositedAmount.GetValue());
@@ -256,11 +262,6 @@ async function UpdateBalances() {
 
     document.getElementById('depositAmountOldGldsDip20').value = depositableAmount;
     document.getElementById('depositAmountOldGldsDip20').max = depositableAmount;
-
-
-    let icrc1TokenInfo = await getIcrc1TokenInfo();
-    let gldsIcrc1TokensBalanceInUserWallet = (await icrc1TokenInfo.GetBalanceFromUsersWallet()).GetValue();
-
     document.getElementById('glds-icrc1-tokens-in-wallet').value = gldsIcrc1TokensBalanceInUserWallet;
 }
 

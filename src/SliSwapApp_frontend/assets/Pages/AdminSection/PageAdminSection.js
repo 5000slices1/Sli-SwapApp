@@ -33,7 +33,7 @@ async function UpdateVisibilityForDynamicRows(tokenSymbol, shouldShow) {
     if (RelatedHtmlPageExist() == false) {
 
         return;
-    }    
+    }
     const tableRows = document.querySelectorAll('#Table_' + tokenSymbol + ' tr');
 
     tableRows.forEach(tr => {
@@ -131,7 +131,7 @@ async function UpdateValues() {
         swapAppCanisterIdTextBox.value = "unknown";
     }
     let swapAppPrincipal = Principal.fromText(CommonIdentityProvider.SwapAppPrincipalText);
-    
+
     if (StopRequested() == true) { return; }
 
     let sliToken = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Icrc1Sli);
@@ -295,6 +295,63 @@ async function setGldsIcrcCanisterId() {
     }
 }
 
+async function lock_ICRC1_changing_CanisterIds(){
+    console.log("try to set state:");
+    let result = await SwapAppActorProvider.set_changing_icrc1_canister_ids_to_locked_state();
+    console.log(result);
+    console.log("o.k. try to set state:");
+
+    console.log("calling is locked:");
+    let isLocked = await SliSwapApp_backend.changing_icrc1_canister_ids_has_locked_state();
+    console.log("is locked:");
+    console.log(isLocked);
+    await initialize_set_icrc1_cansiter_ids_buttons();
+}
+
+async function initialize_set_icrc1_cansiter_ids_buttons(){
+
+    let isLocked = await SliSwapApp_backend.changing_icrc1_canister_ids_has_locked_state();
+    
+    var element = document.getElementById('set-sli-icrc1-canister-id');
+    if (element != null) {
+
+        element.removeEventListener('click', async () => { await setSliIcrcCanisterId(); }, true);
+
+        if (isLocked == true) {
+            element.disabled = true;
+        }
+        else {
+            element.disabled = false;
+            element.addEventListener('click', async () => { await setSliIcrcCanisterId(); }, true);
+        }
+    }
+
+    element = document.getElementById('set-glds-icrc1-canister-id');
+    if (element != null) {
+
+        element.removeEventListener('click', async () => { await setGldsIcrcCanisterId(); }, true);
+        if (isLocked == true) {
+            element.disabled = true;
+        }
+        else {
+            element.disabled = false;
+            element.addEventListener('click', async () => { await setGldsIcrcCanisterId(); }, true);
+        }
+    }
+
+    element = document.getElementById('page_admin_lock_setting_icrc1_cansiter_ids');
+    if (element != null){
+        element.removeEventListener('click', async () => { await lock_ICRC1_changing_CanisterIds(); }, true);
+        if (isLocked == true) {
+            element.disabled = true;
+        }
+        else {
+            element.disabled = false;
+            element.addEventListener('click', async () => { await lock_ICRC1_changing_CanisterIds(); }, true);
+        }
+    }
+}
+
 //This section is called everytime the corresponding html-page 'PageAdminSection.html' is shown
 export const admin_section_init = async function initAdminSection() {
 
@@ -303,6 +360,8 @@ export const admin_section_init = async function initAdminSection() {
     }
 
     admin_section_init.CommonThingsInitialized = false;
+    await initialize_set_icrc1_cansiter_ids_buttons();
+    
     await RemoveButtonClickEvents();
     await AddButtonClickEvents();
 
@@ -310,19 +369,7 @@ export const admin_section_init = async function initAdminSection() {
     await UpdateVisibilityForDynamicRows("glds", true);
     await UpdateUiFromModel();
 
-    var element = document.getElementById('set-sli-icrc1-canister-id');
-    if (element != null) {
-        element.removeEventListener('click', async () => { await setSliIcrcCanisterId(); }, true);
-        element.disabled = false;
-        element.addEventListener('click', async () => { await setSliIcrcCanisterId(); }, true);
-    }
-
-    element = document.getElementById('set-glds-icrc1-canister-id');
-    if (element != null) {
-        element.removeEventListener('click', async () => { await setGldsIcrcCanisterId(); }, true);
-        element.disabled = false;
-        element.addEventListener('click', async () => { await setGldsIcrcCanisterId(); }, true);
-    }
+ 
 
     admin_section_init.CommonThingsInitialized = true;
     await UpdateValues();
@@ -360,7 +407,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
 
     transferFeeBigInt = dip20Token.TransferFee.GetRawValue();
     dip20CanisterIdToUse = dip20Token.CanisterId;
-    
+
     let approveAmount = TokenBalance.FromNumber(5000, dip20Token.Decimals).GetRawValue();
 
     const indexArray = Get2DimArray(numberOfWalletsToCreate, bucketSize);
@@ -374,14 +421,14 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
             let approvalWalletIdentity = GetRandomIdentity();
             let approvalWalletPrincipal = approvalWalletIdentity.getPrincipal();
             let principalAlreadyOccupied = await SliSwapApp_backend.ApprovedWalletsPrincipalExist(approvalWalletPrincipal);
-            
+
             if (principalAlreadyOccupied == false) {
 
                 //(1) Transfer fee amount into the wallet, because the 'approve' call costs fee.
                 let transferResult = await dip20Token.TransferTokens(approvalWalletPrincipal, transferFeeBigInt);
-                
+
                 if (transferResult.Result == ResultTypes.ok) {
-                
+
                     let hostToUse = 'https://icp-api.io';
 
                     const agent = new HttpAgent({
@@ -396,12 +443,12 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
 
                     // (2) Approve now transfer delegation
                     var approveResponse = GetResultFromVariant(await swappingWalletActor.approve(sliSwapAppPrincipal, approveAmount));
-                    
+
                     if (approveResponse.Result == ResultTypes.ok) {
 
                         // (3) Check the allowance amount
                         var allowanceNumber = await swappingWalletActor.allowance(approvalWalletPrincipal, sliSwapAppPrincipal);
-                                                
+
                         if (allowanceNumber >= approveAmount) {
 
                             var addApprovalWalletIntoDatabaseResponse;
@@ -417,7 +464,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
                                         await SwapAppActorProvider.AddApprovalWalletGlds(approvalWalletPrincipal)
                                     break;
                             }
-                            
+
                             if (addApprovalWalletIntoDatabaseResponse.Result == ResultTypes.ok) {
 
                                 try {
@@ -487,9 +534,6 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
     }
 }
 
-
-
-
 async function AddButtonClickEvents() {
     document.getElementById("ButtonTabpage1").addEventListener('click', async function () {
         showTabpage(event, 'tabContentIcrc1');
@@ -525,6 +569,7 @@ async function RemoveButtonClickEvents() {
         async function () {
             await CreateTheDynamicWalletsNow(SpecifiedTokenInterfaceType.Dip20Glds);
         }, false);
+
 }
 
 
