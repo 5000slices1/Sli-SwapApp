@@ -37,9 +37,6 @@ async function IdentityChanged(){
   let appSettingsButton = document.getElementById("PageAdminSection");   
   var userRole = await SwapAppActorProvider.GetUserRole();
 
-  console.log("My user role:");
-  console.log(userRole);
-
   //---------------------
   if ( ContainsRule(userRole, 'Owner', 'Admin')){           
     appSettingsButton.style.display = "block";
@@ -77,8 +74,14 @@ window.onclick = function(event) {
   }
 }
 
+ 
+
 document.addEventListener('DOMContentLoaded', async function() {
       
+//   window.addEventListener('resize', function(event) {
+     
+// }, true);
+
   PubSub.subscribe('index_js_UserIdentityChanged', 'UserIdentityChanged', IdentityChanged);
   await CommonIdentityProvider.Init();
      

@@ -77,7 +77,10 @@ export async function DynamicPageContentLoad(tagName, tagValueToSearch) {
       xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = async function() {
         if (this.readyState == 4) {
-          if (this.status == 200) {elmnt.innerHTML = this.responseText;                                     
+          if (this.status == 200) {
+            var htmlToShow = this.responseText;
+            htmlToShow +="<br/><br/><br/><br/><br/>"; // so that footer is not overlapping content during scrolling
+            elmnt.innerHTML = htmlToShow;                                     
             await init_javascript_code(tagValueToSearch);            
           }
           if (this.status == 404) {elmnt.innerHTML = "Page not found.";}          

@@ -1,210 +1,210 @@
-import { CommonIdentityProvider,ResultInfo, ResultTypes} from "../../Types/CommonTypes.js";
+import { CommonIdentityProvider, ResultInfo, ResultTypes } from "../../Types/CommonTypes.js";
 import { SwapAppActorInterface } from "../../Types/Interfaces.js";
-import {GetResultFromVariant} from "../../Utils/CommonUtils.js"
+import { GetResultFromVariant } from "../../Utils/CommonUtils.js"
 
-export class SwapAppActorFetcher{
+export class SwapAppActorFetcher {
 
-    #provider;    
-    #swapAppActor;
+  #provider;
+  #swapAppActor;
 
 
-    #ProviderIsDefined(){
-        if (this.#provider == null || this.#provider == undefined || this.#provider == false){
-            return false;
-        }
-        return true;
+  #ProviderIsDefined() {
+    if (this.#provider == null || this.#provider == undefined || this.#provider == false) {
+      return false;
+    }
+    return true;
+  }
+
+  async Init(provider) {
+    this.#provider = provider;
+
+    if (this.#ProviderIsDefined() == false) {
+      this.#provider = null;
+      this.#swapAppActor = null;
+      return;
     }
 
-    async Init(provider){
-        this.#provider = provider;  
-                
-        if (this.#ProviderIsDefined() == false){            
-            this.#provider = null;
-            this.#swapAppActor = null;            
-            return;
-        }
-           
-        let dAppPrincipalText =  CommonIdentityProvider.SwapAppPrincipalText;          
-        this.#swapAppActor = await this.#provider.createActor({ canisterId: dAppPrincipalText, interfaceFactory: SwapAppActorInterface });                       
-        
+    let dAppPrincipalText = CommonIdentityProvider.SwapAppPrincipalText;
+    this.#swapAppActor = await this.#provider.createActor({ canisterId: dAppPrincipalText, interfaceFactory: SwapAppActorInterface });
+
+  }
+
+  async GetUserRole() {
+
+    if (this.#ProviderIsDefined() == false) {
+
+      return { 'NormalUser': null };
     }
 
-    async GetUserRole(){
+    try {
 
-        if (this.#ProviderIsDefined() == false){
+      let userRole = await this.#swapAppActor.GetUserRole();
+      return userRole;
+    }
+    catch (error) {
+      return { 'NormalUser': null };
+    }
+  }
 
-            return {'NormalUser':null};
-        }
-        
-        try{
-                               
-            let userRole = await this.#swapAppActor.GetUserRole() ;                
-            return userRole;      
-        }
-        catch(error){
-            return {'NormalUser':null};
-        }        
+  //Set Sli canister-id in the backend:
+  async SliIcrc1_SetCanisterId(canisterId) {
+
+    if (this.#ProviderIsDefined() == false) {
+      return new ResultInfo(ResultTypes.err, "You are not connected.");
+    }
+    return GetResultFromVariant(await this.#swapAppActor.SliIcrc1_SetCanisterId(canisterId));
+  }
+
+  //Set Glds canister-id in the backend:
+  async GldsIcrc1_SetCanisterId(canisterId) {
+    if (this.#ProviderIsDefined() == false) {
+      return new ResultInfo(ResultTypes.err, "You are not connected.");
+    }
+    return GetResultFromVariant(await this.#swapAppActor.GldsIcrc1_SetCanisterId(canisterId));
+  }
+
+
+  async AddApprovalWalletSli(approvalWalletPrincipal) {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    //Set Sli canister-id in the backend:
-    async SliIcrc1_SetCanisterId(canisterId){
+    try {
+      let result = await this.#swapAppActor.AddNewApprovedSliWallet(approvalWalletPrincipal);
+      return GetResultFromVariant(result);
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
 
-        if (this.#ProviderIsDefined() == false){
-            return new ResultInfo(ResultTypes.err, "You are not connected.");
-        }        
-        return GetResultFromVariant(await this.#swapAppActor.SliIcrc1_SetCanisterId(canisterId));            
+  async AddApprovalWalletGlds(approvalWalletPrincipal) {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    //Set Glds canister-id in the backend:
-    async GldsIcrc1_SetCanisterId(canisterId){
-        if (this.#ProviderIsDefined() == false){
-            return new ResultInfo(ResultTypes.err, "You are not connected.");
-        }
-        return GetResultFromVariant(await this.#swapAppActor.GldsIcrc1_SetCanisterId(canisterId));
+    try {
+      let result = await this.#swapAppActor.AddNewApprovedGldsWallet(approvalWalletPrincipal);
+      return GetResultFromVariant(result);
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
+
+  async DepositSliDip20Tokens(amount) {
+
+
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
+    try {
+      let result = await this.#swapAppActor.DepositSliDip20Tokens(amount);
+      return GetResultFromVariant(result);
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
 
-    async AddApprovalWalletSli(approvalWalletPrincipal){
 
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {
-            let result = await this.#swapAppActor.AddNewApprovedSliWallet(approvalWalletPrincipal);
-            return GetResultFromVariant(result);
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
+  async DepositGldsDip20Tokens(amount) {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    async AddApprovalWalletGlds(approvalWalletPrincipal){
+    try {
+      let result = await this.#swapAppActor.DepositGldsDip20Tokens(amount);
+      return GetResultFromVariant(result);
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
 
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {
-            let result = await this.#swapAppActor.AddNewApprovedGldsWallet(approvalWalletPrincipal);
-            return GetResultFromVariant(result);
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
+  async GetDepositedSliAmount() {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    async DepositSliDip20Tokens(amount){
+    try {
+      let result = await this.#swapAppActor.GetSliDip20DepositedAmount();
+      let parsedResult = GetResultFromVariant(result);
+      return parsedResult;
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
 
-      
+  async GetDepositedGldsAmount() {
 
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {           
-            let result = await this.#swapAppActor.DepositSliDip20Tokens(amount);
-            return GetResultFromVariant(result);
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
+    try {
+      let result = await this.#swapAppActor.GetGldsDip20DepositedAmount();
+      let parsedResult = GetResultFromVariant(result);
+      return parsedResult;
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
 
-    async DepositGldsDip20Tokens(amount){
+  async GetUserIdForSli() {
 
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {
-            let result = await this.#swapAppActor.DepositGldsDip20Tokens(amount);
-            return GetResultFromVariant(result);
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    async GetDepositedSliAmount(){
+    try {
+      let result = await this.#swapAppActor.GetUserIdForSli();
+      let parsedResult = GetResultFromVariant(result);
+      return parsedResult;
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
 
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {
-            let result = await this.#swapAppActor.GetSliDip20DepositedAmount();
-            let parsedResult = GetResultFromVariant(result);
-             return parsedResult;
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
+  async GetUserIdForGlds() {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    async GetDepositedGldsAmount(){
+    try {
+      let result = await this.#swapAppActor.GetUserIdForGlds();
+      let parsedResult = GetResultFromVariant(result);
+      return parsedResult;
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
+    }
+  }
 
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {
-            let result = await this.#swapAppActor.GetGldsDip20DepositedAmount();
-            let parsedResult = GetResultFromVariant(result);
-             return parsedResult;
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
+  async set_changing_icrc1_canister_ids_to_locked_state() {
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    async GetUserIdForSli(){
-
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {
-            let result = await this.#swapAppActor.GetUserIdForSli();
-            let parsedResult = GetResultFromVariant(result);
-             return parsedResult;
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
+    try {
+      let result = await this.#swapAppActor.set_changing_icrc1_canister_ids_to_locked_state();
+      let parsedResult = GetResultFromVariant(result);
+      return parsedResult;
+    }
+    catch (error) {
+      return new ResultInfo(ResultTypes.err, error);
     }
 
-    async GetUserIdForGlds(){
-
-        if (this.#ProviderIsDefined() == false) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-          }
- 
-        try
-        {
-            let result = await this.#swapAppActor.GetUserIdForGlds();
-            let parsedResult = GetResultFromVariant(result);
-             return parsedResult;
-        }
-        catch(error)
-        {
-          return new ResultInfo(ResultTypes.err, error);
-        }
-    }
+  }
 
 }

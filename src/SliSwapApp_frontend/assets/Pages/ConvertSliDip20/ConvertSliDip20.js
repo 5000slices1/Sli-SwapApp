@@ -224,15 +224,22 @@ async function UpdateBalances() {
     }
 
     let tokenInfo = await getTokenInfo();
+    let icrc1TokenInfo = await getIcrc1TokenInfo();
+
     var feeNeeded = tokenInfo.TransferFee.GetValue();
 
     //One fee for approval and one for transfer. Therefore the fee = 3 * transferFee, because at least 0.001 must be transfered
     feeNeeded = feeNeeded + feeNeeded + feeNeeded;
 
-    let sliDip20TokensBalanceInUserWallet = (await tokenInfo.GetBalanceFromUsersWallet()).GetValue();
+    let [firstResult, secondResult, response] = await Promise.all([tokenInfo.GetBalanceFromUsersWallet(), 
+        icrc1TokenInfo.GetBalanceFromUsersWallet(), SwapAppActorProvider.GetDepositedSliAmount()]);
 
 
-    let response = await SwapAppActorProvider.GetDepositedSliAmount();
+    let sliDip20TokensBalanceInUserWallet = firstResult.GetValue();
+    let sliIcrc1TokensBalanceInUserWallet = secondResult.GetValue();
+
+
+    //let response = await SwapAppActorProvider.GetDepositedSliAmount();
     if (response.Result == ResultTypes.ok) {
         let depositedAmount = new TokenBalance(BigInt(response.ResultValue), tokenInfo.Decimals);
         document.getElementById('DepositedAmountOldSliDip20').value = Number(depositedAmount.GetValue());
@@ -256,11 +263,6 @@ async function UpdateBalances() {
 
     document.getElementById('depositAmountOldSliDip20').value = depositableAmount;
     document.getElementById('depositAmountOldSliDip20').max = depositableAmount;
-
-
-    let icrc1TokenInfo = await getIcrc1TokenInfo();
-    let sliIcrc1TokensBalanceInUserWallet = (await icrc1TokenInfo.GetBalanceFromUsersWallet()).GetValue();
-
     document.getElementById('sli-icrc1-tokens-in-wallet').value = sliIcrc1TokensBalanceInUserWallet;
 }
 
@@ -286,8 +288,6 @@ export const convertSliDip20_init = async function initConvertSliDip20() {
         elementConvert.removeEventListener('click', async () => { await convert_deposited_oldSliTokens(); });
         elementConvert.addEventListener('click', async () => { await convert_deposited_oldSliTokens(); });
     }
-
-
 
     await UpdateBalances();
 };

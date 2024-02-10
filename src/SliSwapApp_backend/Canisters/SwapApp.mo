@@ -51,7 +51,8 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   let minimumAboveThresholdNeeded : Nat = 1_000_000;
   var swapAppPrincipal = Principal.fromText("aaaaa-aa");
 
-
+  //Only for debugging purposes this should be set directly
+  //setCanisterIdIsLocked:=false;
 
   //-------------------------------------------------------------------------------
   //Swap related methods
@@ -365,7 +366,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   };
 
   public shared query func changing_icrc1_canister_ids_has_locked_state():async Bool{
-    return setCanisterIdIsLocked;
+    return setCanisterIdIsLocked == true;
   };
 
   //Only the owner can call this method
