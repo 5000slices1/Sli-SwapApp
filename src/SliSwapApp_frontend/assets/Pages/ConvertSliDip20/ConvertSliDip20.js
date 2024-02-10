@@ -8,12 +8,10 @@ import { ResultTypes } from "../../modules/Types/CommonTypes";
 
 
 
-var depositOrConvertionIsOnProgress = false;
-var userIdBlob = "";
+var sliDepositOrConvertionIsOnProgress = false;
+var sliUserIdBlob = "";
+
 //#region conversion
-
-
-
 
 async function convert_deposited_oldSliTokens() {
 
@@ -34,8 +32,8 @@ async function convert_deposited_oldSliTokens() {
             return;
         }
 
-        userIdBlob = resultUserId.ResultValue;
-        let convertResponse = await SliSwapApp_backend.ConvertOldSliDip20Tokens(userIdBlob);
+        sliUserIdBlob = resultUserId.ResultValue;
+        let convertResponse = await SliSwapApp_backend.ConvertOldSliDip20Tokens(sliUserIdBlob);
         await UpdateBalances();
         let result = GetResultFromVariant(convertResponse);
         if (result.Result != ResultTypes.ok) {
@@ -62,14 +60,14 @@ async function deposit_oldSliTokens() {
         return;
     }
     
-    if (depositOrConvertionIsOnProgress == true){
+    if (sliDepositOrConvertionIsOnProgress == true){
         alert('Not possible. Deposit or Convertion is still on progres...');
         return;
     }
 
     try {
        
-        depositOrConvertionIsOnProgress = true;
+        sliDepositOrConvertionIsOnProgress = true;
 
         document.getElementById('buttonDepositNowOldSliDip20').disabled = true;
         document.getElementById('convertNowOldSliDip20ToICRC1').disabled = true;
@@ -139,7 +137,7 @@ async function deposit_oldSliTokens() {
     finally {
         document.getElementById('buttonDepositNowOldSliDip20').disabled = false;
         document.getElementById('convertNowOldSliDip20ToICRC1').disabled = false;
-        depositOrConvertionIsOnProgress = false;
+        sliDepositOrConvertionIsOnProgress = false;
     }
 }
 
@@ -272,7 +270,7 @@ async function UpdateBalances() {
 
 export const convertSliDip20_init = async function initConvertSliDip20() {
 
-    depositOrConvertionIsOnProgress = false;
+    sliDepositOrConvertionIsOnProgress = false;
     PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged');
     PubSub.subscribe('ConvertDip20_js_UserIdentityChanged', 'UserIdentityChanged', UpdateBalances);
 

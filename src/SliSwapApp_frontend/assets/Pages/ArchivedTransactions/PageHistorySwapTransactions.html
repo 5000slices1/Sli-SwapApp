@@ -1,0 +1,74 @@
+
+<html>
+  <header style="display: none;">
+    <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
+  </header>
+  <body>
+
+<div>
+  <style>
+    tr.spaceUnder>td {
+      padding-bottom: 1em;
+      padding-bottom: 12px;
+      padding-top: 12px;
+    }
+
+    .fixed_header {
+      table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 5em;
+      vertical-align: middle;
+    }
+    .fixed_header tbody {
+      display: block;
+      overflow: auto;
+      height: 600px;
+      color: #fff;
+    }
+    .fixed_header thead tr {
+      display: block;
+    }
+    .fixed_header thead {
+      background: rgb(44, 43, 43);
+      color: #fff;
+    }
+    .fixed_header th,
+    .fixed_header td {
+      padding-left: 16px;
+      padding-bottom: 16px;
+      padding-top: 5px;
+      text-align: left;
+      border: solid white;
+    }
+    
+  </style>
+<div class="container" id="ArchiveTransactions_HtmlPage">  
+    <swapControl >
+      <b><label style="color:  #bfbcbc;">Swapping history of $GLDS and $SLI tokens:</label></b>
+      <br/><br/>
+      <label style="background-color:  #090917;color:  #bfbcbc;">Filter:</label>
+      <input id="ArchiveTransactions_filterInput"  
+      style="text-align: left; padding-left: 8px;padding-right: 8px; width:420px;margin-left:24px;background-color:  #090917;color:  #bfbcbc;"> </input>
+      <button id="ArchiveTransactions_button_filter_apply" class="button-49"  style="padding-top: 4px; margin-left: 12px; cursor:pointer;">Apply</button>
+      <br/><br/>
+      <table class="fixed_header" style="height:600px;min-width: 1070px;">
+        <thead id="ArchiveTransaction_thead">
+          <tr  class="spaceUnder">
+            <th style="width: 220px;">Date</th>
+            <th style="width: 150px;">Token</th>
+            <th style="width: 150px;">Amount</th>
+            <th style="width: 550px;">Users-Wallet</th>     
+          </tr>
+        </thead>
+        <tbody id="ArchiveTransaction_tbody">
+      
+        </tbody>
+      </table>
+    </swapControl>    
+  </div>
+
+ </div>
+</body>
+
+</body>
+</html>

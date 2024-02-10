@@ -1,8 +1,11 @@
-import { ResultInfo, CustomResultInfo, ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
+import { ResultInfo, CustomResultInfo,ConversionCompletedArchiveItem, 
+  SpecifiedTokenInterfaceType,ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
 //import { Ed25519KeyIdentity } from '@dfinity/identity';
 import { Secp256k1KeyIdentity } from "@dfinity/identity-secp256k1";
-
+import { TokenBalance } from "../SubModules/Token/TokenBalance";
+import { Principal } from "@dfinity/principal";
+import { Buffer } from "buffer";
 //Returns true if the object has all the fileds included
 export function hasFieldsSet(item, ...fieldNames) {
   for (let fieldName of fieldNames) {
@@ -22,6 +25,7 @@ export function createEnum(values) {
   return Object.freeze(enumObject);
 }
 
+//Only the first property is used
 export function GetCustomResultFromVariant(item){
   for (var key in item) {
     if (Object.hasOwn(item, key)) {
@@ -29,8 +33,58 @@ export function GetCustomResultFromVariant(item){
        let resultValue = item[key];
        return new CustomResultInfo(key, resultValue);
     }
+  }
 }
 
+export function GetCustomDictionaryFromVariant(item){
+  var map = Object.create(null);
+  for (var itemKey in item) {
+    if (Object.hasOwn(item, itemKey)) {
+       map[itemKey] = item[itemKey];    
+    }
+  }
+  return map;
+}
+
+
+export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
+
+  let singleItem = GetCustomDictionaryFromVariant(responseItem); 
+
+  var result = new ConversionCompletedArchiveItem();
+  var decimals = 8; // we can hardcode this, because sli and glds DIP20 has decimals=8 set
+  let tokenType = GetCustomResultFromVariant(singleItem['tokenType']);
+  let amount = singleItem['amount'];
+  
+  let tokenBalance = new TokenBalance(BigInt(amount), Number(decimals));
+  result.AmountBigInt = tokenBalance.GetRawValue();
+  result.AmountDecimal = tokenBalance.GetValue();
+
+  if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Sli){
+    result.IsSliToken = true;
+    result.IsGldsToken = false;
+    result.TokenType = "SLI";
+  } else if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Glds){
+
+    result.IsSliToken = false;
+    result.IsGldsToken = true;
+    result.TokenType = "GLDS";
+  }
+
+  let rawPrincipal = singleItem['userPrincipal'];
+  result.UserPrincipal =  Principal.fromHex(rawPrincipal.toHex()).toText();
+
+  let timeTicksNanoSeconds = Number(singleItem['time']);
+  let timeTicksMilliSeconds = Math.trunc(Number(timeTicksNanoSeconds / 1000000));
+  let date = new Date(Number(timeTicksMilliSeconds));
+  result.RawTimeTicks =Number(timeTicksMilliSeconds);
+  result.DateTime = date;
+  result.TimeLocalTimeString = date.toLocaleString();
+
+  let conversionIdUintArray = singleItem['conversionId'];
+  let conversionId = Buffer.from(conversionIdUintArray).toString('hex');
+  result.ConversionId = conversionId;
+  return result;
 
 }
 
