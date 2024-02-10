@@ -37,6 +37,8 @@ async function IdentityChanged(){
   let appSettingsButton = document.getElementById("PageAdminSection");   
   var userRole = await SwapAppActorProvider.GetUserRole();
 
+  console.log("My user role:");
+  console.log(userRole);
 
   //---------------------
   if ( ContainsRule(userRole, 'Owner', 'Admin')){           

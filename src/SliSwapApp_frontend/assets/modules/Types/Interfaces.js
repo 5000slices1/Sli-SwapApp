@@ -128,89 +128,146 @@ export const Icrc1Interface = ({ IDL }) => {
 };
 
 export const SwapAppActorInterface = ({ IDL }) => {
+  const List = IDL.Rec();
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const Result_3 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
-  const ResponseGetUsersSwapWallet = IDL.Variant({
-    'Ok' : IDL.Principal,
-    'Err' : IDL.Text,
-    'NotExist' : IDL.Null,
+  const Time = IDL.Int;
+  const SpecificTokenType = IDL.Variant({
+    'Icrc1Sli' : IDL.Null,
+    'Dip20Glds' : IDL.Null,
+    'Icrc1Glds' : IDL.Null,
+    'Dip20Sli' : IDL.Null,
   });
-  const Balance = IDL.Nat;
-  const Result_1 = IDL.Variant({ 'ok' : Balance, 'err' : IDL.Text });
-  const Metadata = IDL.Record({
-    'fee' : IDL.Nat,
-    'decimals' : IDL.Nat,
-    'logo' : IDL.Text,
-    'name' : IDL.Text,
-    'symbol' : IDL.Text,
-    'canisterId' : IDL.Text,
+  const ArchivedConversionCompleted = IDL.Record({
+    'time' : Time,
+    'userPrincipal' : IDL.Principal,
+    'tokenType' : SpecificTokenType,
+    'amount' : IDL.Nat,
+    'conversionId' : IDL.Vec(IDL.Nat8),
   });
-  const TokensInfoAsResponse = IDL.Record({
-    'Icrc1_Glds' : Metadata,
-    'Dip20_Sli' : Metadata,
-    'Dip20_Glds' : Metadata,
-    'Icrc1_Sli' : Metadata,
+  const Result_7 = IDL.Variant({
+    'ok' : ArchivedConversionCompleted,
+    'err' : IDL.Text,
   });
-  const Result_2 = IDL.Variant({ 'ok' : IDL.Vec(IDL.Nat8), 'err' : IDL.Text });
-  const UserRole = IDL.Variant({
-    'Anonymous' : IDL.Null,
-    'NormalUser' : IDL.Null,
-    'Admin' : IDL.Null,
-    'Owner' : IDL.Null,
+  const Result_6 = IDL.Variant({
+    'ok' : IDL.Vec(ArchivedConversionCompleted),
+    'err' : IDL.Text,
+  });
+  const Result_1 = IDL.Variant({ 'ok' : IDL.Vec(IDL.Nat64), 'err' : IDL.Text });
+  List.fill(IDL.Opt(IDL.Tuple(IDL.Vec(IDL.Nat8), List)));
+  const ArchivedConversionStarted = IDL.Record({
+    'depositIds' : List,
+    'time' : Time,
+    'userPrincipal' : IDL.Principal,
+    'tokenType' : SpecificTokenType,
+    'amount' : IDL.Nat,
+    'conversionId' : IDL.Vec(IDL.Nat8),
+  });
+  const Result_5 = IDL.Variant({
+    'ok' : ArchivedConversionStarted,
+    'err' : IDL.Text,
+  });
+  const Result_4 = IDL.Variant({
+    'ok' : IDL.Vec(ArchivedConversionStarted),
+    'err' : IDL.Text,
+  });
+  const ArchivedDeposit = IDL.Record({
+    'to' : IDL.Principal,
+    'depositId' : IDL.Vec(IDL.Nat8),
+    'realAmount' : IDL.Nat,
+    'from' : IDL.Principal,
+    'time' : Time,
+    'tokenType' : SpecificTokenType,
+    'amount' : IDL.Nat,
+  });
+  const Result_3 = IDL.Variant({ 'ok' : ArchivedDeposit, 'err' : IDL.Text });
+  const Result_2 = IDL.Variant({
+    'ok' : IDL.Vec(ArchivedDeposit),
+    'err' : IDL.Text,
+  });
+  const UsedSubAccount = IDL.Record({
+    'subAccount' : IDL.Vec(IDL.Nat8),
+    'createdAt' : Time,
   });
   return IDL.Service({
-    'AddAdminUser' : IDL.Func([IDL.Principal], [Result], []),
-    'AddNewApprovedGldsWallet' : IDL.Func([IDL.Principal], [Result], []),
-    'AddNewApprovedSliWallet' : IDL.Func([IDL.Principal], [Result], []),
-    'ApprovedWalletsPrincipalExist' : IDL.Func(
-        [IDL.Principal],
-        [IDL.Bool],
-        ['query'],
-      ),
-    'CanUserDepositGldsDip20' : IDL.Func([IDL.Principal], [Result], ['query']),
-    'CanUserDepositSliDip20' : IDL.Func([IDL.Principal], [Result], ['query']),
-    'ConvertOldGldsDip20Tokens' : IDL.Func([IDL.Vec(IDL.Nat8)], [Result], []),
-    'ConvertOldSliDip20Tokens' : IDL.Func([IDL.Vec(IDL.Nat8)], [Result], []),
-    'DepositGldsDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
-    'DepositSliDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
-    'GetGldsDip20DepositedAmount' : IDL.Func([], [Result_3], []),
-    'GetGldsSwapWalletForPrincipal' : IDL.Func(
-        [IDL.Principal],
-        [ResponseGetUsersSwapWallet],
-        ['query'],
-      ),
-    'GetIcrc1Balance' : IDL.Func([IDL.Principal], [Result_1], []),
-    'GetListOfAdminUsers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
-    'GetNumberOfGldsApprovedWallets' : IDL.Func(
+    'Clear' : IDL.Func([], [Result], []),
+    'conversion_Completed_Add' : IDL.Func(
+        [ArchivedConversionCompleted],
+        [Result],
         [],
-        [IDL.Nat, IDL.Nat],
-        ['query'],
       ),
-    'GetNumberOfSliApprovedWallets' : IDL.Func(
-        [],
-        [IDL.Nat, IDL.Nat],
-        ['query'],
-      ),
-    'GetSliDip20DepositedAmount' : IDL.Func([], [Result_3], []),
-    'GetSliSwapWalletForPrincipal' : IDL.Func(
+    'conversion_Completed_FromPrincipal_Count' : IDL.Func(
         [IDL.Principal],
-        [ResponseGetUsersSwapWallet],
+        [IDL.Nat64],
         ['query'],
       ),
-    'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
-    'GetTokensInfos' : IDL.Func([], [TokensInfoAsResponse], ['query']),
-    'GetUserIdForGlds' : IDL.Func([], [Result_2], ['query']),
-    'GetUserIdForSli' : IDL.Func([], [Result_2], ['query']),
-    'GetUserRole' : IDL.Func([], [UserRole], ['query']),
-    'GldsIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
-    'GldsIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
-    'GldsIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
-    'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Principal], [Result], []),
-    'RemoveAdminUser' : IDL.Func([IDL.Principal], [Result], []),
-    'SliIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
-    'SliIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_1], []),
-    'SliIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_1], []),
-    'SliIcrc1_SetCanisterId' : IDL.Func([IDL.Principal], [Result], []),
+    'conversion_Completed_Get_Item_By_Index' : IDL.Func(
+        [IDL.Nat64],
+        [Result_7],
+        ['query'],
+      ),
+    'conversion_Completed_Get_Items' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [Result_6],
+        ['query'],
+      ),
+    'conversion_Completed_Indizes_For_Principal' : IDL.Func(
+        [IDL.Principal],
+        [Result_1],
+        ['query'],
+      ),
+    'conversion_Completed_Total_Count' : IDL.Func([], [IDL.Nat64], ['query']),
+    'conversion_Started_Add' : IDL.Func(
+        [ArchivedConversionStarted],
+        [Result],
+        [],
+      ),
+    'conversion_Started_FromPrincipal_Count' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Nat64],
+        ['query'],
+      ),
+    'conversion_Started_Get_Item_By_Index' : IDL.Func(
+        [IDL.Nat64],
+        [Result_5],
+        ['query'],
+      ),
+    'conversion_Started_Get_Items' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [Result_4],
+        ['query'],
+      ),
+    'conversion_Started_Indizes_For_Principal' : IDL.Func(
+        [IDL.Principal],
+        [Result_1],
+        ['query'],
+      ),
+    'conversion_Started_Total_Count' : IDL.Func([], [IDL.Nat64], ['query']),
+    'cycles_available' : IDL.Func([], [IDL.Nat], ['query']),
+    'deposit_Add' : IDL.Func([ArchivedDeposit], [Result], []),
+    'deposit_FromPrincipal_Count' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Nat64],
+        ['query'],
+      ),
+    'deposit_Get_Item_By_Index' : IDL.Func([IDL.Nat64], [Result_3], ['query']),
+    'deposit_Get_Items' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], ['query']),
+    'deposit_Indizes_For_Principal' : IDL.Func(
+        [IDL.Principal],
+        [Result_1],
+        ['query'],
+      ),
+    'deposit_Total_Count' : IDL.Func([], [IDL.Nat64], ['query']),
+    'deposit_cycles' : IDL.Func([], [], []),
+    'getArchiveCanisterId' : IDL.Func([], [IDL.Principal], ['query']),
+    'setSwapAppCanisterId' : IDL.Func([IDL.Principal], [Result], []),
+    'subAccount_Add' : IDL.Func([IDL.Vec(IDL.Nat8)], [], []),
+    'subAccount_Count' : IDL.Func([], [IDL.Nat], ['query']),
+    'subAccount_Delete' : IDL.Func([IDL.Vec(IDL.Nat8)], [], []),
+    'subAccount_GetItems' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(UsedSubAccount)],
+        ['query'],
+      ),
   });
   
 };
