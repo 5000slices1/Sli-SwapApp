@@ -41,6 +41,22 @@ export class CustomResultInfo {
   }
 }
 
+export class ConversionCompletedArchiveItem{
+
+  AmountBigInt;
+  AmountDecimal;
+  RawTimeTicks;
+  DateTime;
+  TimeLocalTimeString;
+  TokenType;
+  UserPrincipal;
+  ConversionId;
+  IsSliToken;
+  IsGldsToken;
+  
+
+}
+
 
 export class TokenInfo {
   canisterId;
