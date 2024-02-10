@@ -51,8 +51,6 @@ export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
 
   let singleItem = GetCustomDictionaryFromVariant(responseItem); 
 
-  console.log("singleItem");
-  console.log(singleItem);
   var result = new ConversionCompletedArchiveItem();
   var decimals = 8; // we can hardcode this, because sli and glds DIP20 has decimals=8 set
   let tokenType = GetCustomResultFromVariant(singleItem['tokenType']);

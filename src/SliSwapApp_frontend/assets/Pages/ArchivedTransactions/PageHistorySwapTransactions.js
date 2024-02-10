@@ -104,8 +104,6 @@ export const historyTransactions_init = async function initHistoryTransactions()
 
     var bucketSize = 2;
     bucketSize = Math.min(bucketSize, count);
-    console.log("count");
-    console.log(count);
 
     archiveCompletedTransactions = new Array();
     for(var i = 0; i < count; i+=bucketSize){
@@ -127,7 +125,6 @@ export const historyTransactions_init = async function initHistoryTransactions()
     archiveCompletedTransactions.sort(function(a,b){
         return b.RawTimeTicks-a.RawTimeTicks;
     });
-    console.log(archiveCompletedTransactions);
     historyTransactions_UpdateUiFromModel();
 
 
