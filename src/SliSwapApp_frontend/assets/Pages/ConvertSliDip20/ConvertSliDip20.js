@@ -1,7 +1,7 @@
 import { CommonIdentityProvider, SpecifiedTokenInterfaceType, SwapAppActorProvider } from "../../modules/Types/CommonTypes";
 import { PubSub } from "../../modules/Utils/PubSub";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
-import { GetResultFromVariant, GetCustomResultFromVariant } from "../../modules/Utils/CommonUtils";
+import { GetResultFromVariant } from "../../modules/Utils/CommonUtils";
 import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
 import { Principal } from "@dfinity/principal";
 import { ResultTypes } from "../../modules/Types/CommonTypes";

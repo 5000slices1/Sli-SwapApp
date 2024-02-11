@@ -63,12 +63,12 @@ export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
   if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Sli){
     result.IsSliToken = true;
     result.IsGldsToken = false;
-    result.TokenType = "SLI";
+    result.TokenType = "$SLI";
   } else if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Glds){
 
     result.IsSliToken = false;
     result.IsGldsToken = true;
-    result.TokenType = "GLDS";
+    result.TokenType = "$GLDS";
   }
 
   let rawPrincipal = singleItem['userPrincipal'];

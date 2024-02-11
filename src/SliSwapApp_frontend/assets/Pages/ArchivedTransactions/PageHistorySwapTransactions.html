@@ -8,9 +8,9 @@
 <div>
   <style>
     tr.spaceUnder>td {
-      padding-bottom: 1em;
-      padding-bottom: 12px;
-      padding-top: 12px;
+      /* padding-bottom: 1em; */
+      padding-bottom: 8px;
+      padding-top: 8px;
     }
 
     .fixed_header {
@@ -18,50 +18,246 @@
       border-collapse: collapse;
       border-spacing: 5em;
       vertical-align: middle;
+    
     }
     .fixed_header tbody {
       display: block;
       overflow: auto;
-      height: 600px;
+      /* overflow:hidden; */
+      /* height: 600px; */
+      width: 1220px;
+      height:600px;
       color: #fff;
     }
     .fixed_header thead tr {
       display: block;
+      /* overflow:hidden; */
+   
     }
     .fixed_header thead {
-      background: rgb(44, 43, 43);
+     
       color: #fff;
+      /* overflow:hidden; */
+
     }
     .fixed_header th,
     .fixed_header td {
-      padding-left: 16px;
-      padding-bottom: 16px;
+      padding-left: 4px;
+      padding-bottom: 4px;
       padding-top: 5px;
       text-align: left;
       border: solid white;
+      font-size: 12px;
+      height: 40px;
+      vertical-align: middle;
     }
     
   </style>
-<div class="container" id="ArchiveTransactions_HtmlPage">  
-    <swapControl >
-      <b><label style="color:  #bfbcbc;">Swapping history of $GLDS and $SLI tokens:</label></b>
-      <br/><br/>
-      <label style="background-color:  #090917;color:  #bfbcbc;">Filter:</label>
+<div class="container" id="ArchiveTransactions_HtmlPage" 
+style="font-size: 12;width:1400px; height:200px; ">  
+    <swapControl style="height: 600px;" >
+      <b><label style="font-size: 18;color:  #bfbcbc;">Swapping history of $GLDS and $SLI tokens:</label></b>
+      <br/><br/><br/>
+      <label style="font-size: 14;background-color:  #090917;color:  #bfbcbc;">Filter:</label>
       <input id="ArchiveTransactions_filterInput"  
-      style="text-align: left; padding-left: 8px;padding-right: 8px; width:420px;margin-left:24px;background-color:  #090917;color:  #bfbcbc;"> </input>
-      <button id="ArchiveTransactions_button_filter_apply" class="button-49"  style="padding-top: 4px; margin-left: 12px; cursor:pointer;">Apply</button>
-      <br/><br/>
-      <table class="fixed_header" style="height:600px;min-width: 1070px;">
-        <thead id="ArchiveTransaction_thead">
-          <tr  class="spaceUnder">
-            <th style="width: 220px;">Date</th>
-            <th style="width: 150px;">Token</th>
-            <th style="width: 150px;">Amount</th>
-            <th style="width: 550px;">Users-Wallet</th>     
+      style="text-align: left; padding-left: 8px;padding-right: 8px; 
+      width:420px;margin-left:24px;background-color:  #090917;color:  #bfbcbc;"> </input>
+      <button id="ArchiveTransactions_button_filter_apply" class="button-49" 
+       style="padding-top: 4px; margin-left: 12px; cursor:pointer;">Apply</button>
+      <br/><br/><br/>
+      <table class="fixed_header" style="font-size: 12px;">
+        <thead id="ArchiveTransaction_thead" style="font-size: 12px;">
+          <tr  class="spaceUnder" style="font-size: 12px;">
+            <th style="width: 150px;font-size: 12px; background: rgb(44, 43, 43);">Date</th>
+            <th style="width: 55px;font-size: 12px; background: rgb(44, 43, 43);">Token</th>
+            <th style="width: 60px;font-size: 12px; background: rgb(44, 43, 43);">Amount</th>
+            <th style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">Users-Wallet</th>
+            <th style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">Conversion-Id</th>        
           </tr>
         </thead>
-        <tbody id="ArchiveTransaction_tbody">
-      
+        <tbody id="ArchiveTransaction_tbody" style="font-size: 12px;height: 100%;">
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
+          <tr  class="spaceUnder">
+            <td style="width: 150px;">2/10/2024, 10:21:43 PM</td>
+            <td style="width: 55px;">$GLDS</td>
+            <td style="width: 60px;">2000.007</td>
+            <td style="width: 450px;">2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>
+            <td style="width: 450px" >2d2d956ffb319e31de3300aaa1230e8af8af64cb8f3de52662b799a6cfe65b81</td>        
+          </tr>
         </tbody>
       </table>
     </swapControl>    

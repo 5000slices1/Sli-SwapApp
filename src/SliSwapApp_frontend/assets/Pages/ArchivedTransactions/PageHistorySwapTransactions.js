@@ -64,22 +64,26 @@ function historyTransactions_UpdateUiFromModel(){
         }
 
         if (item.IsSliToken == true){
-            htmlString+="<tr class=\"spaceUnder\" style=\"background-color: rgb(67, 2, 220);vertical-align: middle;\">\n";
+            htmlString+="<tr class=\"spaceUnder\" style=\"font-size: 12px;background-color: rgb(67, 2, 220);vertical-align: middle;\">\n";
 
         }else{
-            htmlString+="<tr class=\"spaceUnder\" style=\"background-color: rgb(37, 5, 112);vertical-align: middle;\">\n";
+            htmlString+="<tr class=\"spaceUnder\" style=\"font-size: 12px;background-color: rgb(37, 5, 112);vertical-align: middle;\">\n";
         }
-        htmlString+="<td style=\"width: 220px;padding-left: 8px;\">";
+        htmlString+="<td style=\"font-size: 12px;width: 150px;padding-left: 8px;\">";
         htmlString+=item.TimeLocalTimeString + "</td>\n";
 
-        htmlString+="<td style=\"width: 150px;padding-left: 8px;\">";
+        htmlString+="<td style=\"font-size: 12px;width: 55px;padding-left: 8px;\">";
         htmlString+=item.TokenType + "</td>\n";
 
-        htmlString+="<td style=\"width: 150px;padding-left: 8px;\">";
+        htmlString+="<td style=\"font-size: 12px;width: 60px;padding-left: 8px;\">";
         htmlString+=item.AmountDecimal + "</td>\n";
 
-        htmlString+="<td style=\"width: 550px;padding-left: 8px;\">";
+        htmlString+="<td style=\"font-size: 12px;width: 450px;padding-left: 8px;\">";
         htmlString+=item.UserPrincipal + "</td>\n";
+    
+        htmlString+="<td style=\"font-size: 12px;width: 450px;padding-left: 8px;\">";
+        htmlString+=item.ConversionId + "</td>\n";
+
         htmlString+="</tr>\n";
     }
 
