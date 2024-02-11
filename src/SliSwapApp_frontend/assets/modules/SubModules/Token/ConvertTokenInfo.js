@@ -14,12 +14,12 @@ export class ConvertTokenInfo {
     this.TargetToken = new TokenInfo(targetTockenType);
   }
 
-  async UpdateTokensInfos(sourceToken_TokenInfo, targetToken_TokenInfo){
+  async UpdateTokensInfos(sourceToken_TokenInfo, targetToken_TokenInfo) {
     await this.SourceToken.UpdateTokenInfo(sourceToken_TokenInfo);
     await this.TargetToken.UpdateTokenInfo(targetToken_TokenInfo);
   }
 
-  async UserIdentityChanged(provider, principal){
+  async UserIdentityChanged(provider, principal) {
     await this.SourceToken.UserIdentityChanged(provider, principal);
     await this.TargetToken.UserIdentityChanged(provider, principal);
 

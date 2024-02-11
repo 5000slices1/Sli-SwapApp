@@ -111,7 +111,7 @@ function historyDepositsTransactions_UpdateUiFromModel() {
         htmlString += "<td style=\"font-size: 12px;width: 80px;padding-left: 8px;\">";
         htmlString += item.TokenType + "</td>\n";
 
-        htmlString += "<td style=\"font-size: 12px;width: 80px;padding-left: 8px;\">";
+        htmlString += "<td style=\"font-size: 12px;width: 120px;padding-left: 8px;\">";
         htmlString += item.Amount + "</td>\n";
 
         htmlString += "<td style=\"width: 500px;font-size: 12px;padding: 0px; margin: 0px;\">";
@@ -132,7 +132,7 @@ function historyDepositsTransactions_UpdateUiFromModel() {
         htmlString += "</td>";
 
 
-        htmlString += "<td style=\"width: 600px;font-size: 12px;\">\n<table style=\"border: none;padding: 0px; margin-top: -20px;\nmargin-bottom: -20px;margin-left: -10px;\">\n \n<tr style=\"height: 10px;\">\n<td style=\"border: none;width: 160px;\nheight: 10px;\">\n" +
+        htmlString += "<td style=\"width: 640px;font-size: 12px;\">\n<table style=\"border: none;padding: 0px; margin-top: -20px;\nmargin-bottom: -20px;margin-left: -10px;\">\n \n<tr style=\"height: 10px;\">\n<td style=\"border: none;width: 160px;\nheight: 10px;\">\n" +
             "Status:"
             + "\n</td>\n<td style=\"border: none;height: 0px;\">\n" +
             item.ConversionStatusText
@@ -160,6 +160,11 @@ function historyDepositsTransactions_UpdateUiFromModel() {
 
 
 function setDepositTableBodySizeAutomatically() {
+
+    if (HistoryDepositsTransactions_HtmlPage_Exist() == false) {
+        return;
+    }
+
     let elementTableBody = document.getElementById('ArchiveDepositsTransaction_tbody');
     let elementSwapControl = document.getElementById('ArchiveDepositsTransactions_swapControl');
 

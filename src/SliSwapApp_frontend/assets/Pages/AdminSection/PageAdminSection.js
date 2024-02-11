@@ -7,6 +7,7 @@ import { Get2DimArray, GetRandomIdentity } from "../../modules/Utils/CommonUtils
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { Dip20Interface } from "../../modules/Types/Interfaces";
 import { GlobalDataProvider } from "../../modules/Types/CommonTypes";
+import { loadingProgessEnabled, loadingProgessDisabled } from "../../modules/Utils/CommonUtils";
 import fetch from 'isomorphic-fetch';
 
 function showTabpage(evt, idName) {
@@ -235,76 +236,89 @@ async function UpdateValues() {
 
 
 async function setSliIcrcCanisterId() {
-    let inputElementSliCanisterId = document.getElementById("sli-icrc1-canister-id");
-    if (inputElementSliCanisterId) {
-        var canisterIdPrincipal;
 
-        let canisterId = inputElementSliCanisterId.value;
-        try {
-            canisterIdPrincipal = Principal.fromText(canisterId);
-        } catch (error) {
-            alert('This is not a valid canister-id');
-            return;
+    try {
+        loadingProgessEnabled();
+        let inputElementSliCanisterId = document.getElementById("sli-icrc1-canister-id");
+        if (inputElementSliCanisterId) {
+            var canisterIdPrincipal;
+
+            let canisterId = inputElementSliCanisterId.value;
+            try {
+                canisterIdPrincipal = Principal.fromText(canisterId);
+            } catch (error) {
+                alert('This is not a valid canister-id');
+                return;
+            }
+
+            let result = await SwapAppActorProvider.SliIcrc1_SetCanisterId(canisterIdPrincipal);
+
+            if (result.Result == ResultTypes.err) {
+                alert(result.ResultValue);
+                return;
+            }
+            if (result.Result == ResultTypes.ok) {
+
+                await CommonIdentityProvider.WalletsProvider.UpdateTokenInfosFromBackend();
+                let icrc1SliToken = await CommonIdentityProvider.WalletsProvider.
+                    GetToken(SpecifiedTokenInterfaceType.Icrc1Sli);
+                await icrc1SliToken.UpdateTokenActors();
+                UpdateValues();
+            }
         }
-
-        let result = await SwapAppActorProvider.SliIcrc1_SetCanisterId(canisterIdPrincipal);
-
-        if (result.Result == ResultTypes.err) {
-            alert(result.ResultValue);
-            return;
-        }
-        if (result.Result == ResultTypes.ok) {
-
-            await CommonIdentityProvider.WalletsProvider.UpdateTokenInfosFromBackend();
-            let icrc1SliToken = await CommonIdentityProvider.WalletsProvider.
-                GetToken(SpecifiedTokenInterfaceType.Icrc1Sli);
-            await icrc1SliToken.UpdateTokenActors();
-            UpdateValues();
-        }
+    } finally {
+        loadingProgessDisabled();
     }
 }
 
 async function setGldsIcrcCanisterId() {
-    let inputElementGldsCanisterId = document.getElementById("glds-icrc1-canister-id");
-    if (inputElementGldsCanisterId) {
-        var canisterIdPrincipal;
-        let canisterId = inputElementGldsCanisterId.value;
-        try {
-            canisterIdPrincipal = Principal.fromText(canisterId);
-        } catch (error) {
-            alert('This is not a valid canister-id');
-            return;
+
+    try {
+        loadingProgessEnabled();
+        let inputElementGldsCanisterId = document.getElementById("glds-icrc1-canister-id");
+        if (inputElementGldsCanisterId) {
+            var canisterIdPrincipal;
+            let canisterId = inputElementGldsCanisterId.value;
+            try {
+                canisterIdPrincipal = Principal.fromText(canisterId);
+            } catch (error) {
+                alert('This is not a valid canister-id');
+                return;
+            }
+
+
+            let result = await SwapAppActorProvider.GldsIcrc1_SetCanisterId(canisterIdPrincipal);
+
+
+            if (result.Result == ResultTypes.err) {
+                alert(result.ResultValue);
+                return;
+            }
+            if (result.Result == ResultTypes.ok) {
+                await CommonIdentityProvider.WalletsProvider.UpdateTokenInfosFromBackend();
+                let icrc1GldsToken = await CommonIdentityProvider.WalletsProvider.
+                    GetToken(SpecifiedTokenInterfaceType.Icrc1Glds);
+                await icrc1GldsToken.UpdateTokenActors();
+                UpdateValues();
+            }
+
         }
-
-
-        let result = await SwapAppActorProvider.GldsIcrc1_SetCanisterId(canisterIdPrincipal);
-
-
-        if (result.Result == ResultTypes.err) {
-            alert(result.ResultValue);
-            return;
-        }
-        if (result.Result == ResultTypes.ok) {
-            await CommonIdentityProvider.WalletsProvider.UpdateTokenInfosFromBackend();
-            let icrc1GldsToken = await CommonIdentityProvider.WalletsProvider.
-                GetToken(SpecifiedTokenInterfaceType.Icrc1Glds);
-            await icrc1GldsToken.UpdateTokenActors();
-            UpdateValues();
-        }
-
+    }
+    finally {
+        loadingProgessDisabled();
     }
 }
 
-async function lock_ICRC1_changing_CanisterIds(){
-   
+async function lock_ICRC1_changing_CanisterIds() {
+
     await SwapAppActorProvider.set_changing_icrc1_canister_ids_to_locked_state();
     await initialize_set_icrc1_cansiter_ids_buttons();
 }
 
-async function initialize_set_icrc1_cansiter_ids_buttons(){
+async function initialize_set_icrc1_cansiter_ids_buttons() {
 
     let isLocked = await SliSwapApp_backend.changing_icrc1_canister_ids_has_locked_state();
-    
+
     var element = document.getElementById('set-sli-icrc1-canister-id');
     if (element != null) {
 
@@ -333,7 +347,7 @@ async function initialize_set_icrc1_cansiter_ids_buttons(){
     }
 
     element = document.getElementById('page_admin_lock_setting_icrc1_cansiter_ids');
-    if (element != null){
+    if (element != null) {
         element.removeEventListener('click', async () => { await lock_ICRC1_changing_CanisterIds(); }, true);
         if (isLocked == true) {
             element.disabled = true;
@@ -353,19 +367,25 @@ export const admin_section_init = async function initAdminSection() {
     }
 
     admin_section_init.CommonThingsInitialized = false;
-    await initialize_set_icrc1_cansiter_ids_buttons();
-    
-    await RemoveButtonClickEvents();
-    await AddButtonClickEvents();
 
-    await UpdateVisibilityForDynamicRows("sli", true);
-    await UpdateVisibilityForDynamicRows("glds", true);
-    await UpdateUiFromModel();
+    try {
+        loadingProgessEnabled();
+        await initialize_set_icrc1_cansiter_ids_buttons();
 
- 
+        await RemoveButtonClickEvents();
+        await AddButtonClickEvents();
 
-    admin_section_init.CommonThingsInitialized = true;
-    await UpdateValues();
+        await UpdateVisibilityForDynamicRows("sli", true);
+        await UpdateVisibilityForDynamicRows("glds", true);
+        await UpdateUiFromModel();
+
+        admin_section_init.CommonThingsInitialized = true;
+        await UpdateValues();
+    }
+    finally {
+        loadingProgessDisabled();
+    }
+
 };
 
 
@@ -374,156 +394,162 @@ export const admin_section_init = async function initAdminSection() {
 
 async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
 
-    let sliSwapAppPrincipal = Principal.fromText(CommonIdentityProvider.SwapAppPrincipalText);
-    var dip20CanisterIdToUse = "";
-    var transferFeeBigInt = BigInt(0);
-    var dip20Token = null;
-    var numberOfWalletsToCreate = 0;
-    let bucketSize = 40;
+    try {
+        loadingProgessEnabled();
 
-    switch (specifiedTokenInterfaceType) {
-        case SpecifiedTokenInterfaceType.Dip20Sli:
-            numberOfWalletsToCreate = Number(document.getElementById('sli_SwapWallets_NumberOfWalletsToCreate').value);
-            dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Sli);
+        let sliSwapAppPrincipal = Principal.fromText(CommonIdentityProvider.SwapAppPrincipalText);
+        var dip20CanisterIdToUse = "";
+        var transferFeeBigInt = BigInt(0);
+        var dip20Token = null;
+        var numberOfWalletsToCreate = 0;
+        let bucketSize = 40;
 
-            break;
-        case SpecifiedTokenInterfaceType.Dip20Glds:
-            numberOfWalletsToCreate = Number(document.getElementById('glds_SwapWallets_NumberOfWalletsToCreate').value);
-            dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Glds);
-            break;
-    }
+        switch (specifiedTokenInterfaceType) {
+            case SpecifiedTokenInterfaceType.Dip20Sli:
+                numberOfWalletsToCreate = Number(document.getElementById('sli_SwapWallets_NumberOfWalletsToCreate').value);
+                dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Sli);
+
+                break;
+            case SpecifiedTokenInterfaceType.Dip20Glds:
+                numberOfWalletsToCreate = Number(document.getElementById('glds_SwapWallets_NumberOfWalletsToCreate').value);
+                dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Glds);
+                break;
+        }
 
 
-    if (numberOfWalletsToCreate <= 0) {
-        return;
-    }
+        if (numberOfWalletsToCreate <= 0) {
+            return;
+        }
 
-    transferFeeBigInt = dip20Token.TransferFee.GetRawValue();
-    dip20CanisterIdToUse = dip20Token.CanisterId;
+        transferFeeBigInt = dip20Token.TransferFee.GetRawValue();
+        dip20CanisterIdToUse = dip20Token.CanisterId;
 
-    let approveAmount = TokenBalance.FromNumber(5000, dip20Token.Decimals).GetRawValue();
+        let approveAmount = TokenBalance.FromNumber(5000, dip20Token.Decimals).GetRawValue();
 
-    const indexArray = Get2DimArray(numberOfWalletsToCreate, bucketSize);
-    var updateLock = false;
-    for (var z = 0; z < indexArray.length; z++) {
-        let innerArr = indexArray[z];
+        const indexArray = Get2DimArray(numberOfWalletsToCreate, bucketSize);
+        var updateLock = false;
+        for (var z = 0; z < indexArray.length; z++) {
+            let innerArr = indexArray[z];
 
-        //Do in parallel (With parallel size of 'bucketSize')
-        const promises = innerArr.map(async (parallelIndex) => {
+            //Do in parallel (With parallel size of 'bucketSize')
+            const promises = innerArr.map(async (parallelIndex) => {
 
-            let approvalWalletIdentity = GetRandomIdentity();
-            let approvalWalletPrincipal = approvalWalletIdentity.getPrincipal();
-            let principalAlreadyOccupied = await SliSwapApp_backend.ApprovedWalletsPrincipalExist(approvalWalletPrincipal);
+                let approvalWalletIdentity = GetRandomIdentity();
+                let approvalWalletPrincipal = approvalWalletIdentity.getPrincipal();
+                let principalAlreadyOccupied = await SliSwapApp_backend.ApprovedWalletsPrincipalExist(approvalWalletPrincipal);
 
-            if (principalAlreadyOccupied == false) {
+                if (principalAlreadyOccupied == false) {
 
-                //(1) Transfer fee amount into the wallet, because the 'approve' call costs fee.
-                let transferResult = await dip20Token.TransferTokens(approvalWalletPrincipal, transferFeeBigInt);
+                    //(1) Transfer fee amount into the wallet, because the 'approve' call costs fee.
+                    let transferResult = await dip20Token.TransferTokens(approvalWalletPrincipal, transferFeeBigInt);
 
-                if (transferResult.Result == ResultTypes.ok) {
+                    if (transferResult.Result == ResultTypes.ok) {
 
-                    let hostToUse = 'https://icp-api.io';
+                        let hostToUse = 'https://icp-api.io';
 
-                    const agent = new HttpAgent({
-                        fetch,
-                        identity: approvalWalletIdentity,
-                        host: hostToUse
-                    });
+                        const agent = new HttpAgent({
+                            fetch,
+                            identity: approvalWalletIdentity,
+                            host: hostToUse
+                        });
 
-                    let swappingWalletActor = Actor.createActor(
-                        Dip20Interface, { agent: agent, canisterId: dip20CanisterIdToUse }
-                    );
+                        let swappingWalletActor = Actor.createActor(
+                            Dip20Interface, { agent: agent, canisterId: dip20CanisterIdToUse }
+                        );
 
-                    // (2) Approve now transfer delegation
-                    var approveResponse = GetResultFromVariant(await swappingWalletActor.approve(sliSwapAppPrincipal, approveAmount));
+                        // (2) Approve now transfer delegation
+                        var approveResponse = GetResultFromVariant(await swappingWalletActor.approve(sliSwapAppPrincipal, approveAmount));
 
-                    if (approveResponse.Result == ResultTypes.ok) {
+                        if (approveResponse.Result == ResultTypes.ok) {
 
-                        // (3) Check the allowance amount
-                        var allowanceNumber = await swappingWalletActor.allowance(approvalWalletPrincipal, sliSwapAppPrincipal);
+                            // (3) Check the allowance amount
+                            var allowanceNumber = await swappingWalletActor.allowance(approvalWalletPrincipal, sliSwapAppPrincipal);
 
-                        if (allowanceNumber >= approveAmount) {
+                            if (allowanceNumber >= approveAmount) {
 
-                            var addApprovalWalletIntoDatabaseResponse;
+                                var addApprovalWalletIntoDatabaseResponse;
 
-                            //(4) Add the approved wallet-principal into database in the backend
-                            switch (specifiedTokenInterfaceType) {
-                                case SpecifiedTokenInterfaceType.Dip20Sli:
-                                    addApprovalWalletIntoDatabaseResponse =
-                                        await SwapAppActorProvider.AddApprovalWalletSli(approvalWalletPrincipal);
-                                    break;
-                                case SpecifiedTokenInterfaceType.Dip20Glds:
-                                    addApprovalWalletIntoDatabaseResponse =
-                                        await SwapAppActorProvider.AddApprovalWalletGlds(approvalWalletPrincipal)
-                                    break;
-                            }
+                                //(4) Add the approved wallet-principal into database in the backend
+                                switch (specifiedTokenInterfaceType) {
+                                    case SpecifiedTokenInterfaceType.Dip20Sli:
+                                        addApprovalWalletIntoDatabaseResponse =
+                                            await SwapAppActorProvider.AddApprovalWalletSli(approvalWalletPrincipal);
+                                        break;
+                                    case SpecifiedTokenInterfaceType.Dip20Glds:
+                                        addApprovalWalletIntoDatabaseResponse =
+                                            await SwapAppActorProvider.AddApprovalWalletGlds(approvalWalletPrincipal)
+                                        break;
+                                }
 
-                            if (addApprovalWalletIntoDatabaseResponse.Result == ResultTypes.ok) {
+                                if (addApprovalWalletIntoDatabaseResponse.Result == ResultTypes.ok) {
 
-                                try {
+                                    try {
 
-                                    let index = parallelIndex % bucketSize;
-                                    let waitTime = (index * 150);
-                                    setTimeout(() => {
+                                        let index = parallelIndex % bucketSize;
+                                        let waitTime = (index * 150);
+                                        setTimeout(() => {
 
-                                        while (updateLock == true) {
-                                            //wait
-                                        }
-                                        updateLock = true;
+                                            while (updateLock == true) {
+                                                //wait
+                                            }
+                                            updateLock = true;
 
-                                        try {
-                                            switch (specifiedTokenInterfaceType) {
-                                                case SpecifiedTokenInterfaceType.Dip20Sli:
-                                                    {
-                                                        let actValue = Number(document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value);
-                                                        let newValue = Number(actValue + 1);
-                                                        document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value = Number(newValue);
-                                                    }
-                                                    break;
+                                            try {
+                                                switch (specifiedTokenInterfaceType) {
+                                                    case SpecifiedTokenInterfaceType.Dip20Sli:
+                                                        {
+                                                            let actValue = Number(document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value);
+                                                            let newValue = Number(actValue + 1);
+                                                            document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value = Number(newValue);
+                                                        }
+                                                        break;
 
-                                                case SpecifiedTokenInterfaceType.Dip20Glds:
-                                                    {
-                                                        let actValue = Number(document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value);
-                                                        let newValue = Number(actValue + 1);
-                                                        document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value = Number(newValue);
-                                                    }
-                                                    break;
-                                                default: break;
+                                                    case SpecifiedTokenInterfaceType.Dip20Glds:
+                                                        {
+                                                            let actValue = Number(document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value);
+                                                            let newValue = Number(actValue + 1);
+                                                            document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value = Number(newValue);
+                                                        }
+                                                        break;
+                                                    default: break;
+                                                }
+
+
+                                            }
+                                            finally {
+                                                updateLock = false;
                                             }
 
-
-                                        }
-                                        finally {
-                                            updateLock = false;
-                                        }
-
-                                    }, waitTime);
-                                }
-                                catch (error) {
-                                    //do nothing
-                                    alert(error);
+                                        }, waitTime);
+                                    }
+                                    catch (error) {
+                                        //do nothing
+                                        alert(error);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        await Promise.all(promises);
+            await Promise.all(promises);
 
-        setTimeout(async () => {
-            let numberOfApprovedSliWallets = await SliSwapApp_backend.GetNumberOfSliApprovedWallets();
-            let numberOfApprovedGldsWallets = await SliSwapApp_backend.GetNumberOfGldsApprovedWallets();
+            setTimeout(async () => {
+                let numberOfApprovedSliWallets = await SliSwapApp_backend.GetNumberOfSliApprovedWallets();
+                let numberOfApprovedGldsWallets = await SliSwapApp_backend.GetNumberOfGldsApprovedWallets();
 
-            GlobalDataProvider.ApprovedWallets_Sli_Free = numberOfApprovedSliWallets[0];
-            GlobalDataProvider.ApprovedWallets_Sli_InUse = numberOfApprovedSliWallets[1];
+                GlobalDataProvider.ApprovedWallets_Sli_Free = numberOfApprovedSliWallets[0];
+                GlobalDataProvider.ApprovedWallets_Sli_InUse = numberOfApprovedSliWallets[1];
 
-            GlobalDataProvider.ApprovedWallets_Glds_Free = numberOfApprovedGldsWallets[0];
-            GlobalDataProvider.ApprovedWallets_Glds_InUse = numberOfApprovedGldsWallets[1];
+                GlobalDataProvider.ApprovedWallets_Glds_Free = numberOfApprovedGldsWallets[0];
+                GlobalDataProvider.ApprovedWallets_Glds_InUse = numberOfApprovedGldsWallets[1];
 
-            await UpdateUiFromModel();
-        }, 1000);
+                await UpdateUiFromModel();
+            }, 1000);
+        }
+    } finally {
+        loadingProgessDisabled();
     }
 }
 

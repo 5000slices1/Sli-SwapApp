@@ -1,7 +1,5 @@
-
-
-module{
- public type Metadata = {
+module {
+  public type Metadata = {
     fee : Nat;
     decimals : Nat8;
     owner : Principal;
@@ -33,7 +31,5 @@ module{
       #AmountTooSmall;
     };
   };
-
-
 
 };

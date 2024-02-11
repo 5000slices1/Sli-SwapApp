@@ -12,9 +12,7 @@ import TypesIcrc "../Types/TypesICRC1";
 import Dip20Types "../Types/TypesDip20";
 import CommonLib "CommonLib";
 
-module{
-
-
+module {
 
     public func AddAdminUser(caller : Principal, appSettings : T.AppSettings, principal : Text) : async* Result.Result<Text, Text> {
 
@@ -39,7 +37,7 @@ module{
         };
         let realPrincipal = Principal.fromText(principal);
 
-        let userIsAlreadyAdminOrOwner =  CommonLib.UserIsOwnerOrAdmin(appSettings, realPrincipal);
+        let userIsAlreadyAdminOrOwner = CommonLib.UserIsOwnerOrAdmin(appSettings, realPrincipal);
         if (userIsAlreadyAdminOrOwner == true) {
             appSettings.SwapAppAdmins := List.filter<Text>(appSettings.SwapAppAdmins, func n { n != principal });
             return #ok("Principal is no longer an admin user.");
@@ -51,6 +49,5 @@ module{
     public func GetListOfAdminUsers(appSettings : T.AppSettings) : [Text] {
         return List.toArray<Text>(appSettings.SwapAppAdmins);
     };
-
 
 };

@@ -44,7 +44,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   stable var archiveCanisterId : Principal = Principal.fromText("aaaaa-aa");
   stable var archiveCanisterIdWasSet : Bool = false;
-  stable var setCanisterIdIsLocked:Bool = false;
+  stable var setCanisterIdIsLocked : Bool = false;
 
   let minimumCycles : Nat = 4_000_000_000;
   let archiveTopUpCyclesAmount : Nat = 1_000_000_000;
@@ -53,7 +53,6 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   //Only for debugging purposes these should be set directly
   //archiveCanisterIdWasSet:=false;
-
 
   //-------------------------------------------------------------------------------
   //Swap related methods
@@ -356,17 +355,17 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
   //------------------------------------------------------------------------------
 
-  public shared ({ caller }) func set_changing_icrc1_canister_ids_to_locked_state():async Result.Result<Text,Text>{
+  public shared ({ caller }) func set_changing_icrc1_canister_ids_to_locked_state() : async Result.Result<Text, Text> {
     let userIsOwnerOrAdmin = CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
     if (userIsOwnerOrAdmin == false) {
       return #err("You need to be owner or admin.");
     };
-    setCanisterIdIsLocked:=true;
+    setCanisterIdIsLocked := true;
     return #ok("Ok. Settings the ICRC canisterId's is now locked.");
 
   };
 
-  public shared query func changing_icrc1_canister_ids_has_locked_state():async Bool{
+  public shared query func changing_icrc1_canister_ids_has_locked_state() : async Bool {
     return setCanisterIdIsLocked == true;
   };
 

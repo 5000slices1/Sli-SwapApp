@@ -11,10 +11,10 @@ import Interfaces "../Interfaces/Interfaces";
 import TypesIcrc "../Types/TypesICRC1";
 import Dip20Types "../Types/TypesDip20";
 
-module{
+module {
 
     public func UserIsOwnerOrAdmin(appSettings : T.AppSettings, principal : Principal) : Bool {
-        
+
         let userRole = GetUserRole(appSettings, principal);
         if (userRole == #Owner or userRole == #Admin) {
             return true;
@@ -42,7 +42,5 @@ module{
 
         return #NormalUser;
     };
-
-
 
 };

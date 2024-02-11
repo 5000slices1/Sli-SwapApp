@@ -16,7 +16,7 @@ export const pageIds = createEnum(
 export const pageIdValues = createEnum(
   [
     'PageConvertSliDip20', 'PageConvertGldsDip20',
-    'PageStartPage', 'PageHistorySwapTransactions','PageHistorySwapDeposits' ,'PageAdminSection'
+    'PageStartPage', 'PageHistorySwapTransactions', 'PageHistorySwapDeposits', 'PageAdminSection'
   ]
 )
 
@@ -41,7 +41,7 @@ export class CustomResultInfo {
   }
 }
 
-export class ConversionCompletedArchiveItem{
+export class ConversionCompletedArchiveItem {
 
   AmountBigInt;
   AmountDecimal;
@@ -57,7 +57,7 @@ export class ConversionCompletedArchiveItem{
   TransactionIndex;
 }
 
-export class ConversionStartedArchiveItem{
+export class ConversionStartedArchiveItem {
 
   AmountBigInt;
   AmountDecimal;
@@ -73,7 +73,7 @@ export class ConversionStartedArchiveItem{
   SubAccount;
 }
 
-export class ArchivedDepositItem{
+export class ArchivedDepositItem {
   TokenType;
   Amount;
   RealAmount;
@@ -167,7 +167,7 @@ export class GlobalData {
   Icrc1_Glds_TokenTransferFee;
   Icrc1_Glds_Deposited_In_SwapApp;
 
-  constructor(){
+  constructor() {
     this.Dip20Sli_amount_InUserWallet = 0.0;
     this.Dip20Glds_amount_InUserWallet = 0.0;
     this.SwapApp_CanisterId_Text = "";

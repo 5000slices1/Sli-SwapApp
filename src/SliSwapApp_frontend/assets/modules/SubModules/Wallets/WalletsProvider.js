@@ -21,12 +21,12 @@ export class WalletsProvider {
   IcpBalance;
 
   constructor() {
-   
+
     this.UsersIdentity = new UsersIdentity();
     this.SliConvertInfo = new ConvertTokenInfo(SpecifiedTokenInterfaceType.Dip20Sli, SpecifiedTokenInterfaceType.Icrc1Sli);
     this.GldsConvertInfo = new ConvertTokenInfo(SpecifiedTokenInterfaceType.Dip20Glds, SpecifiedTokenInterfaceType.Icrc1Glds);
     this.IcpBalance = new TokenBalance();
- 
+
     PubSub.unsubscribe('WalletsProvider_UpdateAllWalletBalances_Started');
 
     PubSub.subscribe('WalletsProvider_UpdateAllWalletBalances_Started',
@@ -46,7 +46,7 @@ export class WalletsProvider {
       case SpecifiedTokenInterfaceType.Icrc1Sli: return this.SliConvertInfo.TargetToken;
       case SpecifiedTokenInterfaceType.Icrc1Glds: return this.GldsConvertInfo.TargetToken;
     }
-  
+
   }
 
   //MetaData + canisterId of the tokens are updated
@@ -85,7 +85,7 @@ export class WalletsProvider {
 
     try {
 
-        //nothing at this moment
+      //nothing at this moment
     }
     finally {
 

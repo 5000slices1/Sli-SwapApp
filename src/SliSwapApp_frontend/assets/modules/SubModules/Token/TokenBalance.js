@@ -4,19 +4,24 @@ export class TokenBalance {
   #RawValue;
   #Decimals;
 
-  SetDecimals(decimals){
+  SetDecimals(decimals) {
     this.#Decimals = Number(decimals);
     return this;
   }
-  
+
   SetRawValue(balanceValue) {
     this.#RawValue = balanceValue;
     return this;
   }
 
-  SetValue(amount){
+  SetValue(amount) {
 
-    this.#RawValue = BigInt( Number(amount) * (10 ** Number(this.#Decimals)));
+    var withprecision = Number(amount);
+    withprecision = parseFloat(withprecision.toFixed(this.#Decimals));
+    var tempNumber = (Number(withprecision) * (10 ** Number(this.#Decimals)));
+    tempNumber = parseFloat(tempNumber.toFixed(0));
+
+    this.#RawValue = BigInt(tempNumber);
     return this;
   }
 
@@ -31,11 +36,11 @@ export class TokenBalance {
     return number / (10 ** Number(this.#Decimals));
   }
 
-  static FromNumber(numberValue, decimals = 8){
+  static FromNumber(numberValue, decimals = 8) {
     return new TokenBalance().SetDecimals(decimals).SetValue(numberValue);
   }
 
-  constructor(tokenBalanceBigInt = BigInt(0),decimals = 8) {
+  constructor(tokenBalanceBigInt = BigInt(0), decimals = 8) {
     this.#RawValue = BigInt(tokenBalanceBigInt);
     this.#Decimals = Number(decimals);
   }
