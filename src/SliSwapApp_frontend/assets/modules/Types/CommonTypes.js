@@ -53,6 +53,8 @@ export class ConversionCompletedArchiveItem{
   ConversionId;
   IsSliToken;
   IsGldsToken;
+  SubAccount;
+  TransactionIndex;
 }
 
 export class ConversionStartedArchiveItem{
@@ -68,6 +70,30 @@ export class ConversionStartedArchiveItem{
   IsSliToken;
   IsGldsToken;
   DepositIds;
+  SubAccount;
+}
+
+export class ArchivedDepositItem{
+  TokenType;
+  Amount;
+  RealAmount;
+  From;
+  To;
+  DepositId;
+  DateTime;
+  RawTimeTicks;
+  TimeLocalTimeString;
+  IsSliToken;
+  IsGldsToken;
+
+  ConversionId;
+  ConversionWasStarted;
+  ConversionWasCompleted;
+  ConversionStatusText;
+
+  ConversionUsedOwnerPrincipal;
+  ConversionUsedOwnerSubAccount;
+
 }
 
 

@@ -64,6 +64,7 @@ export function ConvertResponseToConversionStartedArchiveItem(responseItem){
   result.TimeLocalTimeString = temp.TimeLocalTimeString;
   result.TokenType = temp.TokenType;
   result.UserPrincipal = temp.UserPrincipal;
+  result.SubAccount = temp.SubAccount;
 
   let depositIds = singleItem['depositIds'];
 
@@ -75,18 +76,12 @@ export function ConvertResponseToConversionStartedArchiveItem(responseItem){
   }
  
   result.DepositIds = depositIdsArray;
-
-  console.log("result");
-  console.log(result);
-
   return result;
-
 }
 
 export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
 
   let singleItem = GetCustomDictionaryFromVariant(responseItem); 
-
   var result = new ConversionCompletedArchiveItem();
   var decimals = 8; // we can hardcode this, because sli and glds DIP20 has decimals=8 set
   let tokenType = GetCustomResultFromVariant(singleItem['tokenType']);
@@ -110,6 +105,17 @@ export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
   let rawPrincipal = singleItem['userPrincipal'];
   result.UserPrincipal =  Principal.fromHex(rawPrincipal.toHex()).toText();
 
+  let subAccount = singleItem['subAccount'];
+  if (subAccount != undefined){
+    result.SubAccount = Buffer.from(subAccount).toString('hex');
+  }
+
+  let transactionIndex = singleItem['transactionIndex'];
+
+  if (transactionIndex != undefined){
+    result.TransactionIndex = transactionIndex;
+  }
+  
   let timeTicksNanoSeconds = Number(singleItem['time']);
   let timeTicksMilliSeconds = Math.trunc(Number(timeTicksNanoSeconds / 1000000));
   let date = new Date(Number(timeTicksMilliSeconds));

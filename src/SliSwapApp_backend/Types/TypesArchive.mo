@@ -35,6 +35,7 @@ module {
         conversionId:Blob;
         depositIds:[Blob]; 
         userPrincipal:Principal;
+        subAccount:Blob;
         time:Time.Time;
     };
 
@@ -43,6 +44,8 @@ module {
         amount:Nat;
         conversionId:Blob;
         userPrincipal:Principal;
+        subAccount:Blob;
+        transactionIndex:Nat;
         time:Time.Time;
     };
 

@@ -51,10 +51,8 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   let minimumAboveThresholdNeeded : Nat = 1_000_000;
   var swapAppPrincipal = Principal.fromText("aaaaa-aa");
 
-  //Only for debugging purposes this should be set directly
-  //setCanisterIdIsLocked:=false;
-
-//archiveCanisterIdWasSet:=false;
+  //Only for debugging purposes these should be set directly
+  //archiveCanisterIdWasSet:=false;
 
 
   //-------------------------------------------------------------------------------

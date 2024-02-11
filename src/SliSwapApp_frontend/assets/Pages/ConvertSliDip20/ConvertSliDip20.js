@@ -17,12 +17,12 @@ async function convert_deposited_oldSliTokens() {
 
 
 
+    if (PageExistAndUserIsLoggedIn() == false) {
+        return;
+    }
+
     try {
         
-        if (PageExistAndUserIsLoggedIn() == false) {
-            return;
-        }
-
         document.getElementById('buttonDepositNowOldSliDip20').disabled = true;
         document.getElementById('convertNowOldSliDip20ToICRC1').disabled = true;
 
