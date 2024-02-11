@@ -657,7 +657,7 @@ module{
                     tokenType:TypesCommon.SpecificTokenType = specifiedTokenType;
                     amount:Nat = depositAmountToConsider;
                     conversionId:Blob = conversionIdCreated;
-                    depositIds:List.List<Blob> = depositIds; 
+                    depositIds:[Blob] = List.toArray(depositIds); 
                     userPrincipal:Principal = usersPrincipal;
                     time:Time.Time = Time.now();
                 };

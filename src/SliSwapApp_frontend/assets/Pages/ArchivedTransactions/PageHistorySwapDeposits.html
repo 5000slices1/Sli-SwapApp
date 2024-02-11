@@ -13,6 +13,7 @@
         border-collapse: collapse;
         border-spacing: 5em;
         vertical-align: middle;
+      
       }
       .fixed_header tbody {
         display: block;
@@ -36,7 +37,7 @@
         padding-bottom: 4px;
         padding-top: 5px;
         text-align: left;
-        border: solid rgb(62, 61, 61);
+        border: solid rgb(157, 154, 154);
         font-size: 12px;
         height: 40px;
         vertical-align: middle;
@@ -48,55 +49,42 @@
 
 
   
-<div class="container" id="ArchiveTransactions_HtmlPage" 
+<div class="container" id="ArchiveDepositsTransactions_HtmlPage" 
 style="vertical-align: top;" 
 >  
-    <swapControl id ="ArchiveTransactions_swapControl" style="vertical-align: top;height:800px"  >
-      <b><label style="font-size: 18px;color: #bfbcbc;">Swapping history of $GLDS and $SLI tokens:</label></b>
+    <swapControl id ="ArchiveDepositsTransactions_swapControl" style="vertical-align: top;height:800px"  >
+      <b><label style="font-size: 18px;color: #bfbcbc;">Deposits history of $GLDS and $SLI tokens:</label></b>
       <br/><br/><br/>
       <label style="font-size: 14;background-color:  #090917;color:  #bfbcbc;">Filter:</label>
-      <input id="ArchiveTransactions_filterInput"  
+      <input id="ArchiveDepositsTransactions_filterInput"  
       style="text-align: left; padding-left: 8px;padding-right: 8px; 
       width:420px;margin-left:24px;background-color:  #090917;color:  #bfbcbc;"> </input>
-      <button id="ArchiveTransactions_button_filter_apply" class="button-49" 
+      <button id="ArchiveDepositsTransactions_button_filter_apply" class="button-49" 
        style="padding-top: 4px; margin-left: 12px; cursor:pointer;">Apply</button>
       <br/><br/><br/>
       <table class="fixed_header"
       style="font-size: 12px;">
-        <thead id="ArchiveTransaction_thead" style="font-size: 12px;">
+        <thead style="font-size: 12px;">
           <tr  class="spaceUnder" style="font-size: 12px;">
             <th style="width: 150px;font-size: 12px; background: rgb(44, 43, 43);">Date</th>
             <th style="width: 55px;font-size: 12px; background: rgb(44, 43, 43);">Token</th>
-            <th style="width: 80px;font-size: 12px; background: rgb(44, 43, 43);">Amount</th>
+            <th style="width: 60px;font-size: 12px; background: rgb(44, 43, 43);">Amount</th>
             <th style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">Users-Wallet</th>
             <th style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">Conversion-Id</th>        
           </tr>
         </thead>
-        <tbody id="ArchiveTransaction_tbody" style="font-size: 12px;height: 600px;">
+        <tbody id="ArchiveDepositsTransaction_tbody" style="font-size: 12px;height: 600px;">
           <tr  class="spaceUnder" style="font-size: 12px;">
             <td style="width: 150px;font-size: 12px; background: rgb(44, 43, 43);">2/10/2024, 10:21:43 PM</td>
             <td style="width: 55px;font-size: 12px; background: rgb(44, 43, 43);">	$GLDS</td>
-            <td style="width: 80px;font-size: 12px; background: rgb(44, 43, 43);">0.007	</td>
+            <td style="width: 60px;font-size: 12px; background: rgb(44, 43, 43);">0.007	</td>
             <td style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">itwm5-5ff6e-rgu6l-4hw2f-q6j4k-awfav-r3qxq-frks2-3tnkt-6ptzu-2qe</td>
             <td style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">d5f6502428166353db4a4157658490e0948c703dc132112a80d5b335edeffccc</td>        
           </tr>
-          <tr  class="spaceUnder" style="font-size: 12px;">
-            <td style="width: 150px;font-size: 12px; background: rgb(44, 43, 43);">2/10/2024, 10:21:43 PM</td>
-            <td style="width: 55px;font-size: 12px; background: rgb(44, 43, 43);">	$GLDS</td>
-            <td style="width: 80px;font-size: 12px; background: rgb(44, 43, 43);">0.007	</td>
-            <td style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">itwm5-5ff6e-rgu6l-4hw2f-q6j4k-awfav-r3qxq-frks2-3tnkt-6ptzu-2qe</td>
-            <td style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">d5f6502428166353db4a4157658490e0948c703dc132112a80d5b335edeffccc</td>        
-          </tr>
-          <tr  class="spaceUnder" style="font-size: 12px;">
-            <td style="width: 150px;font-size: 12px; background: rgb(44, 43, 43);">2/10/2024, 10:21:43 PM</td>
-            <td style="width: 55px;font-size: 12px; background: rgb(44, 43, 43);">	$GLDS</td>
-            <td style="width: 80px;font-size: 12px; background: rgb(44, 43, 43);">0.007	</td>
-            <td style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">itwm5-5ff6e-rgu6l-4hw2f-q6j4k-awfav-r3qxq-frks2-3tnkt-6ptzu-2qe</td>
-            <td style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">d5f6502428166353db4a4157658490e0948c703dc132112a80d5b335edeffccc</td>        
-          </tr>
-          
+        
        
-      
+        
+ 
         </tbody>
       </table>
     </swapControl>  

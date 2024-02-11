@@ -16,7 +16,7 @@ export const pageIds = createEnum(
 export const pageIdValues = createEnum(
   [
     'PageConvertSliDip20', 'PageConvertGldsDip20',
-    'PageStartPage', 'PageHistorySwapTransactions', 'PageAdminSection'
+    'PageStartPage', 'PageHistorySwapTransactions','PageHistorySwapDeposits' ,'PageAdminSection'
   ]
 )
 
@@ -53,8 +53,21 @@ export class ConversionCompletedArchiveItem{
   ConversionId;
   IsSliToken;
   IsGldsToken;
-  
+}
 
+export class ConversionStartedArchiveItem{
+
+  AmountBigInt;
+  AmountDecimal;
+  RawTimeTicks;
+  DateTime;
+  TimeLocalTimeString;
+  TokenType;
+  UserPrincipal;
+  ConversionId;
+  IsSliToken;
+  IsGldsToken;
+  DepositIds;
 }
 
 

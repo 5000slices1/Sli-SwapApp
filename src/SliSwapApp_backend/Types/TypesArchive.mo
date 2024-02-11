@@ -33,7 +33,7 @@ module {
         tokenType:TypesCommon.SpecificTokenType;
         amount:Nat;
         conversionId:Blob;
-        depositIds:List.List<Blob>; 
+        depositIds:[Blob]; 
         userPrincipal:Principal;
         time:Time.Time;
     };

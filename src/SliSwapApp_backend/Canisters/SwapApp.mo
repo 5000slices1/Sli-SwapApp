@@ -54,6 +54,9 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //Only for debugging purposes this should be set directly
   //setCanisterIdIsLocked:=false;
 
+//archiveCanisterIdWasSet:=false;
+
+
   //-------------------------------------------------------------------------------
   //Swap related methods
 

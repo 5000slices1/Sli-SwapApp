@@ -75,7 +75,7 @@ function historyTransactions_UpdateUiFromModel(){
         htmlString+="<td style=\"font-size: 12px;width: 55px;padding-left: 8px;\">";
         htmlString+=item.TokenType + "</td>\n";
 
-        htmlString+="<td style=\"font-size: 12px;width: 60px;padding-left: 8px;\">";
+        htmlString+="<td style=\"font-size: 12px;width: 80px;padding-left: 8px;\">";
         htmlString+=item.AmountDecimal + "</td>\n";
 
         htmlString+="<td style=\"font-size: 12px;width: 450px;padding-left: 8px;\">";
@@ -92,10 +92,34 @@ function historyTransactions_UpdateUiFromModel(){
 }
 
 
+function setTableBodySizeAutomatically(){
+    let elementTableBody = document.getElementById('ArchiveTransaction_tbody');
+    let elementSwapControl = document.getElementById('ArchiveTransactions_swapControl');
+
+    const height = window.innerHeight|| document.documentElement.clientHeight|| 
+    document.body.clientHeight;
+    var newHeight = height - 250;
+    newHeight = Math.max(newHeight, 350);
+
+    elementSwapControl.style.height = newHeight + "px";
+    elementTableBody.style.height  = (newHeight-200) + "px";
+ 
+}
+
 export const historyTransactions_init = async function initHistoryTransactions(){
 
+    if (HistoryTransactions_HtmlPage_Exist() == false)
+    {
+        return;
+    }
     document.getElementById('ArchiveTransactions_filterInput').value = archiveCompletedTransactions_filter;
 
+    setTableBodySizeAutomatically();
+
+    window.addEventListener('resize', function(event) {
+        setTableBodySizeAutomatically();
+    }, true);
+    
     historyTransactions_UpdateUiFromModel();
 
     let elementApplyFilter = document.getElementById('ArchiveTransactions_button_filter_apply');
@@ -106,7 +130,7 @@ export const historyTransactions_init = async function initHistoryTransactions()
 
     let count = Number(await SliSwapApp_archive.conversion_Completed_Total_Count());
 
-    var bucketSize = 2;
+    var bucketSize = 500;
     bucketSize = Math.min(bucketSize, count);
 
     archiveCompletedTransactions = new Array();

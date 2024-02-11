@@ -1,4 +1,4 @@
-import { ResultInfo, CustomResultInfo,ConversionCompletedArchiveItem, 
+import { ResultInfo, CustomResultInfo,ConversionCompletedArchiveItem, ConversionStartedArchiveItem,
   SpecifiedTokenInterfaceType,ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
 //import { Ed25519KeyIdentity } from '@dfinity/identity';
@@ -46,6 +46,42 @@ export function GetCustomDictionaryFromVariant(item){
   return map;
 }
 
+export function ConvertResponseToConversionStartedArchiveItem(responseItem){
+
+  let singleItem = GetCustomDictionaryFromVariant(responseItem); 
+
+  var temp = ConvertResponseToConversionCompletedArchiveItem(responseItem);
+
+
+  let result =  new ConversionStartedArchiveItem();
+  result.AmountBigInt = temp.AmountBigInt;
+  result.AmountDecimal = temp.AmountDecimal;
+  result.ConversionId = temp.ConversionId;
+  result.DateTime = temp.DateTime;
+  result.IsGldsToken = temp.IsGldsToken;
+  result.IsSliToken = temp.IsSliToken;
+  result.RawTimeTicks = temp.RawTimeTicks;
+  result.TimeLocalTimeString = temp.TimeLocalTimeString;
+  result.TokenType = temp.TokenType;
+  result.UserPrincipal = temp.UserPrincipal;
+
+  let depositIds = singleItem['depositIds'];
+
+  var depositIdsArray = new Array();
+  for(let i=0; i<depositIds.length; i++){
+    let arr = depositIds[i];
+    let hexString = Buffer.from(arr).toString('hex');
+    depositIdsArray.push(hexString);
+  }
+ 
+  result.DepositIds = depositIdsArray;
+
+  console.log("result");
+  console.log(result);
+
+  return result;
+
+}
 
 export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
 
