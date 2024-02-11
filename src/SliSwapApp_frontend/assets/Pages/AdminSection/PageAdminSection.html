@@ -1,259 +1,252 @@
 <html>
-  <header style="display: none;">
-    <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
-  </header>
-  <body>
+<header style="display: none;">
+  <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
+</header>
 
- 
+<body>
 
+  <div id="DivPageAdminSection">
+    <!-- Tab links -->
+    <div class="tab" style="margin-right: -12px;">
+      <button class="tablinks" style="color: #b2b1b6;" type="submit" id="ButtonTabpage1"
+        onclick="showTabpage(event, 'tabContentIcrc1')">ICRC1 Tokens</button>
+      <button class="tablinks" style="color: #b2b1b6;" type="submit" id="ButtonTabpage2"
+        onclick="showTabpage(event, 'tabContentSwapWallets')">Swap-wallets</button>
+    </div>
 
-<div  id ="DivPageAdminSection">
- <!-- Tab links -->
- <div class="tab" style="margin-right: -12px;">
-  <button class="tablinks" style="color: #b2b1b6;" type="submit" id="ButtonTabpage1" onclick="showTabpage(event, 'tabContentIcrc1')">ICRC1 Tokens</button>
-  <button class="tablinks" style="color: #b2b1b6;" type="submit" id="ButtonTabpage2" onclick="showTabpage(event, 'tabContentSwapWallets')">Swap-wallets</button>
-</div> 
- 
-
-
-<!-- #region ICRC1 tokens settings -->
-  <div class="tabcontent" id="tabContentIcrc1" 
-  style="max-width: 100%;width: 780px;"
-  >
-    <div style="width: 780px;display: flex;
+    <!-- #region ICRC1 tokens settings -->
+    <div class="tabcontent" id="tabContentIcrc1" style="max-width: 100%;width: 780px;">
+      <div style="width: 780px;display: flex;
     margin: 0 auto;align-items: center;
     max-width: 100%;">
-    <swapControl style="width: 780px;">
-      <b><label style="color: #430dd9;">Token settings</label></b>
-      <br />
-      <br />
-      <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">SLI-ICRC1 token:</p>
-      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table id="Table_sli" style="font-size:smaller;table-layout: fixed;">
-          <tr>
-            <td style="width: 150px;"><label>SLI-ICRC1 canister-id: </label></td>
-            <td style="width: 200px;"><input id="sli-icrc1-canister-id" 
-              style="width: 420px;padding-right: 12px;" type="text" value=""></td>
-            <td><button id="set-sli-icrc1-canister-id" class="button-49"
-                style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>           
-          </tr>      
-          <tr id="row_sli_MetadataLogo" >
-            <td style="width: 150px;"><label>Logo: </label></td>
-            <td style="width: 200px;"><label id="sliTokenLogo"></label></td>            
-          </tr>
-          <tr id="row_sli_MetadataSymbol" >
-            <td style="width: 150px;"><label>Symbol: </label></td>
-            <td style="width: 200px;"><label id="sliTokenSymbol"></label></td>            
-          </tr>
-          <tr id="row_sli_MetadataName">
-            <td style="width: 150px;"><label>Name: </label></td>
-            <td style="width: 200px;"><label id="sliTokenName"></label></td>            
-          </tr>
-          <tr id="row_sli_MetadataDecimals" >
-            <td style="width: 150px;"><label>Decimals: </label></td>
-            <td style="width: 200px;"><label id="sliTokenDecimals" ></label></td>            
-          </tr>
-          <tr id="row_sli_MetadataTotalSupply">
-            <td style="width: 150px;"><label>Total supply: </label></td>
-            <td style="width: 200px;"><label id="sliTokenTotalSupply"></label></td>            
-          </tr>
-          <tr id="row_sli_MetadataFee">
-            <td style="width: 150px;"><label>Transfer fee: </label></td>
-            <td style="width: 200px;"><label id="sliTokenTransferFee"></label></td>            
-          </tr>
-          <tr>
-            <td><label>Deposited in Swap-App: </label></td>
-            <td><input pattern="[0-9]*" step="0.001" inputmode="numeric" min="0.001"
-                id="sli-icrc1-deposited-in-swap-app" style="padding-right: 12px; background-color: lightgray;"
-                type="number" readonly value="0.0"></td>
-          </tr>          
-        </table>
+        <swapControl style="width: 780px;">
+          <b><label style="color: #430dd9;">Token settings</label></b>
+          <br />
+          <br />
+          <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">SLI-ICRC1 token:</p>
+          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+            <table id="Table_sli" style="font-size:smaller;table-layout: fixed;">
+              <tr>
+                <td style="width: 150px;"><label>SLI-ICRC1 canister-id: </label></td>
+                <td style="width: 200px;"><input id="sli-icrc1-canister-id" style="width: 420px;padding-right: 12px;"
+                    type="text" value=""></td>
+                <td><button id="set-sli-icrc1-canister-id" class="button-49"
+                    style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>
+              </tr>
+              <tr id="row_sli_MetadataLogo">
+                <td style="width: 150px;"><label>Logo: </label></td>
+                <td style="width: 200px;"><label id="sliTokenLogo"></label></td>
+              </tr>
+              <tr id="row_sli_MetadataSymbol">
+                <td style="width: 150px;"><label>Symbol: </label></td>
+                <td style="width: 200px;"><label id="sliTokenSymbol"></label></td>
+              </tr>
+              <tr id="row_sli_MetadataName">
+                <td style="width: 150px;"><label>Name: </label></td>
+                <td style="width: 200px;"><label id="sliTokenName"></label></td>
+              </tr>
+              <tr id="row_sli_MetadataDecimals">
+                <td style="width: 150px;"><label>Decimals: </label></td>
+                <td style="width: 200px;"><label id="sliTokenDecimals"></label></td>
+              </tr>
+              <tr id="row_sli_MetadataTotalSupply">
+                <td style="width: 150px;"><label>Total supply: </label></td>
+                <td style="width: 200px;"><label id="sliTokenTotalSupply"></label></td>
+              </tr>
+              <tr id="row_sli_MetadataFee">
+                <td style="width: 150px;"><label>Transfer fee: </label></td>
+                <td style="width: 200px;"><label id="sliTokenTransferFee"></label></td>
+              </tr>
+              <tr>
+                <td><label>Deposited in Swap-App: </label></td>
+                <td><input pattern="[0-9]*" step="0.001" inputmode="numeric" min="0.001"
+                    id="sli-icrc1-deposited-in-swap-app" style="padding-right: 12px; background-color: lightgray;"
+                    type="number" readonly value="0.0"></td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="margin-top: 28px;margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">
+            GLDS-ICRC1 token:</p>
+          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+            <table id="Table_glds" style="font-size:smaller;table-layout: fixed;">
+              <tr>
+                <td style="width: 150px;"><label>GLDS-ICRC1 canister-id: </label></td>
+                <td style="width: 200px;"><input id="glds-icrc1-canister-id"
+                    style="padding-right: 12px;margin-left: 0.2em;width: 420px;" type="text" value=""></td>
+                <td><button id="set-glds-icrc1-canister-id" class="button-49"
+                    style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>
+                <td></td>
+              </tr>
+              <tr id="row_glds_MetadataLogo">
+                <td style="width: 150px;"><label>Logo: </label></td>
+                <td style="width: 200px;"><label id="gldsTokenLogo"></label></td>
+              </tr>
+              <tr id="row_glds_MetadataSymbol">
+                <td style="width: 150px;"><label>Symbol: </label></td>
+                <td style="width: 200px;"><label id="gldsTokenSymbol"></label></td>
+              </tr>
+              <tr id="row_glds_MetadataName">
+                <td style="width: 150px;"><label>Name: </label></td>
+                <td style="width: 200px;"><label id="gldsTokenName"></label></td>
+              </tr>
+              <tr id="row_glds_MetadataDecimals">
+                <td style="width: 150px;"><label>Decimals: </label></td>
+                <td style="width: 200px;"><label id="gldsTokenDecimals"></label></td>
+              </tr>
+              <tr id="row_glds_MetadataTotalSupply">
+                <td style="width: 150px;"><label>Total supply: </label></td>
+                <td style="width: 200px;"><label id="gldsTokenTotalSupply"></label></td>
+              </tr>
+              <tr id="row_glds_MetadataFee">
+                <td style="width: 150px;"><label>Transfer fee: </label></td>
+                <td style="width: 200px;"><label id="gldsTokenTransferFee"></label></td>
+              </tr>
+              <tr>
+                <td><label>Available in Swap-App: </label></td>
+                <td><input pattern="[0-9]*" step="0.001" inputmode="numeric" min="0.001"
+                    id="glds-icrc1-deposited-in-swap-app"
+                    style="padding-right: 12px;margin-left: 0.2em;background-color: lightgray;" type="number" readonly
+                    value="0.0"></td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="margin-top: 28px;margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">
+            Swap-App deposit address:</p>
+          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+            <table style="font-size:smaller;table-layout: fixed;">
+              <tr>
+                <td colspan="3">
+                  <label>Please transfer the desired amount of the above two ICRC1 tokens to this address:</label>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td style="width: 200px;">
+                  <input id="swap-app-canister-id" readonly
+                    style="padding-right: 12px;width: 432px;margin-left: 0.2em;background-color: lightgray;" type="text"
+                    value="454">
+                </td>
+                <td>
+                </td>
+              </tr>
+
+            </table>
+          </div>
+
+          <p style="margin-top: 28px;margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">
+            Lock the function to set ICRC1 canister-Ids:</p>
+          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+            <table style="font-size:smaller;table-layout: fixed;">
+              <tr>
+                <td colspan="3">
+                  <label>Click on the button 'Lock now' to disable changing the ICRC1 canister-Id's again.</label>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td style="width: 200px;">
+                  <button class="button-49" id="page_admin_lock_setting_icrc1_cansiter_ids"
+                    style="margin-left: 8px; cursor:pointer;width:200px;margin-right: 8px;">Lock now</button>
+                </td>
+                <td>
+                </td>
+              </tr>
+
+            </table>
+          </div>
+          <br />
+        </swapControl>
       </div>
+    </div>
+    <!-- #endregion ICRC1 tokens settings -->
 
-      <p style="margin-top: 28px;margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">
-        GLDS-ICRC1 token:</p>
-      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table  id="Table_glds"style="font-size:smaller;table-layout: fixed;">
-          <tr>
-            <td style="width: 150px;"><label>GLDS-ICRC1 canister-id: </label></td>
-            <td style="width: 200px;"><input id="glds-icrc1-canister-id" 
-              style="padding-right: 12px;margin-left: 0.2em;width: 420px;" type="text" value=""></td>
-            <td><button id="set-glds-icrc1-canister-id" class="button-49"
-                style="margin-left: 0.2em; cursor:pointer;">Apply change</label></td>
-            <td></td>
-          </tr>
-          <tr id="row_glds_MetadataLogo">
-            <td style="width: 150px;"><label>Logo: </label></td>
-            <td style="width: 200px;"><label id="gldsTokenLogo"></label></td>            
-          </tr>
-          <tr id="row_glds_MetadataSymbol">
-            <td style="width: 150px;"><label>Symbol: </label></td>
-            <td style="width: 200px;"><label id="gldsTokenSymbol"></label></td>            
-          </tr>
-          <tr id="row_glds_MetadataName">
-            <td style="width: 150px;"><label>Name: </label></td>
-            <td style="width: 200px;"><label id="gldsTokenName"></label></td>            
-          </tr>
-          <tr id="row_glds_MetadataDecimals" >
-            <td style="width: 150px;"><label>Decimals: </label></td>
-            <td style="width: 200px;"><label id="gldsTokenDecimals" ></label></td>            
-          </tr>
-          <tr id="row_glds_MetadataTotalSupply" >
-            <td style="width: 150px;"><label>Total supply: </label></td>
-            <td style="width: 200px;"><label id="gldsTokenTotalSupply"></label></td>            
-          </tr>
-          <tr id="row_glds_MetadataFee" >
-            <td style="width: 150px;"><label>Transfer fee: </label></td>
-            <td style="width: 200px;"><label id="gldsTokenTransferFee"></label></td>            
-          </tr>
-          <tr>
-            <td><label>Available in Swap-App: </label></td>
-            <td><input pattern="[0-9]*" step="0.001" inputmode="numeric" min="0.001"
-                id="glds-icrc1-deposited-in-swap-app" style="padding-right: 12px;margin-left: 0.2em;background-color: lightgray;"
-                type="number" readonly value="0.0"></td>
-          </tr>
-        </table>
-      </div>
-
-      <p style="margin-top: 28px;margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">
-        Swap-App deposit address:</p>
-      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table style="font-size:smaller;table-layout: fixed;">
-          <tr>
-            <td colspan="3">
-              <label>Please transfer the desired amount of the above two ICRC1 tokens to this address:</label>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>             
-            <td style="width: 200px;">
-              <input id="swap-app-canister-id"  readonly
-              style="padding-right: 12px;width: 432px;margin-left: 0.2em;background-color: lightgray;" 
-              type="text"  value="454">
-            </td>
-            <td>
-            </td>
-          </tr>
-
-        </table>
-      </div>
-
-      <p style="margin-top: 28px;margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">
-        Lock the function to set ICRC1 canister-Ids:</p>
-      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table style="font-size:smaller;table-layout: fixed;">
-          <tr>
-            <td colspan="3">
-              <label>Click on the button 'Lock now' to disable changing the ICRC1 canister-Id's again.</label>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>             
-            <td style="width: 200px;">
-              <button class="button-49" id ="page_admin_lock_setting_icrc1_cansiter_ids"
-              style="margin-left: 8px; cursor:pointer;width:200px;margin-right: 8px;">Lock now</button>
-            </td>
-            <td>
-            </td>
-          </tr>
-
-        </table>
-      </div>
-      <br />
-    </swapControl>
-  </div>
-  </div>
-<!-- #endregion ICRC1 tokens settings -->
-
-<!-- #region Swap-Wallets settings -->
-<div class="tabcontent" id="tabContentSwapWallets" 
-style="max-width: 100%;width: 580px;"
->
-  <div style="width: 580px;display: flex;
+    <!-- #region Swap-Wallets settings -->
+    <div class="tabcontent" id="tabContentSwapWallets" style="max-width: 100%;width: 580px;">
+      <div style="width: 580px;display: flex;
   margin: 0 auto;align-items: center;
   max-width: 100%;">
-  <swapControl style="width: 580px;">
-    <b><label style="color: #430dd9;">Wallets for the swapping process</label></b>
-    <br />
-    <br />
-   
-    <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-      <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets for Dip20-Sli swapping:</p>
-      <table id="Table_sli" style="font-size:smaller;table-layout: fixed;">
-        <tr>
-          <td style="width: 180px;">
-            <label>Number of wallets to create: </label>
-          </td>
-          <td style="width: 85px;">
-            <input id="sli_SwapWallets_NumberOfWalletsToCreate" 
-            style="width: 85px;padding-right: 2px;" type="number" min="0" step="1" value="0">
-          </td>
-          <td><button id="sli_SwapWallets_button_createWallets" type="submit" class="button-49"
-              style=" margin-left: 2.0em; cursor:pointer;width: 80px;">Create now</label>
-            </td>           
-        </tr>      
-        <tr>
-          <td style="width: 180px;"><label>Free wallets: </label></td>
-          <td style="width: 85px;"><input id="sli_SwapWallets_NumberOfFreeWallets" 
-            style="width: 85px;padding-right: 2px;" type="number" step="1"
-            readonly="true"
-            value="0"></label></td>            
-        </tr>
-        <tr >
-          <td style="width: 180px;"><label>Used wallets: </label></td>
-          <td style="width: 85px;"><input id="sli_SwapWallets_NumberOfUsedWallets" 
-            style="width: 85px;padding-right: 2px;" type="number" step="1"
-            readonly="true"
-            value="0"></label></td>            
-        </tr>            
-      </table>
-      <br>
+        <swapControl style="width: 580px;">
+          <b><label style="color: #430dd9;">Wallets for the swapping process</label></b>
+          <br />
+          <br />
+
+          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+            <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets for
+              Dip20-Sli swapping:</p>
+            <table id="Table_sli" style="font-size:smaller;table-layout: fixed;">
+              <tr>
+                <td style="width: 180px;">
+                  <label>Number of wallets to create: </label>
+                </td>
+                <td style="width: 85px;">
+                  <input id="sli_SwapWallets_NumberOfWalletsToCreate" style="width: 85px;padding-right: 2px;"
+                    type="number" min="0" step="1" value="0">
+                </td>
+                <td><button id="sli_SwapWallets_button_createWallets" type="submit" class="button-49"
+                    style=" margin-left: 2.0em; cursor:pointer;width: 80px;">Create now</label>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 180px;"><label>Free wallets: </label></td>
+                <td style="width: 85px;"><input id="sli_SwapWallets_NumberOfFreeWallets"
+                    style="width: 85px;padding-right: 2px;" type="number" step="1" readonly="true" value="0"></label>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 180px;"><label>Used wallets: </label></td>
+                <td style="width: 85px;"><input id="sli_SwapWallets_NumberOfUsedWallets"
+                    style="width: 85px;padding-right: 2px;" type="number" step="1" readonly="true" value="0"></label>
+                </td>
+              </tr>
+            </table>
+            <br>
+          </div>
+
+          </br>
+          <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+            <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets for
+              Dip20-Glds swapping:</p>
+            <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
+              <table id="Table_glds" style="font-size:smaller;table-layout: fixed;">
+                <tr>
+                  <td style="width: 180px;">
+                    <label>Number of wallets to create: </label>
+                  </td>
+                  <td style="width: 85px;">
+                    <input id="glds_SwapWallets_NumberOfWalletsToCreate" style="width: 85px;padding-right: 2px;"
+                      type="number" min="0" step="1" value="0">
+                  </td>
+                  <td><button id="glds_SwapWallets_button_createWallets" type="submit" class="button-49"
+                      style=" margin-left: 2.0em; cursor:pointer;width: 80px;">Create now</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 180px;"><label>Free wallets: </label></td>
+                  <td style="width: 85px;"><input id="glds_SwapWallets_NumberOfFreeWallets"
+                      style="width: 85px;padding-right: 2px;" type="number" step="1" readonly="true" value="0"></label>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 180px;"><label>Used wallets: </label></td>
+                  <td style="width: 85px;"><input id="glds_SwapWallets_NumberOfUsedWallets"
+                      style="width: 85px;padding-right: 2px;" type="number" step="1" readonly="true" value="0"></label>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <br />
+        </swapControl>
+      </div>
     </div>
 
-    </br>
-    <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-      <p style="margin-bottom: 8px;color: #612dee;font-size:medium;padding-bottom: 0.1em;">Create new wallets for Dip20-Glds swapping:</p>
-      <div style="background-color: #f4c174;padding: 0.4em;border-radius: 0.8em;">
-        <table id="Table_glds" style="font-size:smaller;table-layout: fixed;">
-          <tr>
-            <td style="width: 180px;">
-              <label>Number of wallets to create: </label>
-            </td>
-            <td style="width: 85px;">
-              <input id="glds_SwapWallets_NumberOfWalletsToCreate" 
-              style="width: 85px;padding-right: 2px;" type="number" min="0" step="1" value="0">
-            </td>
-            <td><button id="glds_SwapWallets_button_createWallets" type="submit" class="button-49"
-                style=" margin-left: 2.0em; cursor:pointer;width: 80px;">Create now</label>
-              </td>           
-          </tr>      
-          <tr>
-            <td style="width: 180px;"><label>Free wallets: </label></td>
-            <td style="width: 85px;"><input id="glds_SwapWallets_NumberOfFreeWallets" 
-              style="width: 85px;padding-right: 2px;" type="number" step="1"
-              readonly="true"
-              value="0"></label></td>            
-          </tr>
-          <tr >
-            <td style="width: 180px;"><label>Used wallets: </label></td>
-            <td style="width: 85px;"><input id="glds_SwapWallets_NumberOfUsedWallets" 
-              style="width: 85px;padding-right: 2px;" type="number" step="1"
-              readonly="true"
-              value="0"></label></td>            
-          </tr>            
-        </table>
-    </div>
-
-    <br />
-  </swapControl>
-</div>
-</div>
-
-<!-- #endregion Swap-Wallets settings -->
+    <!-- #endregion Swap-Wallets settings -->
 
   </div>
 
@@ -271,7 +264,8 @@ style="max-width: 100%;width: 580px;"
       document.getElementById(cityName).style.display = "block";
       evt.currentTarget.className += " active";
     }
-    </script>
+  </script>
 
 </body>
+
 </html>

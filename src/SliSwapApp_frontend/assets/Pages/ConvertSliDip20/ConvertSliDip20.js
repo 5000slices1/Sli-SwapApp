@@ -1,10 +1,11 @@
 import { CommonIdentityProvider, SpecifiedTokenInterfaceType, SwapAppActorProvider } from "../../modules/Types/CommonTypes";
 import { PubSub } from "../../modules/Utils/PubSub";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
-import { GetResultFromVariant } from "../../modules/Utils/CommonUtils";
+import { GetResultFromVariant, loadingProgessEnabled, loadingProgessDisabled } from "../../modules/Utils/CommonUtils";
 import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
 import { Principal } from "@dfinity/principal";
 import { ResultTypes } from "../../modules/Types/CommonTypes";
+
 
 
 
@@ -22,7 +23,8 @@ async function convert_deposited_oldSliTokens() {
     }
 
     try {
-        
+
+        loadingProgessEnabled();
         document.getElementById('buttonDepositNowOldSliDip20').disabled = true;
         document.getElementById('convertNowOldSliDip20ToICRC1').disabled = true;
 
@@ -47,6 +49,7 @@ async function convert_deposited_oldSliTokens() {
     finally {
         document.getElementById('buttonDepositNowOldSliDip20').disabled = false;
         document.getElementById('convertNowOldSliDip20ToICRC1').disabled = false;
+        loadingProgessDisabled();
     }
 }
 
@@ -59,14 +62,16 @@ async function deposit_oldSliTokens() {
     if (PageExistAndUserIsLoggedIn() == false) {
         return;
     }
-    
-    if (sliDepositOrConvertionIsOnProgress == true){
+
+    if (sliDepositOrConvertionIsOnProgress == true) {
         alert('Not possible. Deposit or Convertion is still on progres...');
         return;
     }
 
     try {
-       
+
+        loadingProgessEnabled();
+
         sliDepositOrConvertionIsOnProgress = true;
 
         document.getElementById('buttonDepositNowOldSliDip20').disabled = true;
@@ -101,7 +106,7 @@ async function deposit_oldSliTokens() {
 
         if (depositablePossibleResponse.Result == false) {
 
-            alert( depositablePossibleResponse.ResultValue);
+            alert(depositablePossibleResponse.ResultValue);
             return;
         }
 
@@ -112,7 +117,7 @@ async function deposit_oldSliTokens() {
             return;
         }
 
-        var amountToDepositBigInt = BigInt(TokenBalance.FromNumber(realAmountToDeposit, tokenInfo.Decimals).GetRawValue());
+        var amountToDepositBigInt = BigInt(TokenBalance.FromNumber(realAmountToDeposit, tokenInfo.Decimals).GetRawValue());    
         let approvalAmountBigInt = BigInt(TokenBalance.FromNumber(amountToDeposit, tokenInfo.Decimals).GetRawValue());
 
         let approveResult = await tokenInfo.approve(swapAppPrincipal, approvalAmountBigInt);
@@ -122,7 +127,7 @@ async function deposit_oldSliTokens() {
             return;
         }
 
-        let depositResult = await SliSwapApp_backend.DepositSliDip20Tokens(userPrincipal, amountToDepositBigInt);       
+        let depositResult = await SliSwapApp_backend.DepositSliDip20Tokens(userPrincipal, amountToDepositBigInt);
         let parsedResult = GetResultFromVariant(depositResult);
 
         await UpdateBalances();
@@ -138,6 +143,7 @@ async function deposit_oldSliTokens() {
         document.getElementById('buttonDepositNowOldSliDip20').disabled = false;
         document.getElementById('convertNowOldSliDip20ToICRC1').disabled = false;
         sliDepositOrConvertionIsOnProgress = false;
+        loadingProgessDisabled();
     }
 }
 
@@ -146,13 +152,13 @@ async function deposit_oldSliTokens() {
 //#region Helper functions 
 
 
-function PageExistAndUserIsLoggedIn(){
+function PageExistAndUserIsLoggedIn() {
 
-    if (RelatedHtmlPageExist()== false){
+    if (RelatedHtmlPageExist() == false) {
         return false;
     }
 
-    if (userIsLoggedIn() == false){
+    if (userIsLoggedIn() == false) {
         return false;
     }
 
@@ -231,8 +237,8 @@ async function UpdateBalances() {
     //One fee for approval and one for transfer. Therefore the fee = 3 * transferFee, because at least 0.001 must be transfered
     feeNeeded = feeNeeded + feeNeeded + feeNeeded;
 
-    let [firstResult, secondResult, response] = await Promise.all([tokenInfo.GetBalanceFromUsersWallet(), 
-        icrc1TokenInfo.GetBalanceFromUsersWallet(), SwapAppActorProvider.GetDepositedSliAmount()]);
+    let [firstResult, secondResult, response] = await Promise.all([tokenInfo.GetBalanceFromUsersWallet(),
+    icrc1TokenInfo.GetBalanceFromUsersWallet(), SwapAppActorProvider.GetDepositedSliAmount()]);
 
 
     let sliDip20TokensBalanceInUserWallet = firstResult.GetValue();
@@ -272,24 +278,29 @@ async function UpdateBalances() {
 
 export const convertSliDip20_init = async function initConvertSliDip20() {
 
-    sliDepositOrConvertionIsOnProgress = false;
-    PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged');
-    PubSub.subscribe('ConvertDip20_js_UserIdentityChanged', 'UserIdentityChanged', UpdateBalances);
+    try {
+        loadingProgessEnabled();
+        sliDepositOrConvertionIsOnProgress = false;
+        PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged');
+        PubSub.subscribe('ConvertDip20_js_UserIdentityChanged', 'UserIdentityChanged', UpdateBalances);
 
-    let elementDeposit = document.getElementById('buttonDepositNowOldSliDip20');
-    if (elementDeposit != null) {
-        elementDeposit.removeEventListener('click', async () => { await deposit_oldSliTokens(); });
-        elementDeposit.addEventListener('click', async () => { await deposit_oldSliTokens(); });
+        let elementDeposit = document.getElementById('buttonDepositNowOldSliDip20');
+        if (elementDeposit != null) {
+            elementDeposit.removeEventListener('click', async () => { await deposit_oldSliTokens(); });
+            elementDeposit.addEventListener('click', async () => { await deposit_oldSliTokens(); });
+        }
+
+
+        let elementConvert = document.getElementById('convertNowOldSliDip20ToICRC1');
+        if (elementConvert != null) {
+            elementConvert.removeEventListener('click', async () => { await convert_deposited_oldSliTokens(); });
+            elementConvert.addEventListener('click', async () => { await convert_deposited_oldSliTokens(); });
+        }
+
+        await UpdateBalances();
+    } finally {
+        loadingProgessDisabled();
     }
-
-
-    let elementConvert = document.getElementById('convertNowOldSliDip20ToICRC1');
-    if (elementConvert != null) {
-        elementConvert.removeEventListener('click', async () => { await convert_deposited_oldSliTokens(); });
-        elementConvert.addEventListener('click', async () => { await convert_deposited_oldSliTokens(); });
-    }
-
-    await UpdateBalances();
 };
 
 

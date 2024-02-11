@@ -106,7 +106,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
     lastIndex := Nat.min(lastIndex, length);
 
     var resultAsList : List.List<TypesArchive.UsedSubAccount> = List.nil<TypesArchive.UsedSubAccount>();
-    for (index in Iter.range(from, lastIndex-1)) {
+    for (index in Iter.range(from, lastIndex -1)) {
       let itemOrNull = List.get(entries.usedSubAccounts, index);
       switch (itemOrNull) {
         case (?item) {
@@ -188,7 +188,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
 
     var result : List.List<TypesArchive.ArchivedDeposit> = List.nil<TypesArchive.ArchivedDeposit>();
 
-    for (index in Iter.range(from, lastIndex-1)) {
+    for (index in Iter.range(from, lastIndex -1)) {
 
       try {
         let blob : Blob = getBlobByIndex(entries.deposits, Nat64.fromNat(index));
@@ -276,7 +276,6 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
     };
   };
 
-
   public shared query func conversion_Started_Get_Item_By_Index(index : Nat64) : async Result.Result<TypesArchive.ArchivedConversionStarted, Text> {
 
     let blob : Blob = getBlobByIndex(entries.conversionStarted, index);
@@ -291,7 +290,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
     };
   };
 
-   public shared query func conversion_Started_Get_Items(from : Nat, count : Nat) : async Result.Result<[TypesArchive.ArchivedConversionStarted], Text> {
+  public shared query func conversion_Started_Get_Items(from : Nat, count : Nat) : async Result.Result<[TypesArchive.ArchivedConversionStarted], Text> {
 
     let blobsCount : Nat = Nat64.toNat(getSize(entries.conversionStarted));
 
@@ -304,7 +303,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
 
     var result : List.List<TypesArchive.ArchivedConversionStarted> = List.nil<TypesArchive.ArchivedConversionStarted>();
 
-    for (index in Iter.range(from, lastIndex-1)) {
+    for (index in Iter.range(from, lastIndex -1)) {
 
       try {
         let blob : Blob = getBlobByIndex(entries.conversionStarted, Nat64.fromNat(index));
@@ -327,7 +326,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
 
   };
 
-    public shared ({ caller }) func conversion_Started_Add(item : TypesArchive.ArchivedConversionStarted) : async Result.Result<Text, Text> {
+  public shared ({ caller }) func conversion_Started_Add(item : TypesArchive.ArchivedConversionStarted) : async Result.Result<Text, Text> {
 
     if (caller != swapAppCanisterId) {
       return #err("caller is not swapAppPrincipal. caller:" #Principal.toText(caller) # " , swapapp-principal: " #Principal.toText(swapAppCanisterId));
@@ -378,7 +377,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
     };
   };
 
- public shared query func conversion_Completed_Indizes_For_Principal(principal : Principal) : async Result.Result<[Nat64], Text> {
+  public shared query func conversion_Completed_Indizes_For_Principal(principal : Principal) : async Result.Result<[Nat64], Text> {
 
     let encodedPrincipal = Principal.toBlob(principal);
     let currentIndizesOrNull = StableTrieMap.get(entries.conversionCompleted_Indizes, Blob.equal, Blob.hash, encodedPrincipal);
@@ -391,7 +390,6 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
       };
     };
   };
-
 
   public shared query func conversion_Completed_Get_Item_By_Index(index : Nat64) : async Result.Result<TypesArchive.ArchivedConversionCompleted, Text> {
 
@@ -407,8 +405,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
     };
   };
 
- 
- public shared query func conversion_Completed_Get_Items(from : Nat, count : Nat) : async Result.Result<[TypesArchive.ArchivedConversionCompleted], Text> {
+  public shared query func conversion_Completed_Get_Items(from : Nat, count : Nat) : async Result.Result<[TypesArchive.ArchivedConversionCompleted], Text> {
 
     let blobsCount : Nat = Nat64.toNat(getSize(entries.conversionCompleted));
 
@@ -421,7 +418,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
 
     var result : List.List<TypesArchive.ArchivedConversionCompleted> = List.nil<TypesArchive.ArchivedConversionCompleted>();
 
-    for (index in Iter.range(from, lastIndex-1)) {
+    for (index in Iter.range(from, lastIndex -1)) {
 
       try {
         let blob : Blob = getBlobByIndex(entries.conversionCompleted, Nat64.fromNat(index));
@@ -473,7 +470,6 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
     return #ok("deposit item was added");
   };
 
-
   //--------------------------------------------------------------------
 
   //This function is only for developing purposes
@@ -491,7 +487,6 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
   public shared query func cycles_available() : async Nat {
     Cycles.balance();
   };
-
 
   //----------------------------------------------------------------
   //helper functions

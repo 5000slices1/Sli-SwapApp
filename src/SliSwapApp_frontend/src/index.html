@@ -16,172 +16,205 @@
 </head>
 
 <body>
-  <div>
-    <div style="position: fixed;z-index: 50;  left: -10px; width: 100%; height:130px; background-color: #0e0f27;">
+  <div id="disablingDiv">
+  </div>
+  <div id ="loadingProgressDiv" style="height: 350px;">
+      <swapControl id="loadingProgressContent" 
+      style="color: white;display: block;margin-left:-160px;margin-right: 160px;"
+       >
+       <table>
+        <td style="width: 180px;vertical-align: middle;">
+          Loading / Progressing...    
+          Please wait....
+        </td>
+        <td style="width: 10px;vertical-align: middle;">
+         
+        </td>
+        <td style="width: 32px;">
+           
+          <img src="spinnerIcon.gif" 
+          style="width: 32px;height: 32px;">
 
-    </div>
-  <header style="z-index: 51; min-width: 800px;width: 100%;position: fixed;margin-top: 16px;">
+          <!-- <img src="/src/SliSwapApp_frontend/assets/spinnerIcon.gif" 
+          style="width: 32px;height: 32px;"> -->
+        </img>
+        </td>
+       </table>
+      </swapControl>
+  </div>
+    <div>
+      <div style="position: fixed;z-index: 50;  left: -10px; width: 100%; height:130px; background-color: #0e0f27;">
 
-    <table style="width: 100%;min-width: 450px;">
-      <td align="left" style="width:80px">
-        <img src="appIcons/5000SlicesIcon.png" width="75" height="75"
-          style="margin-right: 12px;min-width: 75px; min-height: 75px;" alt="5000 Slices Swap-App" />
-      </td>
-      <td align="left" style="width:auto; min-width: 200px">
-        <b>
-          <p style="margin-top:24px; font-size: large;min-width: 350; color:rgb(187, 187, 187)">5000 Slices Swap-App</p>
-        </b>
-      </td>
-      <td align="right">
-        <div style="align-content: flex-end;margin-top: 12px;">
-          <table>
-            <td>
-              <div style="margin-top: 6px;">
-              <label id="labelWalletConnectionStatus" style="margin-right: 22px;font-size: 0.8em;
+      </div>
+      <header style="z-index: 51; min-width: 800px;width: 100%;position: fixed;margin-top: 16px;">
+
+        <table style="width: 100%;min-width: 450px;">
+          <td align="left" style="width:80px">
+            <img src="appIcons/5000SlicesIcon.png" width="75" height="75"
+              style="margin-right: 12px;min-width: 75px; min-height: 75px;" alt="5000 Slices Swap-App" />
+          </td>
+          <td align="left" style="width:auto; min-width: 200px">
+            <b>
+              <p style="margin-top:24px; font-size: large;min-width: 350; color:rgb(187, 187, 187)">5000 Slices Swap-App
+              </p>
+            </b>
+          </td>
+          <td align="right">
+            <div style="align-content: flex-end;margin-top: 12px;">
+              <table>
+                <td>
+                  <div style="margin-top: 6px;">
+                    <label id="labelWalletConnectionStatus" style="margin-right: 22px;font-size: 0.8em;
                 color: rgb(40, 40, 211);font-weight: bold; vertical-align: middle; 
                 "></label>
-              </td>
-              <td>    
-            <td>
-              <!-- #region Wallet Connection Control -->
-              <div class="dropdown">
-                <button id="buttonWalletDropDown" style="border-radius: 6px;
-                height:35px;width:120px" type="submit"
-                  class="dropbtn">Wallet
-                  Connection</button>
+                </td>
+                <td>
+                <td>
+                  <!-- #region Wallet Connection Control -->
+                  <div class="dropdown">
+                    <button id="buttonWalletDropDown" style="border-radius: 6px;
+                height:35px;width:120px" type="submit" class="dropbtn">Wallet
+                      Connection</button>
 
-                <div id="dropDownWalletMenu" class="dropdown-content"
-                  style="padding: 3px 3px 3px 6px; position: fixed; width: 180px;
+                    <div id="dropDownWalletMenu" class="dropdown-content"
+                      style="padding: 3px 3px 3px 6px; position: fixed; width: 180px;
                   left: 100%; 
                    margin-left: -210px; margin-top: 70px;                                 
                   background-color: hsl(249, 32%, 8%);box-shadow: 0 0 10px 0 rgba(242, 241, 241, 0.3);border-radius: 0.8em;">
 
-                  <table>
-                    <tr class="spaceUnder">
-                      <button id="loginStoic" type="submit" class="button-dropdownmenu">
-                        <img src="appIcons/stoic.png" width="22px" height="22px"
-                          style="float: left;margin-left: 4px;" />
-                        <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Stoic</div>
-                      </button>
-                    </tr>
+                      <table>
+                        <tr class="spaceUnder">
+                          <button id="loginStoic" type="submit" class="button-dropdownmenu">
+                            <img src="appIcons/stoic.png" width="22px" height="22px"
+                              style="float: left;margin-left: 4px;" />
+                            <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Stoic</div>
+                          </button>
+                        </tr>
 
-                    <tr class="spaceUnder">
-                      <button id="loginPlug" type="submit" class="button-dropdownmenu">
-                        <img src="appIcons/plug.jpg" width="22px" height="22px" style="float: left;margin-left: 4px;" />
-                        <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Plug</div>
-                      </button>
-                    </tr>
-                    <tr>
-                      <button id="logout" type="submit" class="button-dropdownmenu">
+                        <tr class="spaceUnder">
+                          <button id="loginPlug" type="submit" class="button-dropdownmenu">
+                            <img src="appIcons/plug.jpg" width="22px" height="22px"
+                              style="float: left;margin-left: 4px;" />
+                            <div style="margin: auto;text-align: center;margin-top: 2px;">Connect with Plug</div>
+                          </button>
+                        </tr>
+                        <tr>
+                          <button id="logout" type="submit" class="button-dropdownmenu">
 
-                        <div style="margin: auto;text-align: right;margin-right: 10px;  margin-top: 0px;">Log out</div>
-                      </button>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-              <!-- #endregion Wallet Connection Control -->
-            </td>
+                            <div style="margin: auto;text-align: right;margin-right: 10px;  margin-top: 0px;">Log out
+                            </div>
+                          </button>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <!-- #endregion Wallet Connection Control -->
+                </td>
 
-          </table>
-        </div>
-      </td>
-    </table>
+              </table>
+            </div>
+          </td>
+        </table>
 
-  </header>
- </div>
+      </header>
+    </div>
 
 
-  <div style="left: 0px;position: block; ">
-    <table style="margin-left: -4px; padding-top: 140px;  
+    <div style="left: 0px;position: block; ">
+      <table style="margin-left: -4px; padding-top: 140px;  
     width: 100%;min-height: 350px;max-height: 400px;">
 
-      <!-- #region Left side navigation Controls -->
-      <td style="width: 220px;">
+        <!-- #region Left side navigation Controls -->
+        <td style="width: 220px;">
 
-        <!-- This placeholder is needed, please do not delete -->
-        <div style="width: 220px;height:0.01px;background-color: transparent"> 
-           
-        </div>
-        <div style="min-height: 240px;background-color: #0e0f27;
+          <!-- This placeholder is needed, please do not delete -->
+          <div style="width: 220px;height:0.01px;background-color: transparent">
+
+          </div>
+          <div style="min-height: 240px;background-color: #0e0f27;
         border-radius: 8px;
             box-shadow: 0 0 10px 0 rgb(255, 254, 254);
             padding-left: 12px;padding-right: 12px;padding-top: 16px; padding-bottom: 0px;
             font-size: 0.7em;width: 205px;
             position: fixed;
             ">
-          <button type="submit" class="button-navigation" id="PageStartPage" style="color: rgb(143, 143, 143);">Start
-            Page</button>
+            <button type="submit" class="button-navigation" id="PageStartPage" style="color: rgb(143, 143, 143);">Start
+              Page</button>
 
-          <button type="submit" class="button-navigation" id="PageConvertSliDip20"
-            style="color: rgb(143, 143, 143);">Convert 'Sli Dip20 tokens'</button>
+            <button type="submit" class="button-navigation" id="PageConvertSliDip20"
+              style="color: rgb(143, 143, 143);">Convert 'Sli Dip20 tokens'</button>
 
-          <button type="submit" class="button-navigation" id="PageConvertGldsDip20"
-            style="color: rgb(143, 143, 143);">Convert 'Glds Dip20
-            tokens'</button>
+            <button type="submit" class="button-navigation" id="PageConvertGldsDip20"
+              style="color: rgb(143, 143, 143);">Convert 'Glds Dip20
+              tokens'</button>
 
-          <button type="submit" class="button-navigation" id="PageHistorySwapDeposits"
-            style="color: rgb(143, 143, 143);">History of
-            Swap-deposits</button>
+            <button type="submit" class="button-navigation" id="PageHistorySwapDeposits"
+              style="color: rgb(143, 143, 143);">History of
+              Swap-deposits</button>
 
-          <button type="submit" class="button-navigation" id="PageHistorySwapTransactions"
-            style="color: rgb(143, 143, 143);">History of
-            Swap-transactions</button>
+            <button type="submit" class="button-navigation" id="PageHistorySwapTransactions"
+              style="color: rgb(143, 143, 143);">History of
+              Swap-transactions</button>
 
-          <button type="submit" class="button-navigation" id="PageAdminSection"
-            style="display: none;color: rgb(143, 143, 143);">Admin
-            section</button>
-        </div>
-      </td>
-      <!-- #endregion Left side navigation Controls -->
+            <button type="submit" class="button-navigation" id="PageAdminSection"
+              style="display: none;color: rgb(143, 143, 143);">Admin
+              section</button>
+          </div>
+        </td>
+        <!-- #endregion Left side navigation Controls -->
 
-      <!-- #region Dynamically added Html contents -->
+        <!-- #region Dynamically added Html contents -->
 
-      <td style="vertical-align: top; 
+        <td style="vertical-align: top; 
       ">
-      <div id="mainpage_main_content_div" >
+          <div id="mainpage_main_content_div">
 
-        
+
         <td style="padding-left: 0px;position: relative;">
           <div mainContentPageId="PageConvertSliDip20" html-source="/Pages/ConvertSliDip20/ConvertSliDip20.html"></div>
 
-          <div mainContentPageId="PageConvertGldsDip20" html-source="/Pages/ConvertGldsDip20/ConvertGldsDip20.html"></div>
+          <div mainContentPageId="PageConvertGldsDip20" html-source="/Pages/ConvertGldsDip20/ConvertGldsDip20.html">
+          </div>
 
           <div mainContentPageId="PageStartPage" html-source="/Pages/StartPage/StartPage.html"></div>
           <div mainContentPageId="PageAdminSection" html-source="/Pages/AdminSection/PageAdminSection.html"></div>
-          <div mainContentPageId="PageHistorySwapDeposits" html-source="/Pages/ArchivedTransactions/PageHistorySwapDeposits.html"></div>
-          <div mainContentPageId="PageHistorySwapTransactions" html-source="/Pages/ArchivedTransactions/PageHistorySwapTransactions.html"></div>
+          <div mainContentPageId="PageHistorySwapDeposits"
+            html-source="/Pages/ArchivedTransactions/PageHistorySwapDeposits.html"></div>
+          <div mainContentPageId="PageHistorySwapTransactions"
+            html-source="/Pages/ArchivedTransactions/PageHistorySwapTransactions.html"></div>
           <!-- #endregion Dynamically added Html contents -->
-      </td>
+        </td>
 
-    </table>
-  </div>
-
-  <footer id="mainpage_footer" class="footer" style="margin-left: 8px;margin-right: -8px; width:100%;">
-    <div>
-
-      Join Community: <a style="color:rgb(172, 101, 15);" target="_blank"
-        href="https://oc.app/community/ovkev-xiaaa-aaaar-asorq-cai/channel/333479041001113364768524958478479859764/?ref=tzol4-lqaaa-aaaaf-aanaq-cai">OpenChat</a>
-      <div class="col-sm-5">
-        <ul class="social_icon text_align_right d_none">
-          <li> <a target="_blank" href="https://www.facebook.com/mysliceinfo"><i class="fa fa-facebook-f"></i></a></li>
-          <li> <a target="_blank" href="https://twitter.com/info_slice"><i class="fa fa-twitter"></i></a></li>
-          <li> <a target="_blank" href="https://www.youtube.com/channel/UCErWBRjdOWo_hmHNqb4yxDg"><i
-                class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
-          <li> <a target="_blank" href="https://github.com/5000slices1/Sli-SwapApp"><i class="fa fa-github"
-                aria-hidden="true"></i></a></li>
-          <li> <a target="_blank" href="https://t.me/mysliceinfo"><i class="fa fa-telegram" aria-hidden="true"></i></a>
-          </li>
-          <li> <a target="_blank" href="https://www.instagram.com/5000slices"><i class="fa fa-instagram"
-                aria-hidden="true"></i></a></li>
-
-        </ul>
-      </div>
+      </table>
     </div>
-    
-  </footer>
 
+    <footer id="mainpage_footer" class="footer" style="margin-left: 8px;margin-right: -8px; width:100%;">
+      <div>
 
+        Join Community: <a style="color:rgb(172, 101, 15);" target="_blank"
+          href="https://oc.app/community/ovkev-xiaaa-aaaar-asorq-cai/channel/333479041001113364768524958478479859764/?ref=tzol4-lqaaa-aaaaf-aanaq-cai">OpenChat</a>
+        <div class="col-sm-5">
+          <ul class="social_icon text_align_right d_none">
+            <li> <a target="_blank" href="https://www.facebook.com/mysliceinfo"><i class="fa fa-facebook-f"></i></a>
+            </li>
+            <li> <a target="_blank" href="https://twitter.com/info_slice"><i class="fa fa-twitter"></i></a></li>
+            <li> <a target="_blank" href="https://www.youtube.com/channel/UCErWBRjdOWo_hmHNqb4yxDg"><i
+                  class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
+            <li> <a target="_blank" href="https://github.com/5000slices1/Sli-SwapApp"><i class="fa fa-github"
+                  aria-hidden="true"></i></a></li>
+            <li> <a target="_blank" href="https://t.me/mysliceinfo"><i class="fa fa-telegram"
+                  aria-hidden="true"></i></a>
+            </li>
+            <li> <a target="_blank" href="https://www.instagram.com/5000slices"><i class="fa fa-instagram"
+                  aria-hidden="true"></i></a></li>
+
+          </ul>
+        </div>
+      </div>
+
+    </footer>
+
+ 
 
 </body>
 

@@ -7,21 +7,21 @@ import Text "mo:base/Text";
 import T "../Types/TypesCommon";
 import ICRC1 "../Types/TypesICRC1"
 
-module{
+module {
 
-    public type SliSwapAppInterface = actor{
-        GetUserRole:shared query() -> async T.UserRole;
-        GetSwapAppPrincipalText:shared query() -> async Text;
-        
-        SliIcrc1_SetCanisterId: shared (canisterId:Principal) -> async Result.Result<Text, Text>;
-        GldsIcrc1_SetCanisterId: shared (canisterId:Principal) -> async Result.Result<Text, Text>;
-        
-        SliIcrc1_GetCanisterId: shared query () -> async Text;
-        GldsIcrc1_GetCanisterId: shared query () -> async Text;
+    public type SliSwapAppInterface = actor {
+        GetUserRole : shared query () -> async T.UserRole;
+        GetSwapAppPrincipalText : shared query () -> async Text;
 
-        AddAdminUser: shared(principal:Principal) -> async Result.Result<Text, Text>;
-        RemoveAdminUser: shared(principal:Principal) -> async Result.Result<Text, Text>;
-        GetListOfAdminUsers: shared query () -> async [Text];
+        SliIcrc1_SetCanisterId : shared (canisterId : Principal) -> async Result.Result<Text, Text>;
+        GldsIcrc1_SetCanisterId : shared (canisterId : Principal) -> async Result.Result<Text, Text>;
+
+        SliIcrc1_GetCanisterId : shared query () -> async Text;
+        GldsIcrc1_GetCanisterId : shared query () -> async Text;
+
+        AddAdminUser : shared (principal : Principal) -> async Result.Result<Text, Text>;
+        RemoveAdminUser : shared (principal : Principal) -> async Result.Result<Text, Text>;
+        GetListOfAdminUsers : shared query () -> async [Text];
     };
 
 };

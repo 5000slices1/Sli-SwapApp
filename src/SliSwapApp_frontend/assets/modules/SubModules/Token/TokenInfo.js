@@ -3,7 +3,6 @@ import { SpecifiedTokenInterfaceType } from "../../Types/CommonTypes";
 import { Dip20TokenActorFetcher } from "../ActorFetchers/Dip20TokenActorFetcher";
 import { Icrc1TokenActorFetcher } from "../ActorFetchers/Icrc1TokenActorFetcher";
 import { PubSub } from "../../Utils/PubSub";
-import { GetResultFromVariant } from "../../Utils/CommonUtils";
 import { ResultInfo, ResultTypes } from "../../Types/CommonTypes";
 
 export class TokenInfo {
@@ -33,39 +32,39 @@ export class TokenInfo {
   }
 
 
-  async GetTotalSupply(){
-    if (this.MetaDataPresent  == false || this.TokenActor == null){
+  async GetTotalSupply() {
+    if (this.MetaDataPresent == false || this.TokenActor == null) {
       return new TokenBalance();
     }
 
-    return await this.TokenActor.GetTotalSupply(this.Decimals);   
+    return await this.TokenActor.GetTotalSupply(this.Decimals);
   }
 
   //The metadata of the token is updated
-  async UpdateTokenInfo(tokenInfo){
-    if (tokenInfo.hasData()){
+  async UpdateTokenInfo(tokenInfo) {
+    if (tokenInfo.hasData()) {
       this.Name = tokenInfo.name;
       this.Symbol = tokenInfo.symbol;
       this.Logo = tokenInfo.logo;
       this.Decimals = tokenInfo.decimals;
       this.TransferFee = tokenInfo.fee;
-      this.CanisterId = tokenInfo.canisterId; 
+      this.CanisterId = tokenInfo.canisterId;
       this.MetaDataPresent = true;
       PubSub.publish("TokenInfo_WasUpdated", this.SpecifiedTokenInterfaceType);
     }
   }
-  
-  async UserIdentityChanged(provider, principal){
-    this.ResetAfterUserIdentityChanged();  
-        
+
+  async UserIdentityChanged(provider, principal) {
+    this.ResetAfterUserIdentityChanged();
+
     this.#provider = provider;
-    this.#loggedInPrincipal = principal;    
-    await this.UpdateTokenActors();           
+    this.#loggedInPrincipal = principal;
+    await this.UpdateTokenActors();
   };
 
-  async UpdateTokenActors(){
+  async UpdateTokenActors() {
 
-    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+    if (this.CanisterId == null || this.MetaDataPresent == false ||
       this.#provider == null || this.#loggedInPrincipal == null) {
       return;
     }
@@ -73,16 +72,16 @@ export class TokenInfo {
     switch (this.SpecifiedTokenInterfaceType) {
 
       case SpecifiedTokenInterfaceType.Dip20Sli:
-      case SpecifiedTokenInterfaceType.Dip20Glds: {        
-        this.TokenActor = new Dip20TokenActorFetcher();        
-        await this.TokenActor.Init(this.#provider, this.#loggedInPrincipal, this.CanisterId);        
+      case SpecifiedTokenInterfaceType.Dip20Glds: {
+        this.TokenActor = new Dip20TokenActorFetcher();
+        await this.TokenActor.Init(this.#provider, this.#loggedInPrincipal, this.CanisterId);
       }
         break;
 
       case SpecifiedTokenInterfaceType.Icrc1Glds:
-      case SpecifiedTokenInterfaceType.Icrc1Sli: {        
-        this.TokenActor = new Icrc1TokenActorFetcher();        
-        await this.TokenActor.Init(this.#provider, this.#loggedInPrincipal, this.CanisterId);        
+      case SpecifiedTokenInterfaceType.Icrc1Sli: {
+        this.TokenActor = new Icrc1TokenActorFetcher();
+        await this.TokenActor.Init(this.#provider, this.#loggedInPrincipal, this.CanisterId);
       }
         break;
       default: return;
@@ -90,32 +89,30 @@ export class TokenInfo {
 
   }
 
-  async TransferTokens(targetPrincipal, amount){
+  async TransferTokens(targetPrincipal, amount) {
 
-    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+    if (this.CanisterId == null || this.MetaDataPresent == false ||
       this.#provider == null || this.#loggedInPrincipal == null) {
-        return new ResultInfo(ResultTypes.err, "Not initialized");
+      return new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    try
-    {
+    try {
       switch (this.SpecifiedTokenInterfaceType) {
 
         case SpecifiedTokenInterfaceType.Dip20Sli:
-        case SpecifiedTokenInterfaceType.Dip20Glds: {  
-          
-          let result = await this.TokenActor.TransferTokens(targetPrincipal, amount);        
+        case SpecifiedTokenInterfaceType.Dip20Glds: {
+
+          let result = await this.TokenActor.TransferTokens(targetPrincipal, amount);
           return result;
         }
-      
+
         //Transfer for ICRC1 is not needed here in frontend. This will be done on backend side.
-        default:   
+        default:
           break;
-      
+
       }
     }
-    catch(error)
-    {
+    catch (error) {
       return new ResultInfo(ResultTypes.err, error);
     }
 
@@ -123,30 +120,28 @@ export class TokenInfo {
 
   }
 
-  async approve(targetPrincipal, amount){
-    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+  async approve(targetPrincipal, amount) {
+    if (this.CanisterId == null || this.MetaDataPresent == false ||
       this.#provider == null || this.#loggedInPrincipal == null) {
-        return new ResultInfo(ResultTypes.err, "Not initialized");
+      return new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    try
-    {
+    try {
       switch (this.SpecifiedTokenInterfaceType) {
 
         case SpecifiedTokenInterfaceType.Dip20Sli:
-        case SpecifiedTokenInterfaceType.Dip20Glds: {  
-          
-          let result = await this.TokenActor.Approve(targetPrincipal, amount);        
+        case SpecifiedTokenInterfaceType.Dip20Glds: {
+
+          let result = await this.TokenActor.Approve(targetPrincipal, amount);
           return result;
         }
-   
-        default:   
+
+        default:
           break;
-      
+
       }
     }
-    catch(error)
-    {
+    catch (error) {
       return new ResultInfo(ResultTypes.err, error);
     }
 
@@ -154,30 +149,28 @@ export class TokenInfo {
   }
 
 
-  async allowance(sourcePrincipal, targetPrincipal){
-    if (this.CanisterId == null || this.MetaDataPresent == false ||      
+  async allowance(sourcePrincipal, targetPrincipal) {
+    if (this.CanisterId == null || this.MetaDataPresent == false ||
       this.#provider == null || this.#loggedInPrincipal == null) {
-        return new ResultInfo(ResultTypes.err, "Not initialized");
+      return new ResultInfo(ResultTypes.err, "Not initialized");
     }
 
-    try
-    {
+    try {
       switch (this.SpecifiedTokenInterfaceType) {
 
         case SpecifiedTokenInterfaceType.Dip20Sli:
-        case SpecifiedTokenInterfaceType.Dip20Glds: {  
-          
-          let result = await this.TokenActor.Allowance(sourcePrincipal,targetPrincipal);        
+        case SpecifiedTokenInterfaceType.Dip20Glds: {
+
+          let result = await this.TokenActor.Allowance(sourcePrincipal, targetPrincipal);
           return result;
         }
-    
-        default:   
+
+        default:
           break;
-      
+
       }
     }
-    catch(error)
-    {
+    catch (error) {
       return new ResultInfo(ResultTypes.err, error);
     }
 
@@ -185,19 +178,19 @@ export class TokenInfo {
   }
 
 
-  async GetBalanceFromUsersWallet(){ 
-    if (this.TokenActor == null){
-       return new TokenBalance(BigInt(0),0);
-    } 
+  async GetBalanceFromUsersWallet() {
+    if (this.TokenActor == null) {
+      return new TokenBalance(BigInt(0), 0);
+    }
 
     return await this.TokenActor.GetBalance(this.Decimals);
   }
 
-  async GetBalanceForPrincipal(principal){ 
-    if (this.TokenActor == null){
-       return new TokenBalance(BigInt(0),0);
-    } 
-    return await this.TokenActor.GetBalanceForPrincipal(principal,this.Decimals);
+  async GetBalanceForPrincipal(principal) {
+    if (this.TokenActor == null) {
+      return new TokenBalance(BigInt(0), 0);
+    }
+    return await this.TokenActor.GetBalanceForPrincipal(principal, this.Decimals);
   }
 
   //Reset all, except CanisterId and TokenInterfaceType

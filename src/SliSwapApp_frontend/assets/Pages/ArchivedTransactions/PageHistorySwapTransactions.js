@@ -52,7 +52,6 @@ function historyTransactions_UpdateUiFromModel() {
 
     let filterHasContent = archiveCompletedTransactions_filter.length > 0;
 
-
     for (var i = 0; i < archiveCompletedTransactions.length; i++) {
 
         let item = archiveCompletedTransactions[i];
@@ -76,7 +75,7 @@ function historyTransactions_UpdateUiFromModel() {
         htmlString += "<td style=\"font-size: 12px;width: 55px;padding-left: 8px;\">";
         htmlString += item.TokenType + "</td>\n";
 
-        htmlString += "<td style=\"font-size: 12px;width: 80px;padding-left: 8px;\">";
+        htmlString += "<td style=\"font-size: 12px;width: 120px;padding-left: 8px;\">";
         htmlString += item.AmountDecimal + "</td>\n";
 
         htmlString += "<td style=\"font-size: 12px;width: 150px;padding-left: 8px;\">";
@@ -97,6 +96,11 @@ function historyTransactions_UpdateUiFromModel() {
 
 
 function setTableBodySizeAutomatically() {
+
+    if (HistoryTransactions_HtmlPage_Exist() == false) {
+        return;
+    }
+
     let elementTableBody = document.getElementById('ArchiveTransaction_tbody');
     let elementSwapControl = document.getElementById('ArchiveTransactions_swapControl');
 

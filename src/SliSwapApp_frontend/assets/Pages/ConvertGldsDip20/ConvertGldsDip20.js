@@ -1,11 +1,11 @@
 import { CommonIdentityProvider, SpecifiedTokenInterfaceType, SwapAppActorProvider } from "../../modules/Types/CommonTypes";
 import { PubSub } from "../../modules/Utils/PubSub";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
-import { GetResultFromVariant, GetCustomResultFromVariant } from "../../modules/Utils/CommonUtils";
+import { GetResultFromVariant } from "../../modules/Utils/CommonUtils";
 import { TokenBalance } from "../../modules/SubModules/Token/TokenBalance";
 import { Principal } from "@dfinity/principal";
 import { ResultTypes } from "../../modules/Types/CommonTypes";
-
+import { loadingProgessEnabled, loadingProgessDisabled } from "../../modules/Utils/CommonUtils";
 
 
 var gldsDepositOrConvertionIsOnProgress = false;
@@ -18,10 +18,11 @@ async function convert_deposited_oldGldsTokens() {
 
 
     try {
-        
+
         if (PageExistAndUserIsLoggedIn() == false) {
             return;
         }
+        loadingProgessEnabled();
 
         document.getElementById('buttonDepositNowOldGldsDip20').disabled = true;
         document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = true;
@@ -47,6 +48,7 @@ async function convert_deposited_oldGldsTokens() {
     finally {
         document.getElementById('buttonDepositNowOldGldsDip20').disabled = false;
         document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = false;
+        loadingProgessDisabled();
     }
 }
 
@@ -59,14 +61,15 @@ async function deposit_oldGldsTokens() {
     if (PageExistAndUserIsLoggedIn() == false) {
         return;
     }
-    
-    if (gldsDepositOrConvertionIsOnProgress == true){
+
+    if (gldsDepositOrConvertionIsOnProgress == true) {
         alert('Not possible. Deposit or Convertion is still on progres...');
         return;
     }
 
     try {
-       
+
+        loadingProgessEnabled();
         gldsDepositOrConvertionIsOnProgress = true;
 
         document.getElementById('buttonDepositNowOldGldsDip20').disabled = true;
@@ -101,7 +104,7 @@ async function deposit_oldGldsTokens() {
 
         if (depositablePossibleResponse.Result == false) {
 
-            alert( depositablePossibleResponse.ResultValue);
+            alert(depositablePossibleResponse.ResultValue);
             return;
         }
 
@@ -122,7 +125,7 @@ async function deposit_oldGldsTokens() {
             return;
         }
 
-        let depositResult = await SliSwapApp_backend.DepositGldsDip20Tokens(userPrincipal, amountToDepositBigInt);       
+        let depositResult = await SliSwapApp_backend.DepositGldsDip20Tokens(userPrincipal, amountToDepositBigInt);
         let parsedResult = GetResultFromVariant(depositResult);
 
         await UpdateBalances();
@@ -138,6 +141,7 @@ async function deposit_oldGldsTokens() {
         document.getElementById('buttonDepositNowOldGldsDip20').disabled = false;
         document.getElementById('convertNowOldGldsDip20ToICRC1').disabled = false;
         gldsDepositOrConvertionIsOnProgress = false;
+        loadingProgessDisabled();
     }
 }
 
@@ -146,13 +150,13 @@ async function deposit_oldGldsTokens() {
 //#region Helper functions 
 
 
-function PageExistAndUserIsLoggedIn(){
+function PageExistAndUserIsLoggedIn() {
 
-    if (RelatedHtmlPageExist()== false){
+    if (RelatedHtmlPageExist() == false) {
         return false;
     }
 
-    if (userIsLoggedIn() == false){
+    if (userIsLoggedIn() == false) {
         return false;
     }
 
@@ -231,13 +235,13 @@ async function UpdateBalances() {
     //One fee for approval and one for transfer. Therefore the fee = 3 * transferFee, because at least 0.001 must be transfered
     feeNeeded = feeNeeded + feeNeeded + feeNeeded;
 
-    let [firstResult, secondResult, response] = await Promise.all([tokenInfo.GetBalanceFromUsersWallet(), 
-        icrc1TokenInfo.GetBalanceFromUsersWallet(), SwapAppActorProvider.GetDepositedGldsAmount()]);
+    let [firstResult, secondResult, response] = await Promise.all([tokenInfo.GetBalanceFromUsersWallet(),
+    icrc1TokenInfo.GetBalanceFromUsersWallet(), SwapAppActorProvider.GetDepositedGldsAmount()]);
 
-        let gldsDip20TokensBalanceInUserWallet = firstResult.GetValue();
-        let gldsIcrc1TokensBalanceInUserWallet = secondResult.GetValue();
+    let gldsDip20TokensBalanceInUserWallet = firstResult.GetValue();
+    let gldsIcrc1TokensBalanceInUserWallet = secondResult.GetValue();
 
-        
+
     // let response = await SwapAppActorProvider.GetDepositedGldsAmount();
     if (response.Result == ResultTypes.ok) {
         let depositedAmount = new TokenBalance(BigInt(response.ResultValue), tokenInfo.Decimals);
@@ -271,26 +275,32 @@ async function UpdateBalances() {
 
 export const convertGldsDip20_init = async function initConvertGldsDip20() {
 
-    gldsDepositOrConvertionIsOnProgress = false;
-    PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged');
-    PubSub.subscribe('ConvertDip20_js_UserIdentityChanged', 'UserIdentityChanged', UpdateBalances);
+    try {
+        loadingProgessEnabled();
+        gldsDepositOrConvertionIsOnProgress = false;
+        PubSub.unsubscribe('ConvertDip20_js_UserIdentityChanged');
+        PubSub.subscribe('ConvertDip20_js_UserIdentityChanged', 'UserIdentityChanged', UpdateBalances);
 
-    let elementDeposit = document.getElementById('buttonDepositNowOldGldsDip20');
-    if (elementDeposit != null) {
-        elementDeposit.removeEventListener('click', async () => { await deposit_oldGldsTokens(); });
-        elementDeposit.addEventListener('click', async () => { await deposit_oldGldsTokens(); });
+        let elementDeposit = document.getElementById('buttonDepositNowOldGldsDip20');
+        if (elementDeposit != null) {
+            elementDeposit.removeEventListener('click', async () => { await deposit_oldGldsTokens(); });
+            elementDeposit.addEventListener('click', async () => { await deposit_oldGldsTokens(); });
+        }
+
+
+        let elementConvert = document.getElementById('convertNowOldGldsDip20ToICRC1');
+        if (elementConvert != null) {
+            elementConvert.removeEventListener('click', async () => { await convert_deposited_oldGldsTokens(); });
+            elementConvert.addEventListener('click', async () => { await convert_deposited_oldGldsTokens(); });
+        }
+
+
+
+        await UpdateBalances();
     }
-
-
-    let elementConvert = document.getElementById('convertNowOldGldsDip20ToICRC1');
-    if (elementConvert != null) {
-        elementConvert.removeEventListener('click', async () => { await convert_deposited_oldGldsTokens(); });
-        elementConvert.addEventListener('click', async () => { await convert_deposited_oldGldsTokens(); });
+    finally {
+        loadingProgessDisabled();
     }
-
-
-
-    await UpdateBalances();
 };
 
 

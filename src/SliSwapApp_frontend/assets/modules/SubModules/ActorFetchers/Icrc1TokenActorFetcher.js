@@ -24,32 +24,32 @@ export class Icrc1TokenActorFetcher {
 
     async GetBalance(decimal) {
 
-        return await this.GetBalanceForPrincipal(this.#principal, decimal);     
+        return await this.GetBalanceForPrincipal(this.#principal, decimal);
     }
 
-    async GetBalanceForPrincipal(principal, decimal){
+    async GetBalanceForPrincipal(principal, decimal) {
         if (this.#internalActor == null) {
             return new TokenBalance(BigInt(0), decimal);
         }
-      
+
         let balance = await this.#internalActor.icrc1_balance_of({
             owner: principal,
             subaccount: [],
         });
-  
+
         return new TokenBalance(balance, decimal);
 
     }
 
 
 
-    async GetTotalSupply(decimals){
+    async GetTotalSupply(decimals) {
 
         if (this.#internalActor == null) {
-            return new TokenBalance(BigInt(0),decimals);
+            return new TokenBalance(BigInt(0), decimals);
         }
-                    
-        let totalSupply = await this.#internalActor.icrc1_total_supply();        
-        return new TokenBalance(totalSupply, decimals);         
+
+        let totalSupply = await this.#internalActor.icrc1_total_supply();
+        return new TokenBalance(totalSupply, decimals);
     }
 }

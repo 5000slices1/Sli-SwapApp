@@ -19,22 +19,22 @@ export class Dip20TokenActorFetcher {
             this.#principal = null;
             return;
         }
-        
+
         this.#principal = principal;
         this.#internalActor = await provider.createActor({ canisterId: canisterId, interfaceFactory: Dip20Interface });
     }
 
     async GetBalance(decimal) {
-       
-        return await this.GetBalanceForPrincipal(this.#principal, decimal);   
+
+        return await this.GetBalanceForPrincipal(this.#principal, decimal);
     }
 
-    async GetBalanceForPrincipal(principal, decimal){
+    async GetBalanceForPrincipal(principal, decimal) {
         if (this.#internalActor == null) {
             return new TokenBalance(0, decimal);
         }
-      
-        let balance = await this.#internalActor.balanceOf(principal);           
+
+        let balance = await this.#internalActor.balanceOf(principal);
         return new TokenBalance(balance, decimal);
 
     }
@@ -43,73 +43,67 @@ export class Dip20TokenActorFetcher {
         if (this.#internalActor == null) {
             return null;
         }
-        return await this.#internalActor.getMetadata();        
+        return await this.#internalActor.getMetadata();
     }
 
-    async GetTotalSupply(decimals){
+    async GetTotalSupply(decimals) {
 
         if (this.#internalActor == null) {
-            return new TokenBalance(0,decimals);
+            return new TokenBalance(0, decimals);
         }
-              
-        let totalSupply = await this.#internalActor.totalSupply();   
-        return new TokenBalance(totalSupply, decimals);         
+
+        let totalSupply = await this.#internalActor.totalSupply();
+        return new TokenBalance(totalSupply, decimals);
     }
 
-    async TransferTokens(targetPrincipal, amount){
-
-        if (this.#internalActor == null) {
-            new ResultInfo(ResultTypes.err, "Not initialized");
-        }
-    
-        try
-        {         
-              let resultResponse = await this.#internalActor.transfer(targetPrincipal, amount);
-              let returnResult = GetResultFromVariant(resultResponse);
-              return returnResult;          
-        }
-        catch(error)
-        {        
-          return new ResultInfo(ResultTypes.err, error);
-        }
-    
-    }
-
-    async Approve(targetPrincipal, amount){
+    async TransferTokens(targetPrincipal, amount) {
 
         if (this.#internalActor == null) {
             new ResultInfo(ResultTypes.err, "Not initialized");
         }
-    
-        try
-        {                         
-              let resultResponse = await this.#internalActor.approve(targetPrincipal, amount);
-              let returnResult = GetResultFromVariant(resultResponse);
-              return returnResult;          
+
+        try {
+            let resultResponse = await this.#internalActor.transfer(targetPrincipal, amount);
+            let returnResult = GetResultFromVariant(resultResponse);
+            return returnResult;
         }
-        catch(error)
-        {        
-          return new ResultInfo(ResultTypes.err, error);
+        catch (error) {
+            return new ResultInfo(ResultTypes.err, error);
         }
-    
+
     }
 
-    async Allowance(sourcePrincipal, targetPrincipal){
+    async Approve(targetPrincipal, amount) {
 
         if (this.#internalActor == null) {
             new ResultInfo(ResultTypes.err, "Not initialized");
         }
-    
-        try
-        {         
-              let resultResponse = await this.#internalActor.allowance(sourcePrincipal,targetPrincipal);
-              return resultResponse;          
+
+        try {
+            let resultResponse = await this.#internalActor.approve(targetPrincipal, amount);
+            let returnResult = GetResultFromVariant(resultResponse);
+            return returnResult;
         }
-        catch(error)
-        {        
-          return new ResultInfo(ResultTypes.err, error);
+        catch (error) {
+            return new ResultInfo(ResultTypes.err, error);
         }
-    
+
+    }
+
+    async Allowance(sourcePrincipal, targetPrincipal) {
+
+        if (this.#internalActor == null) {
+            new ResultInfo(ResultTypes.err, "Not initialized");
+        }
+
+        try {
+            let resultResponse = await this.#internalActor.allowance(sourcePrincipal, targetPrincipal);
+            return resultResponse;
+        }
+        catch (error) {
+            return new ResultInfo(ResultTypes.err, error);
+        }
+
     }
 
 }

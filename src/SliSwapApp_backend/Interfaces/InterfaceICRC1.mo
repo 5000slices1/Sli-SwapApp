@@ -1,8 +1,7 @@
 import ICRC1Types "../Types/TypesICRC1";
 
-
 module {
-   /// Interface for the ICRC token canister
+    /// Interface for the ICRC token canister
     public type TokenInterface = actor {
 
         /// Returns the name of the token

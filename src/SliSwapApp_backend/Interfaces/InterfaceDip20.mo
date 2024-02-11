@@ -1,8 +1,7 @@
 import Dip20Types "../Types/TypesDip20";
 
-
 module {
- 
+
   public type InterfaceDip20 = actor {
     allowance : shared query (Principal, Principal) -> async Nat;
     approve : shared (Principal, Nat) -> async Dip20Types.TxReceipt;
@@ -28,5 +27,5 @@ module {
     totalSupply : shared query () -> async Nat;
     transfer : shared (Principal, Nat) -> async Dip20Types.TxReceipt;
     transferFrom : shared (Principal, Principal, Nat) -> async Dip20Types.TxReceipt;
-  }
-}
+  };
+};

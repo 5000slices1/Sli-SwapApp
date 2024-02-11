@@ -1,16 +1,19 @@
-
-
-module{
-
+module {
 
     public type Balance = Nat;
 
     ///This value-type is used for the token metadata
-    public type Value = {#Nat8:Nat8; #Nat : Nat; #Int : Int; #Blob : Blob; #Text : Text};
+    public type Value = {
+        #Nat8 : Nat8;
+        #Nat : Nat;
+        #Int : Int;
+        #Blob : Blob;
+        #Text : Text;
+    };
 
     ///Single Metadata item-type
     public type MetaDatum = (Text, Value);
-    
+
     ///This information is used by the token
     public type MetaData = [MetaDatum];
 
@@ -19,14 +22,14 @@ module{
 
     public type Timestamp = Nat64;
 
-    public type TxIndex = Nat;  
+    public type TxIndex = Nat;
 
     public type SupportedStandard = {
         name : Text;
         url : Text;
     };
 
-    ///Definition of account-type 
+    ///Definition of account-type
     public type Account = {
         owner : Principal;
         subaccount : ?Subaccount;
@@ -63,8 +66,5 @@ module{
         #Ok : TxIndex;
         #Err : TransferError;
     };
-
-
-
 
 };

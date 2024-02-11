@@ -12,8 +12,7 @@ import TypesIcrc "../Types/TypesICRC1";
 import Dip20Types "../Types/TypesDip20";
 import CommonLib "CommonLib";
 
-
-module{
+module {
 
     public func SliIcrc1_SetCanisterId(
         caller : Principal,
@@ -25,7 +24,6 @@ module{
         await* SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Icrc1Sli, canisterId, caller);
     };
 
-  
     public func GldsIcrc1_SetCanisterId(
         caller : Principal,
         appSettings : T.AppSettings,
@@ -36,7 +34,7 @@ module{
         await* SetTokenMetaDataByCanisterId(appSettings, tokensInfo, #Icrc1Glds, canisterId, caller);
     };
 
-       public func SetTokenMetaDataByCanisterId(
+    public func SetTokenMetaDataByCanisterId(
         appSettings : T.AppSettings,
         tokensInfo : T.TokensInfo,
         tokenType : T.SpecificTokenType,
@@ -44,7 +42,7 @@ module{
         caller : Principal,
     ) : async* Result.Result<Text, Text> {
 
-        let userIsAdminOrOwner =  CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
+        let userIsAdminOrOwner = CommonLib.UserIsOwnerOrAdmin(appSettings, caller);
 
         if (userIsAdminOrOwner != true) {
             return #err("Only canister owner or admins can call this method");
@@ -181,7 +179,7 @@ module{
         return resultMeta;
     };
 
-    public func IcrcGetBalance(canisterId : Text, principalText : Text, optionalSubAccount:?TypesIcrc.Subaccount) : async* Result.Result<TypesIcrc.Balance, Text> {
+    public func IcrcGetBalance(canisterId : Text, principalText : Text, optionalSubAccount : ?TypesIcrc.Subaccount) : async* Result.Result<TypesIcrc.Balance, Text> {
 
         try {
             let principal : Principal = Principal.fromText(principalText);
@@ -234,10 +232,10 @@ module{
     public func GetTokensInfos(tokensInfo : T.TokensInfo) : T.TokensInfoAsResponse {
 
         let result : T.TokensInfoAsResponse = {
-        Icrc1_Sli = tokensInfo.Icrc1_Sli;
-        Dip20_Sli = tokensInfo.Dip20_Sli;
-        Icrc1_Glds = tokensInfo.Icrc1_Glds;
-        Dip20_Glds = tokensInfo.Dip20_Glds;
+            Icrc1_Sli = tokensInfo.Icrc1_Sli;
+            Dip20_Sli = tokensInfo.Dip20_Sli;
+            Icrc1_Glds = tokensInfo.Icrc1_Glds;
+            Dip20_Glds = tokensInfo.Dip20_Glds;
         };
 
         return result;

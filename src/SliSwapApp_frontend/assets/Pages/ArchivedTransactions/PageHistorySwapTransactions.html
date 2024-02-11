@@ -1,86 +1,86 @@
-
 <html>
-  <header style="display: none;">
-    <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
-    <style>
-      tr.spaceUnder>td {
-        padding-bottom: 8px;
-        padding-top: 8px;
-      }
-  
-      .fixed_header {
-        table-layout: fixed;
-        border-collapse: collapse;
-        border-spacing: 5em;
-        vertical-align: middle;
-        width: 1375px;
-      }
-      .fixed_header tbody {
-        display: block;
-        overflow: auto;
-  
-        /* height:500px;  */
-        color: #fff;
-      }
-      .fixed_header thead tr {
-        display: block;
-    
-      }
-      .fixed_header thead {
-       
-        color: #fff;
-    
-      }
-      .fixed_header th,
-      .fixed_header td {
-        padding-left: 4px;
-        padding-bottom: 4px;
-        padding-top: 5px;
-        text-align: left;
-        border: solid rgb(62, 61, 61);
-        font-size: 12px;
-        height: 40px;
-        vertical-align: middle;
-      }
-      
-    </style>
-  </header>
-  <body>
+<header style="display: none;">
+  <link type="text/css" rel="stylesheet" href="/src/SliSwapApp_frontend/assets/main.css" />
+  <style>
+    tr.spaceUnder>td {
+      padding-bottom: 8px;
+      padding-top: 8px;
+    }
+
+    .fixed_header {
+      table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 5em;
+      vertical-align: middle;
+      width: 1415px;
+    }
+
+    .fixed_header tbody {
+      display: block;
+      overflow: auto;
+
+      /* height:500px;  */
+      color: #fff;
+    }
+
+    .fixed_header thead tr {
+      display: block;
+
+    }
+
+    .fixed_header thead {
+
+      color: #fff;
+
+    }
+
+    .fixed_header th,
+    .fixed_header td {
+      padding-left: 4px;
+      padding-bottom: 4px;
+      padding-top: 5px;
+      text-align: left;
+      border: solid rgb(62, 61, 61);
+      font-size: 12px;
+      height: 40px;
+      vertical-align: middle;
+    }
+  </style>
+</header>
+
+<body>
 
 
-  
-<div class="container" id="ArchiveTransactions_HtmlPage" 
-style="vertical-align: top;" 
->  
-    <swapControl id ="ArchiveTransactions_swapControl" style="vertical-align: top;height:800px"  >
+
+  <div class="container" id="ArchiveTransactions_HtmlPage" style="vertical-align: top;">
+    <swapControl id="ArchiveTransactions_swapControl" style="vertical-align: top;height:800px">
       <b><label style="font-size: 18px;color: #bfbcbc;">Swapping history of $GLDS and $SLI tokens:</label></b>
-      <br/><br/><br/>
+      <br /><br /><br />
       <label style="font-size: 14;background-color:  #090917;color:  #bfbcbc;">Filter:</label>
-      <input id="ArchiveTransactions_filterInput"  
-      style="text-align: left; padding-left: 8px;padding-right: 8px; 
+      <input id="ArchiveTransactions_filterInput" style="text-align: left; padding-left: 8px;padding-right: 8px; 
       width:420px;margin-left:24px;background-color:  #090917;color:  #bfbcbc;"> </input>
-      <button id="ArchiveTransactions_button_filter_apply" class="button-49" 
-       style="padding-top: 4px; margin-left: 12px; cursor:pointer;">Apply</button>
-      <br/><br/><br/>
-      <table class="fixed_header"
-      style="font-size: 12px;">
+      <button id="ArchiveTransactions_button_filter_apply" class="button-49"
+        style="padding-top: 4px; margin-left: 12px; cursor:pointer;">Apply</button>
+      <br /><br /><br />
+      <table class="fixed_header" style="font-size: 12px;">
         <thead id="ArchiveTransaction_thead" style="font-size: 12px;">
-          <tr  class="spaceUnder" style="font-size: 12px;">
+          <tr class="spaceUnder" style="font-size: 12px;">
             <th style="width: 150px;font-size: 12px; background: rgb(44, 43, 43);">Date</th>
             <th style="width: 55px;font-size: 12px; background: rgb(44, 43, 43);">Token</th>
-            <th style="width: 80px;font-size: 12px; background: rgb(44, 43, 43);">Amount</th>
+            <th style="width: 120px;font-size: 12px; background: rgb(44, 43, 43);">Amount</th>
             <th style="width: 150px;font-size: 12px; background: rgb(44, 43, 43);">TxIndex</th>
             <th style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">Users-Wallet</th>
-            <th style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">Conversion-Id</th>        
+            <th style="width: 450px;font-size: 12px; background: rgb(44, 43, 43);">Conversion-Id</th>
           </tr>
         </thead>
         <tbody id="ArchiveTransaction_tbody" style="font-size: 12px;height: 600px;">
         </tbody>
       </table>
-    </swapControl>  
- 
+    </swapControl>
+
   </div>
 
 
 </body>
+
 </html>

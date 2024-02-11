@@ -1,11 +1,13 @@
-import { ResultInfo, CustomResultInfo,ConversionCompletedArchiveItem, ConversionStartedArchiveItem,
-  SpecifiedTokenInterfaceType,ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
+import {
+  ResultInfo, CustomResultInfo, ConversionCompletedArchiveItem, ConversionStartedArchiveItem,
+  SpecifiedTokenInterfaceType, ResultTypes, TokenInfos, TokenInfo
+} from "../Types/CommonTypes";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
-//import { Ed25519KeyIdentity } from '@dfinity/identity';
 import { Secp256k1KeyIdentity } from "@dfinity/identity-secp256k1";
 import { TokenBalance } from "../SubModules/Token/TokenBalance";
 import { Principal } from "@dfinity/principal";
 import { Buffer } from "buffer";
+
 //Returns true if the object has all the fileds included
 export function hasFieldsSet(item, ...fieldNames) {
   for (let fieldName of fieldNames) {
@@ -26,34 +28,34 @@ export function createEnum(values) {
 }
 
 //Only the first property is used
-export function GetCustomResultFromVariant(item){
+export function GetCustomResultFromVariant(item) {
   for (var key in item) {
     if (Object.hasOwn(item, key)) {
 
-       let resultValue = item[key];
-       return new CustomResultInfo(key, resultValue);
+      let resultValue = item[key];
+      return new CustomResultInfo(key, resultValue);
     }
   }
 }
 
-export function GetCustomDictionaryFromVariant(item){
+export function GetCustomDictionaryFromVariant(item) {
   var map = Object.create(null);
   for (var itemKey in item) {
     if (Object.hasOwn(item, itemKey)) {
-       map[itemKey] = item[itemKey];    
+      map[itemKey] = item[itemKey];
     }
   }
   return map;
 }
 
-export function ConvertResponseToConversionStartedArchiveItem(responseItem){
+export function ConvertResponseToConversionStartedArchiveItem(responseItem) {
 
-  let singleItem = GetCustomDictionaryFromVariant(responseItem); 
+  let singleItem = GetCustomDictionaryFromVariant(responseItem);
 
   var temp = ConvertResponseToConversionCompletedArchiveItem(responseItem);
 
 
-  let result =  new ConversionStartedArchiveItem();
+  let result = new ConversionStartedArchiveItem();
   result.AmountBigInt = temp.AmountBigInt;
   result.AmountDecimal = temp.AmountDecimal;
   result.ConversionId = temp.ConversionId;
@@ -69,33 +71,33 @@ export function ConvertResponseToConversionStartedArchiveItem(responseItem){
   let depositIds = singleItem['depositIds'];
 
   var depositIdsArray = new Array();
-  for(let i=0; i<depositIds.length; i++){
+  for (let i = 0; i < depositIds.length; i++) {
     let arr = depositIds[i];
     let hexString = Buffer.from(arr).toString('hex');
     depositIdsArray.push(hexString);
   }
- 
+
   result.DepositIds = depositIdsArray;
   return result;
 }
 
-export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
+export function ConvertResponseToConversionCompletedArchiveItem(responseItem) {
 
-  let singleItem = GetCustomDictionaryFromVariant(responseItem); 
+  let singleItem = GetCustomDictionaryFromVariant(responseItem);
   var result = new ConversionCompletedArchiveItem();
   var decimals = 8; // we can hardcode this, because sli and glds DIP20 has decimals=8 set
   let tokenType = GetCustomResultFromVariant(singleItem['tokenType']);
   let amount = singleItem['amount'];
-  
+
   let tokenBalance = new TokenBalance(BigInt(amount), Number(decimals));
   result.AmountBigInt = tokenBalance.GetRawValue();
   result.AmountDecimal = tokenBalance.GetValue();
 
-  if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Sli){
+  if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Sli) {
     result.IsSliToken = true;
     result.IsGldsToken = false;
     result.TokenType = "$SLI";
-  } else if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Glds){
+  } else if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Glds) {
 
     result.IsSliToken = false;
     result.IsGldsToken = true;
@@ -103,23 +105,23 @@ export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
   }
 
   let rawPrincipal = singleItem['userPrincipal'];
-  result.UserPrincipal =  Principal.fromHex(rawPrincipal.toHex()).toText();
+  result.UserPrincipal = Principal.fromHex(rawPrincipal.toHex()).toText();
 
   let subAccount = singleItem['subAccount'];
-  if (subAccount != undefined){
+  if (subAccount != undefined) {
     result.SubAccount = Buffer.from(subAccount).toString('hex');
   }
 
   let transactionIndex = singleItem['transactionIndex'];
 
-  if (transactionIndex != undefined){
+  if (transactionIndex != undefined) {
     result.TransactionIndex = transactionIndex;
   }
-  
+
   let timeTicksNanoSeconds = Number(singleItem['time']);
   let timeTicksMilliSeconds = Math.trunc(Number(timeTicksNanoSeconds / 1000000));
   let date = new Date(Number(timeTicksMilliSeconds));
-  result.RawTimeTicks =Number(timeTicksMilliSeconds);
+  result.RawTimeTicks = Number(timeTicksMilliSeconds);
   result.DateTime = date;
   result.TimeLocalTimeString = date.toLocaleString();
 
@@ -197,8 +199,8 @@ export async function GetTokensInfos() {
 }
 
 
-export function GetRandomIdentity() { 
-    return Secp256k1KeyIdentity.generate();
+export function GetRandomIdentity() {
+  return Secp256k1KeyIdentity.generate();
 }
 
 export function SeedToIdentity(seed) {
@@ -211,14 +213,26 @@ export function SeedToIdentity(seed) {
   return null;
 }
 
-export function GetRandomString(stringLength){
- 
+export function GetRandomString(stringLength) {
+
   let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var result = "";
-  for(var i = 0; i < stringLength; i++){
+  for (var i = 0; i < stringLength; i++) {
     result += getRandomChar(characters);
   }
   return result;
+}
+
+export function loadingProgessEnabled() {
+
+  document.getElementById('disablingDiv').style.display = 'block';
+  document.getElementById('loadingProgressDiv').style.display = 'block';
+}
+
+export function loadingProgessDisabled() {
+
+  document.getElementById('disablingDiv').style.display = 'none';
+  document.getElementById('loadingProgressDiv').style.display = 'none';
 }
 
 export function Get2DimArray(numberOfWallets, bucketSize) {
@@ -226,53 +240,54 @@ export function Get2DimArray(numberOfWallets, bucketSize) {
 
   for (var i = 0; i < numberOfWallets; i = i + bucketSize) {
 
-      var end = i + bucketSize;
-      end = Math.min(end, numberOfWallets);
-      if (i == end) {
-          break;
-      }
-      const innerArray = [];
-      for (var j = i; j < end; j++) {
-          innerArray.push(j);
-      }
-      if (i == 0) {
-          indexArray[0] = innerArray;
-      }
-      else {
-          indexArray.push(innerArray);
-      }
+    var end = i + bucketSize;
+    end = Math.min(end, numberOfWallets);
+    if (i == end) {
+      break;
+    }
+    const innerArray = [];
+    for (var j = i; j < end; j++) {
+      innerArray.push(j);
+    }
+    if (i == 0) {
+      indexArray[0] = innerArray;
+    }
+    else {
+      indexArray.push(innerArray);
+    }
   }
   return indexArray;
 }
 
 //Internal functions:
 
-function getCryptoRandomBetween(min, max){
+function getCryptoRandomBetween(min, max) {
   //the highest random value that crypto.getRandomValues could store in a Uint32Array
   var MAX_VAL = 4294967295;
-  
+
   //find the number of randoms we'll need to generate in order to give every number between min and max a fair chance
   var numberOfRandomsNeeded = Math.ceil((max - min) / MAX_VAL);
-  
+
   //grab those randoms
   var cryptoRandomNumbers = new Uint32Array(numberOfRandomsNeeded);
   crypto.getRandomValues(cryptoRandomNumbers);
-  
+
   //add them together
-  for(var i = 0, sum = 0; i < cryptoRandomNumbers.length; i++){
+  for (var i = 0, sum = 0; i < cryptoRandomNumbers.length; i++) {
     sum += cryptoRandomNumbers[i];
   }
-  
+
   //and divide their sum by the max possible value to get a decimal
   var randomDecimal = sum / (MAX_VAL * numberOfRandomsNeeded);
-  
+
   //if result is 1, retry. otherwise, return decimal.
   return randomDecimal === 1 ? getCryptoRandomBetween(min, max) : Math.floor(randomDecimal * (max - min + 1) + min);
 }
 
-function getRandomChar(str){
+function getRandomChar(str) {
   return str.charAt(getCryptoRandomBetween(0, str.length - 1));
 }
+
 
 
 

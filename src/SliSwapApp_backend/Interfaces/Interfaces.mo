@@ -4,8 +4,7 @@ import InterfaceIcrc1 "InterfaceICRC1";
 import InterfaceDip20 "InterfaceDip20";
 import InterfaceHistoryCanister "InterfaceHistoryCanister";
 
-
-module{
+module {
 
     public type InterfaceIcrc = icrc1.TokenInterface;
     public type InterfaceSwapApp = swapApp.SliSwapAppInterface;
