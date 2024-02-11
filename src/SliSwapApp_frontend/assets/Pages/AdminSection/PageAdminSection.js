@@ -296,15 +296,8 @@ async function setGldsIcrcCanisterId() {
 }
 
 async function lock_ICRC1_changing_CanisterIds(){
-    console.log("try to set state:");
-    let result = await SwapAppActorProvider.set_changing_icrc1_canister_ids_to_locked_state();
-    console.log(result);
-    console.log("o.k. try to set state:");
-
-    console.log("calling is locked:");
-    let isLocked = await SliSwapApp_backend.changing_icrc1_canister_ids_has_locked_state();
-    console.log("is locked:");
-    console.log(isLocked);
+   
+    await SwapAppActorProvider.set_changing_icrc1_canister_ids_to_locked_state();
     await initialize_set_icrc1_cansiter_ids_buttons();
 }
 

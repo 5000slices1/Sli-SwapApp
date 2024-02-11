@@ -3,7 +3,7 @@ import { convertSliDip20_init } from "../../Pages/ConvertSliDip20/ConvertSliDip2
 import { convertGldsDip20_init } from "../../Pages/ConvertGldsDip20/ConvertGldsDip20";
 import { admin_section_init } from "../../Pages/AdminSection/PageAdminSection";
 import { historyTransactions_init } from "../../Pages/ArchivedTransactions/PageHistorySwapTransactions";
-
+import { historyDepositsTransactions_init } from "../../Pages/ArchivedTransactions/PageHistorySwapDeposits";
 async function init_javascript_code(tagValue){
 
 
@@ -23,6 +23,10 @@ async function init_javascript_code(tagValue){
             break;
             case pageIdValues.PageHistorySwapTransactions:{
               await historyTransactions_init();
+            }
+            case pageIdValues.PageHistorySwapDeposits:{
+
+              await historyDepositsTransactions_init();
             }
             break;
             default:

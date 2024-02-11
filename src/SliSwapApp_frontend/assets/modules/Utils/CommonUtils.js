@@ -1,4 +1,4 @@
-import { ResultInfo, CustomResultInfo,ConversionCompletedArchiveItem, 
+import { ResultInfo, CustomResultInfo,ConversionCompletedArchiveItem, ConversionStartedArchiveItem,
   SpecifiedTokenInterfaceType,ResultTypes, TokenInfos, TokenInfo } from "../Types/CommonTypes";
 import { SliSwapApp_backend } from "../../../../declarations/SliSwapApp_backend";
 //import { Ed25519KeyIdentity } from '@dfinity/identity';
@@ -46,11 +46,42 @@ export function GetCustomDictionaryFromVariant(item){
   return map;
 }
 
+export function ConvertResponseToConversionStartedArchiveItem(responseItem){
+
+  let singleItem = GetCustomDictionaryFromVariant(responseItem); 
+
+  var temp = ConvertResponseToConversionCompletedArchiveItem(responseItem);
+
+
+  let result =  new ConversionStartedArchiveItem();
+  result.AmountBigInt = temp.AmountBigInt;
+  result.AmountDecimal = temp.AmountDecimal;
+  result.ConversionId = temp.ConversionId;
+  result.DateTime = temp.DateTime;
+  result.IsGldsToken = temp.IsGldsToken;
+  result.IsSliToken = temp.IsSliToken;
+  result.RawTimeTicks = temp.RawTimeTicks;
+  result.TimeLocalTimeString = temp.TimeLocalTimeString;
+  result.TokenType = temp.TokenType;
+  result.UserPrincipal = temp.UserPrincipal;
+  result.SubAccount = temp.SubAccount;
+
+  let depositIds = singleItem['depositIds'];
+
+  var depositIdsArray = new Array();
+  for(let i=0; i<depositIds.length; i++){
+    let arr = depositIds[i];
+    let hexString = Buffer.from(arr).toString('hex');
+    depositIdsArray.push(hexString);
+  }
+ 
+  result.DepositIds = depositIdsArray;
+  return result;
+}
 
 export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
 
   let singleItem = GetCustomDictionaryFromVariant(responseItem); 
-
   var result = new ConversionCompletedArchiveItem();
   var decimals = 8; // we can hardcode this, because sli and glds DIP20 has decimals=8 set
   let tokenType = GetCustomResultFromVariant(singleItem['tokenType']);
@@ -63,17 +94,28 @@ export function ConvertResponseToConversionCompletedArchiveItem(responseItem){
   if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Sli){
     result.IsSliToken = true;
     result.IsGldsToken = false;
-    result.TokenType = "SLI";
+    result.TokenType = "$SLI";
   } else if (tokenType.Result == SpecifiedTokenInterfaceType.Dip20Glds){
 
     result.IsSliToken = false;
     result.IsGldsToken = true;
-    result.TokenType = "GLDS";
+    result.TokenType = "$GLDS";
   }
 
   let rawPrincipal = singleItem['userPrincipal'];
   result.UserPrincipal =  Principal.fromHex(rawPrincipal.toHex()).toText();
 
+  let subAccount = singleItem['subAccount'];
+  if (subAccount != undefined){
+    result.SubAccount = Buffer.from(subAccount).toString('hex');
+  }
+
+  let transactionIndex = singleItem['transactionIndex'];
+
+  if (transactionIndex != undefined){
+    result.TransactionIndex = transactionIndex;
+  }
+  
   let timeTicksNanoSeconds = Number(singleItem['time']);
   let timeTicksMilliSeconds = Math.trunc(Number(timeTicksNanoSeconds / 1000000));
   let date = new Date(Number(timeTicksMilliSeconds));

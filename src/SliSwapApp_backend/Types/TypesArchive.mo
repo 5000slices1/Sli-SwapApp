@@ -33,8 +33,9 @@ module {
         tokenType:TypesCommon.SpecificTokenType;
         amount:Nat;
         conversionId:Blob;
-        depositIds:List.List<Blob>; 
+        depositIds:[Blob]; 
         userPrincipal:Principal;
+        subAccount:Blob;
         time:Time.Time;
     };
 
@@ -43,6 +44,8 @@ module {
         amount:Nat;
         conversionId:Blob;
         userPrincipal:Principal;
+        subAccount:Blob;
+        transactionIndex:Nat;
         time:Time.Time;
     };
 

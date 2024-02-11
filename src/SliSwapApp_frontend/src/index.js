@@ -78,9 +78,6 @@ window.onclick = function(event) {
 
 document.addEventListener('DOMContentLoaded', async function() {
       
-//   window.addEventListener('resize', function(event) {
-     
-// }, true);
 
   PubSub.subscribe('index_js_UserIdentityChanged', 'UserIdentityChanged', IdentityChanged);
   await CommonIdentityProvider.Init();

@@ -653,17 +653,18 @@ module{
                     case(null) { };
                 };
 
-                let depositStartedItem:TypesArchive.ArchivedConversionStarted = {
+                let conversionStartedItem:TypesArchive.ArchivedConversionStarted = {
                     tokenType:TypesCommon.SpecificTokenType = specifiedTokenType;
                     amount:Nat = depositAmountToConsider;
                     conversionId:Blob = conversionIdCreated;
-                    depositIds:List.List<Blob> = depositIds; 
+                    depositIds:[Blob] = List.toArray(depositIds); 
                     userPrincipal:Principal = usersPrincipal;
+                    subAccount:Blob = subAccount;
                     time:Time.Time = Time.now();
                 };
 
                 StableTrieMap.delete(dataPerToken.depositState.depositIds, Blob.equal, Blob.hash, encodedPrincipal);
-                ignore await archive.canister.conversion_Started_Add(depositStartedItem);
+                ignore await archive.canister.conversion_Started_Add(conversionStartedItem);
         }
         catch(error)
         {
@@ -931,9 +932,9 @@ module{
             created_at_time : ?Nat64 = Option.make(Nat64.fromIntWrap(Time.now()));
         };
  
+        var blockIndex:Nat = 0;
         try{           
             let transferResult = await icrc1Actor.icrc1_transfer(transferArgs);
-            var blockIndex:Nat = 0;
             switch(transferResult){
                 case (#Ok(txIndex)){              
                     blockIndex:=txIndex;
@@ -966,14 +967,16 @@ module{
         //Save the completed state
         try{
 
-            let depositCompletedItem:TypesArchive.ArchivedConversionCompleted = {
+            let conversionCompletedItem:TypesArchive.ArchivedConversionCompleted = {
                 tokenType:TypesCommon.SpecificTokenType = specifiedTokenType;
                 amount:Nat = subAccountInfo.depositedDip20AmountToConsider;
                 conversionId:Blob = subAccountInfo.conversionId;
                 userPrincipal:Principal = usersPrincipal;
+                subAccount:Blob = subAccountInfo.subAccount;
+                transactionIndex:Nat = blockIndex;
                 time:Time.Time = Time.now();
             };
-            ignore await archive.canister.conversion_Completed_Add(depositCompletedItem);
+            ignore await archive.canister.conversion_Completed_Add(conversionCompletedItem);
             await archive.canister.subAccount_Delete(subAccountInfo.subAccount);
 
         }
