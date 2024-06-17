@@ -27,8 +27,8 @@ import TypesCommon "../Types/TypesCommon";
 
 module {
 
-    //let expirationDuration:Int = 900000000000; // 15 minutes
-    let expirationDuration : Int = 1800000000000; // 30 minutes
+    let expirationDuration:Int = 900000000000; // 15 minutes
+    //let expirationDuration : Int = 1800000000000; // 30 minutes
 
     public func getSwapWallet(
         caller : Principal,
@@ -552,12 +552,17 @@ module {
         // Some additional checks
 
         try {
-            let balanceOnSwapWallet = await* TokensInfoLib.IcrcGetBalance(icrcCanisterId, usersPrincipalAsText, null);
 
+            let swapAppCanisterIdText: Text = Principal.toText(swapAppCanisterId);
+            let balanceOnSwapWallet = await* TokensInfoLib.IcrcGetBalance(icrcCanisterId, swapAppCanisterIdText, null);
+            
             switch (balanceOnSwapWallet) {
                 case (#ok(amount)) {
                     if (amount < depositAmountToConsider) {
-                        return #err("Not enough ICRC1 tokens available inside swapApp wallet");
+                        //return #err("Not enough ICRC1 tokens available inside swapApp wallet");
+                        return #err("Not enough ICRC1 tokens available inside swapApp wallet." # 
+                        "canister: " # debug_show(icrcCanisterId) # "principal text: " # debug_show(swapAppCanisterIdText) #
+                        "balance: " # debug_show(balanceOnSwapWallet));
                     };
                 };
                 case (#err(text)) {
