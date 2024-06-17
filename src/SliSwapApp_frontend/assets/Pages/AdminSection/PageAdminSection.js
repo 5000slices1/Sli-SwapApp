@@ -55,7 +55,7 @@ async function UpdateUiFromModel() {
         value = GlobalDataProvider.Icrc1_Sli_CanisterId;
 
     document.getElementById("sliTokenLogo").
-        innerHTML = GlobalDataProvider.Icrc1_Sli_TokenLogo;
+        src = GlobalDataProvider.Icrc1_Sli_TokenLogo;
 
     document.getElementById("sliTokenSymbol").
         innerHTML = GlobalDataProvider.Icrc1_Sli_TokenSymbol;
@@ -79,7 +79,7 @@ async function UpdateUiFromModel() {
         value = GlobalDataProvider.Icrc1_Glds_CanisterId;
 
     document.getElementById("gldsTokenLogo").
-        innerHTML = GlobalDataProvider.Icrc1_Glds_TokenLogo;
+        src = GlobalDataProvider.Icrc1_Glds_TokenLogo;
 
     document.getElementById("gldsTokenSymbol").
         innerHTML = GlobalDataProvider.Icrc1_Glds_TokenSymbol;

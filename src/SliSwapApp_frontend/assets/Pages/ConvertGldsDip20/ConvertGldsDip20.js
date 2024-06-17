@@ -235,8 +235,15 @@ async function UpdateBalances() {
     //One fee for approval and one for transfer. Therefore the fee = 3 * transferFee, because at least 0.001 must be transfered
     feeNeeded = feeNeeded + feeNeeded + feeNeeded;
 
+    /*
+     // we cannot use Promise.all here -> Because the newest plug-wallet will total crash, and in such a way that even the browser crashes... 
     let [firstResult, secondResult, response] = await Promise.all([tokenInfo.GetBalanceFromUsersWallet(),
     icrc1TokenInfo.GetBalanceFromUsersWallet(), SwapAppActorProvider.GetDepositedGldsAmount()]);
+    */
+
+    let firstResult = await tokenInfo.GetBalanceFromUsersWallet();
+    let secondResult = await icrc1TokenInfo.GetBalanceFromUsersWallet();
+    let response = await SwapAppActorProvider.GetDepositedGldsAmount();
 
     let gldsDip20TokensBalanceInUserWallet = firstResult.GetValue();
     let gldsIcrc1TokensBalanceInUserWallet = secondResult.GetValue();
