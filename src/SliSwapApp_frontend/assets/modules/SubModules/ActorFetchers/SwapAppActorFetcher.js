@@ -207,4 +207,32 @@ export class SwapAppActorFetcher {
 
   }
 
+  async burn_sli_icrc1_tokens(amount) {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
+    }
+
+    try {
+      await this.#swapAppActor.SliIcrc1_BurnTokens(amount);     
+    }
+    catch (error) {
+      // do nothing
+    }
+  }
+
+  async burn_glds_icrc1_tokens(amount) {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
+    }
+
+    try {
+      await this.#swapAppActor.GldsIcrc1_BurnTokens(amount);     
+    }
+    catch (error) {
+      // do nothing
+    }
+  }
+
 }

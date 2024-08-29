@@ -162,7 +162,8 @@ export class IdentiyProvider {
                 return;
             }
 
-            let result = await this.#_adapter.connect(walletName, this.#_connectionObject);
+            
+            await this.#_adapter.connect(walletName, this.#_connectionObject);
 
             if (walletType == WalletTypes.plug) {
                 this.#_plugWalletConnected = true;

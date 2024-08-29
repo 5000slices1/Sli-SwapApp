@@ -25,6 +25,10 @@ import SwapLib "../Modules/SwapLib";
 import Cycles "mo:base/ExperimentalCycles";
 import InterfaceHistoryCanister "../Interfaces/InterfaceHistoryCanister";
 import Archive "../Actors/Archive";
+import TrabyterTokenInterface "../Interfaces/InterfaceTrabyter";
+import Icrc2Interface "../Interfaces/InterfaceICRC2";
+import InterfaceIcrc2 "../Interfaces/InterfaceICRC2";
+import InterfaceIcrc1 "../Interfaces/InterfaceICRC1";
 
 shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.InterfaceSwapApp = this {
 
@@ -45,11 +49,13 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   stable var archiveCanisterId : Principal = Principal.fromText("aaaaa-aa");
   stable var archiveCanisterIdWasSet : Bool = false;
   stable var setCanisterIdIsLocked : Bool = false;
-
-  let minimumCycles : Nat = 4_000_000_000;
-  let archiveTopUpCyclesAmount : Nat = 1_000_000_000;
-  let minimumAboveThresholdNeeded : Nat = 1_000_000;
-  var swapAppPrincipal = Principal.fromText("aaaaa-aa");
+  stable var burningAllowedPrincipal:Principal = Principal.fromText("aaaaa-aa");
+  
+  stable let minimumCycles : Nat = 4_000_000_000;
+  stable let archiveTopUpCyclesAmount : Nat = 1_000_000_000;
+  stable let minimumAboveThresholdNeeded : Nat = 1_000_000;
+  stable var swapAppPrincipal = Principal.fromText("aaaaa-aa");
+  stable var burning_allowances_was_set : Bool = false;
 
   //Only for debugging purposes these should be set directly
   //archiveCanisterIdWasSet:=false;
@@ -102,6 +108,73 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
       archive,
       #Dip20Glds,
     );
+  };
+
+  public shared ({ caller }) func add_burning_allowed_principal(principal : Principal) : async Result.Result<Text, Text> {
+    
+    Debug.print("add_burning_allowed_principal");
+    if (caller != appSettings.SwapAppCreator) {
+        return #err("Only canister owner can call this method");
+    };
+
+    burningAllowedPrincipal := principal;    
+    return #ok("Burning principal set to: " # debug_show(burningAllowedPrincipal));
+  };
+
+  public shared func add_burning_allowances(): async Result.Result<[Icrc2Interface.ApproveResult],Text>{
+
+      if (burning_allowances_was_set == true){
+        return #err("Burning allowances already set.");
+      };
+
+      //Debug.print("add_burning_allowances");
+      let defaultCanisterId = Principal.fromText("aaaaa-aa"); 
+      if (burningAllowedPrincipal == defaultCanisterId) {
+        return #err("Burning principal not set");
+      };
+      //Debug.print("add_burning_allowances. Still here.");
+
+      //Debug.print("burningAllowedPrincipal");
+      //Debug.print(debug_show(burningAllowedPrincipal));
+
+      let sli_canisterId = tokensInfo.Icrc1_Sli.canisterId;
+      let glds_canisterId = tokensInfo.Icrc1_Glds.canisterId;
+      //Debug.print("sli_canisterId");
+      //Debug.print(debug_show(sli_canisterId));
+      //Debug.print("glds_canisterId");
+      //Debug.print(debug_show(glds_canisterId));
+
+      let actorTrabyter : TrabyterTokenInterface.TrabyterTokenInterface = actor (sli_canisterId);
+      let actorTrabyterPremium : TrabyterTokenInterface.TrabyterTokenInterface = actor (glds_canisterId);
+ 
+      let approveArgs:Icrc2Interface.ApproveArgs = {
+        from_subaccount : ?Icrc1.Subaccount = null;        
+        spender : Icrc1.Account = { owner = burningAllowedPrincipal; subaccount = null; };    
+        amount : Icrc1.Balance = 500000000000;      
+        expected_allowance : ?Nat = null;
+        expires_at : ?Nat64 = null;
+        fee : ?Icrc1.Balance= null;
+        memo : ?InterfaceIcrc2.Memo= null;
+        created_at_time : ?Nat64= null;
+    };
+
+        
+      let firstApproveResult:Icrc2Interface.ApproveResult = 
+        await actorTrabyter.icrc2_approve(approveArgs);
+      let secondApproveResult:Icrc2Interface.ApproveResult = 
+        await actorTrabyterPremium.icrc2_approve(approveArgs);
+
+      burning_allowances_was_set:=true;
+      return #ok([firstApproveResult, secondApproveResult]);
+
+      //let firstApproveResult:Icrc2Interface.ApproveResult = 
+      //  await actorTrabyter.icrc2_approve(approveArgs);
+      // let secondApproveResult:Icrc2Interface.ApproveResult = 
+      //   await actorTrabyterPremium.icrc2_approve(approveArgs);
+
+      //return #ok([firstApproveResult, firstApproveResult]);
+
+
   };
 
   public shared query func GetSliSwapWalletForPrincipal(userPrincipal : Principal) : async T.ResponseGetUsersSwapWallet {
@@ -314,6 +387,48 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return result;
   };
 
+  public shared ({caller}) func SliIcrc1_BurnTokens(amount : InterfaceIcrc2.Balance) 
+    : async Result.Result<(InterfaceIcrc2.TransferFromResponse,
+            Icrc1.TransferResult),Text> {
+
+    if (caller != burningAllowedPrincipal) {
+      return #err("Only burning principal can call this method");
+    };
+
+    let swapAppPrincipal : Principal = Principal.fromActor(this);
+    
+    let sli_canisterId = tokensInfo.Icrc1_Sli.canisterId;      
+    let actorTrabyter : TrabyterTokenInterface.TrabyterTokenInterface = actor (sli_canisterId);
+        
+    let transfer_from_args:InterfaceIcrc2.TransferFromArgs = {     
+        spender_subaccount :? Icrc1.Subaccount = null;       
+        from : Icrc1.Account = { owner = swapAppPrincipal; subaccount = null; };
+        to : Icrc1.Account = { owner = burningAllowedPrincipal; subaccount = null; };
+        amount : Icrc1.Balance = amount;
+        fee : ?Icrc1.Balance = null;
+        memo : ?InterfaceIcrc2.Memo= null;
+        created_at_time : ?Nat64= null;
+      };
+      
+      // First we need to transfer
+      let transferResult:InterfaceIcrc2.TransferFromResponse = 
+        await actorTrabyter.icrc2_transfer_from(transfer_from_args);
+
+      // Now burn
+      let burnArgs:TrabyterTokenInterface.BurnArgs = {
+        from_subaccount = null;
+        amount = amount;
+        memo = null;
+        created_at_time = null;
+      };
+
+
+      let burnResult: Icrc1.TransferResult  = await actorTrabyter.burn(burnArgs);
+      
+      return #ok(transferResult, burnResult);
+  };  
+
+
   //------------------------------------------------------------------------------
 
   //------------------------------------------------------------------------------
@@ -352,6 +467,49 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     let principalText : Text = Principal.toText(canisterId);
     return await* TokensInfoLib.GldsIcrc1_SetCanisterId(caller, appSettings, tokensInfo, principalText);
   };
+
+  public shared ({caller}) func GldsIcrc1_BurnTokens(amount : Icrc1.Balance) 
+    : async Result.Result<(InterfaceIcrc2.TransferFromResponse,
+            Icrc1.TransferResult ),Text> {
+
+    if (caller != burningAllowedPrincipal) {
+      return #err("Only burning principal can call this method");
+    };
+
+    
+
+    let glds_canisterId = tokensInfo.Icrc1_Sli.canisterId;      
+    let actorTrabyter : TrabyterTokenInterface.TrabyterTokenInterface = actor (glds_canisterId);
+      
+     let swapAppPrincipal : Principal = Principal.fromActor(this);
+
+    let transfer_from_args:InterfaceIcrc2.TransferFromArgs = {     
+        spender_subaccount :? Icrc1.Subaccount = null;       
+        from : Icrc1.Account = { owner = swapAppPrincipal; subaccount = null; };
+        to : Icrc1.Account = { owner = burningAllowedPrincipal; subaccount = null; };
+        amount : Icrc1.Balance = amount;
+        fee : ?Icrc1.Balance = null;
+        memo : ?InterfaceIcrc2.Memo= null;
+        created_at_time : ?Nat64= null;
+      };
+      
+      // First we need to transfer
+      let transferResult:InterfaceIcrc2.TransferFromResponse = 
+        await actorTrabyter.icrc2_transfer_from(transfer_from_args);
+
+      // Now burn
+      let burnArgs:TrabyterTokenInterface.BurnArgs = {
+        from_subaccount = null;
+        amount = amount;
+        memo = null;
+        created_at_time = null;
+      };
+
+
+      let burnResult:Icrc1.TransferResult  = await actorTrabyter.burn(burnArgs);
+      
+      return #ok(transferResult, burnResult);
+  };  
 
   //------------------------------------------------------------------------------
 
@@ -410,7 +568,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   // Deposit cycles into this canister.
   public shared func deposit_cycles() : async () {
     let amount = Cycles.available();
-    let accepted = Cycles.accept(amount);
+    let accepted = Cycles.accept<system>(amount);
     assert (accepted == amount);
   };
 
@@ -528,7 +686,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
       let cyclesOnArchive : Nat = await archive.canister.cycles_available();
       if (cyclesOnArchive < archiveTopUpCyclesAmount) {
-        Cycles.add(archiveTopUpCyclesAmount);
+        Cycles.add<system>(archiveTopUpCyclesAmount);
         await archive.canister.deposit_cycles();
       };
 
@@ -552,7 +710,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
   //wasInitialized := false;
 
   if (wasInitialized == false) {
-    initializeTimerId := setTimer(
+    initializeTimerId := setTimer<system>(
       #seconds 1,
       func() : async () {
         await initTokenMetaDatas();
@@ -560,7 +718,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     );
   };
 
-  backgroundActivitiesTimerId := recurringTimer(
+  backgroundActivitiesTimerId := recurringTimer<system>(
     #seconds backgroundActivitesTimerTickSeconds,
     func() : async () {
       await backgroundTimerTickFunction();
