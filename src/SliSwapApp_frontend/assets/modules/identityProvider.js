@@ -162,8 +162,9 @@ export class IdentiyProvider {
                 return;
             }
 
-            
-            await this.#_adapter.connect(walletName, this.#_connectionObject);
+            console.log("Login: " + walletName);
+            this.#_adapter.connect(walletName, this.#_connectionObject);
+            console.log("Connected: " + walletName);
 
             if (walletType == WalletTypes.plug) {
                 this.#_plugWalletConnected = true;
@@ -180,6 +181,7 @@ export class IdentiyProvider {
             this.#_inside_login = false;
 
             if (sendEventUserIdentyChanged == true) {
+                console.log("UserIdentityChanged");
                 this.#UserIdentityChanged();
             }
         }
