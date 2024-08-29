@@ -41,8 +41,7 @@ export class Icrc1TokenActorFetcher {
 
     }
 
-
-
+  
     async GetTotalSupply(decimals) {
 
         if (this.#internalActor == null) {

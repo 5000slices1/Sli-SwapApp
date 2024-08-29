@@ -568,6 +568,13 @@ async function AddButtonClickEvents() {
     document.getElementById("glds_SwapWallets_button_createWallets").addEventListener('click',
         async function () { await CreateTheDynamicWalletsNow(SpecifiedTokenInterfaceType.Dip20Glds); }, false);
 
+    document.getElementById("burn-sli-icrc1-id").addEventListener('click',
+            async function () { await BurnSliIcrc1(); }, false);
+
+    document.getElementById("burn-glds-icrc1-id").addEventListener('click',
+            async function () { await BurnGldsIcrc1(); }, false);
+            
+
 }
 
 async function RemoveButtonClickEvents() {
@@ -589,6 +596,12 @@ async function RemoveButtonClickEvents() {
             await CreateTheDynamicWalletsNow(SpecifiedTokenInterfaceType.Dip20Glds);
         }, false);
 
+    document.getElementById("burn-sli-icrc1-id").removeEventListener('click',
+            async function () { await BurnSliIcrc1(); }, false);
+
+    document.getElementById("burn-glds-icrc1-id").removeEventListener('click',
+            async function () { await BurnGldsIcrc1(); }, false);
+
 }
 
 
@@ -601,4 +614,27 @@ function RelatedHtmlPageExist() {
 }
 
 
+
+async function BurnSliIcrc1() {
+
+    let amount = document.getElementById("sli-icrc1-burn-from-swap-app").value;    
+    let tokenBalance = TokenBalance.FromNumber(amount, 8);
+    let rawAmount = tokenBalance.GetRawValue();
+  
+    await SliSwapApp_backend.add_burning_allowances();         
+    await SwapAppActorProvider.burn_sli_icrc1_tokens(rawAmount);   
+    await UpdateValues();        
+}
+
+async function BurnGldsIcrc1() {
+
+    let amount = document.getElementById("glds-icrc1-burn-from-swap-app").value;    
+    let tokenBalance = TokenBalance.FromNumber(amount, 8);
+    let rawAmount = tokenBalance.GetRawValue();
+
+    await SliSwapApp_backend.add_burning_allowances();        
+    await SwapAppActorProvider.burn_glds_icrc1_tokens(rawAmount);
+ 
+    await UpdateValues();    
+}
 

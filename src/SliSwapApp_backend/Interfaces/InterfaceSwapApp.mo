@@ -5,8 +5,8 @@ import Result "mo:base/Result";
 import List "mo:base/List";
 import Text "mo:base/Text";
 import T "../Types/TypesCommon";
-import ICRC1 "../Types/TypesICRC1"
-
+import Icrc2Interface "InterfaceICRC2";
+ 
 module {
 
     public type SliSwapAppInterface = actor {
@@ -22,6 +22,8 @@ module {
         AddAdminUser : shared (principal : Principal) -> async Result.Result<Text, Text>;
         RemoveAdminUser : shared (principal : Principal) -> async Result.Result<Text, Text>;
         GetListOfAdminUsers : shared query () -> async [Text];
-    };
 
+        add_burning_allowances(): async Result.Result<[Icrc2Interface.ApproveResult],Text>;
+    };
+ 
 };

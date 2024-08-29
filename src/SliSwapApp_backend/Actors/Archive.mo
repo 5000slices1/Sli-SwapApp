@@ -480,7 +480,7 @@ shared ({ caller = swapApp_canisterId }) actor class Archive() : async Interface
   /// Deposit cycles into this archive canister.
   public shared func deposit_cycles() : async () {
     let amount = Cycles.available();
-    let accepted = Cycles.accept(amount);
+    let accepted = Cycles.accept<system>(amount);
     assert (accepted == amount);
   };
 

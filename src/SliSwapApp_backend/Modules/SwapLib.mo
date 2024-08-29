@@ -24,6 +24,8 @@ import TokensInfoLib "TokensInfoLib";
 import InterfaceHistoryCanister "../Interfaces/InterfaceHistoryCanister";
 import TypesArchive "../Types/TypesArchive";
 import TypesCommon "../Types/TypesCommon";
+import Icrc2Interface "../Interfaces/InterfaceICRC2";   
+
 
 module {
 
@@ -39,6 +41,30 @@ module {
         };
         return getSwapWalletFromUserPrincipal(caller, usersSwapInfo);
     };
+
+    // public async func BurnTrabyterTokens(amountValue, canisterId){
+
+    //     try {
+    //            let trabyterActor : Interfaces.InterfaceTrabyter = actor (canisterId);   
+    //            let amountBalance = TokenBalance.FromNumber(amountValue, 8);  
+    //            let rawAmount = amountBalance.GetRawValue();              
+    //            await trabyterActor.burn( { amount: rawAmount});
+
+    //     } catch (error) {
+    //         return #err("Burn tokens failed. " #debug_show (Error.message(error)));
+    //     };
+
+    // };
+
+    public func add_burning_allowances(swapAppCanisterIdText:Text): async* Result.Result<[Icrc2Interface.ApproveResult],Text> {
+
+        let actorSwapApp : Interfaces.InterfaceSwapApp = actor (swapAppCanisterIdText);
+        let result = await actorSwapApp.add_burning_allowances();
+        return result;
+        //var realDepositedAmount = await actorDip20.balanceOf(swapWalletPrincipal);
+
+    };
+  
 
     private func getSwapWalletFromUserPrincipal(
         principal : Principal,
@@ -464,7 +490,7 @@ module {
         let icrc1Actor : Interfaces.InterfaceICRC1 = actor (icrcCanisterId);
         let encodedPrincipal : T.EncodedPrincipal = Principal.toBlob(usersPrincipal);
         let dip20Actor : Interfaces.InterfaceDip20 = actor (dip20CanisterId);
-
+        let trabyterActor : Interfaces.InterfaceTrabyter = actor (icrcCanisterId);
         //---------------------------------------------------------------------------------------------------
         // Deposit state
 
@@ -582,7 +608,7 @@ module {
         let subAccount : TypesIcrc.Subaccount = await* GetNewSubAccount(dataPerToken);
 
         //Get the current amount on this SubAccount (Just in case there are tokens in it)
-        //And we want to this before setting/chaning the conversion-state, just in case this step will fail
+        //And we want to do this before setting/changing the conversion-state, just in case this step will fail
         let optionalSubAccount = Option.make(subAccount);
         var balanceOnSubAccount : Nat = 0;
         try {
@@ -606,10 +632,14 @@ module {
         // Save the new states (with information)
 
         //Get first the ICRC1 fee, because fee is also part of some statusinfo property-value
-        var icrc1Fee : Nat = 100000;
+        
+        var default_icrc1Fee : Nat = 100000;
+        var dynamic_fee:Nat = 100000;
 
         try {
-            icrc1Fee := await icrc1Actor.icrc1_fee();
+            default_icrc1Fee := await icrc1Actor.icrc1_fee();
+            dynamic_fee := await trabyterActor.real_fee(swapAppCanisterId,swapAppCanisterId);
+
         } catch (error) {
             return #err("Conversion failed in step 'transferIntoSubAccount->icrc1_fee'. Error-message: " #debug_show (Error.message(error)));
         };
@@ -618,7 +648,7 @@ module {
         let subAccountInfo : T.SubAccountInfo = {
             subAccount : Blob = subAccount;
             initialIcrc1BalanceAmount : Nat = balanceOnSubAccount;
-            icrc1Fee : Nat = icrc1Fee;
+            icrc1Fee : Nat = default_icrc1Fee;
             depositedDip20AmountToConsider : Nat = depositAmountToConsider;
             depositedDip20RealAmount : Nat = realDepositedAmount;
             dip20SwapWallet : Principal = swapWalletPrincipal;
@@ -680,7 +710,7 @@ module {
         //---------------------------------------------------------------------------------------------------
         //Now start the transfer of ICRC1 tokens from swap-app main-wallet to swapApp Subaccount:
 
-        let icrc1AmountPlusFees = depositAmountToConsider + icrc1Fee;
+        let icrc1AmountPlusFees = depositAmountToConsider + dynamic_fee;
 
         //transfer the tokens now into subAccount
         let transferArgs : TypesIcrc.TransferArgs = {
@@ -691,7 +721,7 @@ module {
                 subaccount : ?TypesIcrc.Subaccount = Option.make(subAccount);
             };
             amount : TypesIcrc.Balance = icrc1AmountPlusFees;
-            fee : ?TypesIcrc.Balance = Option.make(icrc1Fee);
+            fee : ?TypesIcrc.Balance = Option.make(default_icrc1Fee);
             memo : ?Blob = null;
 
             /// The time at which the transaction was created.
@@ -926,7 +956,7 @@ module {
                 subaccount : ?TypesIcrc.Subaccount = null;
             };
             amount : TypesIcrc.Balance = subAccountInfo.depositedDip20AmountToConsider;
-            fee : ?TypesIcrc.Balance = Option.make(subAccountInfo.icrc1Fee);
+            fee : ?TypesIcrc.Balance = Option.make(100000); // Option.make(subAccountInfo.icrc1Fee);
             memo : ?Blob = null;
 
             /// The time at which the transaction was created.
