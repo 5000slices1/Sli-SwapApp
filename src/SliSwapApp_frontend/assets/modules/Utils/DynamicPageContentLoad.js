@@ -57,8 +57,23 @@ async function DynamicPageContentLoadRemoveAllPreviousContent() {
 export async function DynamicPageContentLoad(tagName, tagValueToSearch) {
 
   await DynamicPageContentLoadRemoveAllPreviousContent();
+
   var z, i, elmnt, xhttp;
   z = document.getElementsByTagName("div");
+
+  var allNavigationButtons = document.getElementsByClassName("button-navigation");
+    
+  for (i = 0; i < allNavigationButtons.length; i++) {
+    let item = allNavigationButtons[i];
+    var id = item.getAttribute("id");
+    if (id == tagValueToSearch) {
+      item.classList.add("button-navigation-activated");
+    }
+    else {
+      item.classList.remove("button-navigation-activated");
+    }
+  };
+
   for (i = 0; i < z.length; i++) {
     elmnt = z[i];
     let pageIdValue = elmnt.getAttribute(tagName)

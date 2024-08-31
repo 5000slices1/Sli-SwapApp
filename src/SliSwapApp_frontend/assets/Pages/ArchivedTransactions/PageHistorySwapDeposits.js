@@ -101,7 +101,7 @@ function historyDepositsTransactions_UpdateUiFromModel() {
 
 
         if (item.IsSliToken == true) {
-            htmlString += "<tr class=\"spaceUnder\" style=\"font-size: 12px;background-color: rgb(67, 2, 220);vertical-align: middle;\">\n";
+            htmlString += "<tr class=\"spaceUnder\" style=\"font-size: 12px;background-color: rgb(47, 2, 160);vertical-align: middle;\">\n";
         } else {
             htmlString += "<tr class=\"spaceUnder\" style=\"font-size: 12px;background-color: rgb(37, 5, 112);vertical-align: middle;\">\n";
         }
