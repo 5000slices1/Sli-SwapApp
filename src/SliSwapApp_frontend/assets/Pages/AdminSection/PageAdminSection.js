@@ -427,12 +427,14 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
         let approveAmount = TokenBalance.FromNumber(5000, dip20Token.Decimals).GetRawValue();
 
         const indexArray = Get2DimArray(numberOfWalletsToCreate, bucketSize);
-        var updateLock = false;
-        for (var z = 0; z < indexArray.length; z++) {
-            let innerArr = indexArray[z];
-
-            //Do in parallel (With parallel size of 'bucketSize')
-            const promises = innerArr.map(async (parallelIndex) => {
+        //var updateLock = false;
+        //for (var z = 0; z < indexArray.length; z++) {
+            //let innerArr = indexArray[z];
+           
+        for(var z=0; z< numberOfWalletsToCreate; z++){
+           
+                //Do in parallel (With parallel size of 'bucketSize')
+                //const promises = innerArr.map(async (parallelIndex) => {
 
                 let approvalWalletIdentity = GetRandomIdentity();
                 let approvalWalletPrincipal = approvalWalletIdentity.getPrincipal();
@@ -465,7 +467,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
                             // (3) Check the allowance amount
                             var allowanceNumber = await swappingWalletActor.allowance(approvalWalletPrincipal, sliSwapAppPrincipal);
 
-                            if (allowanceNumber >= approveAmount) {
+                            if (Number(allowanceNumber) >= Number(approveAmount)) {
 
                                 var addApprovalWalletIntoDatabaseResponse;
 
@@ -484,16 +486,7 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
                                 if (addApprovalWalletIntoDatabaseResponse.Result == ResultTypes.ok) {
 
                                     try {
-
-                                        let index = parallelIndex % bucketSize;
-                                        let waitTime = (index * 150);
-                                        setTimeout(() => {
-
-                                            while (updateLock == true) {
-                                                //wait
-                                            }
-                                            updateLock = true;
-
+                                    
                                             try {
                                                 switch (specifiedTokenInterfaceType) {
                                                     case SpecifiedTokenInterfaceType.Dip20Sli:
@@ -501,6 +494,10 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
                                                             let actValue = Number(document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value);
                                                             let newValue = Number(actValue + 1);
                                                             document.getElementById("sli_SwapWallets_NumberOfFreeWallets").value = Number(newValue);
+
+                                                            let numWalletsToCreate = Number(document.getElementById('sli_SwapWallets_NumberOfWalletsToCreate').value);
+                                                            let newValue2 = Number(numWalletsToCreate - 1);
+                                                            document.getElementById('sli_SwapWallets_NumberOfWalletsToCreate').value = Number(newValue2);
                                                         }
                                                         break;
 
@@ -509,6 +506,10 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
                                                             let actValue = Number(document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value);
                                                             let newValue = Number(actValue + 1);
                                                             document.getElementById("glds_SwapWallets_NumberOfFreeWallets").value = Number(newValue);
+
+                                                            let numWalletsToCreate = Number(document.getElementById('glds_SwapWallets_NumberOfWalletsToCreate').value);
+                                                            let newValue2 = Number(numWalletsToCreate - 1);
+                                                            document.getElementById('glds_SwapWallets_NumberOfWalletsToCreate').value = Number(newValue2);
                                                         }
                                                         break;
                                                     default: break;
@@ -517,10 +518,10 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
 
                                             }
                                             finally {
-                                                updateLock = false;
+                                                //updateLock = false;
                                             }
 
-                                        }, waitTime);
+                                        //};
                                     }
                                     catch (error) {
                                         //do nothing
@@ -530,27 +531,24 @@ async function CreateTheDynamicWalletsNow(specifiedTokenInterfaceType) {
                             }
                         }
                     }
-                }
-            });
-
-            await Promise.all(promises);
-
-            setTimeout(async () => {
-                let numberOfApprovedSliWallets = await SliSwapApp_backend.GetNumberOfSliApprovedWallets();
-                let numberOfApprovedGldsWallets = await SliSwapApp_backend.GetNumberOfGldsApprovedWallets();
-
-                GlobalDataProvider.ApprovedWallets_Sli_Free = numberOfApprovedSliWallets[0];
-                GlobalDataProvider.ApprovedWallets_Sli_InUse = numberOfApprovedSliWallets[1];
-
-                GlobalDataProvider.ApprovedWallets_Glds_Free = numberOfApprovedGldsWallets[0];
-                GlobalDataProvider.ApprovedWallets_Glds_InUse = numberOfApprovedGldsWallets[1];
-
-                await UpdateUiFromModel();
-            }, 1000);
+                }            
         }
     } finally {
+
+        let numberOfApprovedSliWallets = await SliSwapApp_backend.GetNumberOfSliApprovedWallets();
+        let numberOfApprovedGldsWallets = await SliSwapApp_backend.GetNumberOfGldsApprovedWallets();
+    
+        GlobalDataProvider.ApprovedWallets_Sli_Free = numberOfApprovedSliWallets[0];
+        GlobalDataProvider.ApprovedWallets_Sli_InUse = numberOfApprovedSliWallets[1];
+    
+        GlobalDataProvider.ApprovedWallets_Glds_Free = numberOfApprovedGldsWallets[0];
+        GlobalDataProvider.ApprovedWallets_Glds_InUse = numberOfApprovedGldsWallets[1];
         loadingProgessDisabled();
     }
+
+  
+
+    await UpdateUiFromModel();
 }
 
 async function AddButtonClickEvents() {

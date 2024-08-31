@@ -1,9 +1,9 @@
-import { CommonIdentityProvider, SwapAppActorProvider, WalletTypes, pageIds, pageIdValues } from "../assets/modules/Types/CommonTypes.js";
+import { CommonIdentityProvider, SwapAppActorProvider, WalletTypes, pageIds, pageIdValues,GlobalDataProvider } from "../assets/modules/Types/CommonTypes.js";
 import { PubSub } from "../assets/modules/Utils/PubSub.js";
 import { DynamicPageContentLoad, DynamicPageContentLoad_InitHandlers } from "../assets/modules/Utils/DynamicPageContentLoad.js";
 
 
-
+ 
 //Returns true if item (as object) has some of the fields described in 'fieldnames'
 //In this case the method is used to parse the returned Variant 'UserRole' from called motoko method, to find out which UserRole(s)
 //a user has.
@@ -31,7 +31,12 @@ async function IdentityChanged() {
     labelInfo.innerHTML = "Status: connected to " + usersIdentity.Name + "</br>" + usersIdentity.AccountPrincipalText;
   }
 
-  await DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageStartPage);
+  console.log("IdentityChanged");
+  console.log("GlobalDataProvider.MainPageWasLoaded:"); 
+  console.log(GlobalDataProvider.MainPageWasLoaded); 
+  if (GlobalDataProvider.MainPageWasLoaded == true) {
+    await DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageStartPage);
+  }
 
   let appSettingsButton = document.getElementById("PageAdminSection");
   var userRole = await SwapAppActorProvider.GetUserRole();
@@ -77,17 +82,20 @@ window.onclick = function (event) {
 
 document.addEventListener('DOMContentLoaded', async function () {
 
+  GlobalDataProvider.MainPageWasLoaded = false;
+  await DynamicPageContentLoad_InitHandlers(pageIds.mainContentPageId);
+  await DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageStartPage);
 
   PubSub.subscribe('index_js_UserIdentityChanged', 'UserIdentityChanged', IdentityChanged);
   await CommonIdentityProvider.Init();
 
-  DynamicPageContentLoad(pageIds.mainContentPageId, pageIdValues.PageStartPage);
-
-  DynamicPageContentLoad_InitHandlers(pageIds.mainContentPageId);
-
+  
+  
 
   document.getElementById("buttonWalletDropDown").addEventListener('click', function () { OnToggleWalletDropDownMenu(); }, false);
   document.getElementById("loginPlug").addEventListener('click', async function () { await CommonIdentityProvider.Login(WalletTypes.plug) }, false);
   document.getElementById("loginStoic").addEventListener('click', async function () { await CommonIdentityProvider.Login(WalletTypes.stoic) }, false);
   document.getElementById("logout").addEventListener('click', async function () { await CommonIdentityProvider.Logout() }, false);
+  
+  GlobalDataProvider.MainPageWasLoaded = true;
 }, false)

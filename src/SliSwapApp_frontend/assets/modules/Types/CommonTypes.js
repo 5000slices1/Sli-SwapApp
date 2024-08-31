@@ -167,6 +167,8 @@ export class GlobalData {
   Icrc1_Glds_TokenTransferFee;
   Icrc1_Glds_Deposited_In_SwapApp;
 
+  MainPageWasLoaded;
+
   constructor() {
     this.Dip20Sli_amount_InUserWallet = 0.0;
     this.Dip20Glds_amount_InUserWallet = 0.0;
@@ -194,11 +196,14 @@ export class GlobalData {
     this.ApprovedWallets_Sli_InUse = 0;
     this.ApprovedWallets_Glds_Free = 0;
     this.ApprovedWallets_Glds_InUse = 0;
+
+    this.MainPageWasLoaded = false;
   }
 }
 
-
+ 
 
 export const CommonIdentityProvider = new IdentiyProvider();
 export const SwapAppActorProvider = new SwapAppActorFetcher();
 export const GlobalDataProvider = new GlobalData();
+ 
