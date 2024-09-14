@@ -93,9 +93,35 @@ document.addEventListener('DOMContentLoaded', async function () {
   
 
   document.getElementById("buttonWalletDropDown").addEventListener('click', function () { OnToggleWalletDropDownMenu(); }, false);
-  document.getElementById("loginPlug").addEventListener('click', async function () { await CommonIdentityProvider.Login(WalletTypes.plug) }, false);
-  document.getElementById("loginStoic").addEventListener('click', async function () { await CommonIdentityProvider.Login(WalletTypes.stoic) }, false);
-  document.getElementById("logout").addEventListener('click', async function () { await CommonIdentityProvider.Logout() }, false);
+  document.getElementById("loginPlug").addEventListener('click', async function () { 
+    try{
+
+      await CommonIdentityProvider.Login(WalletTypes.plug) 
+    }
+    catch(error){
+      console.log(error);
+    }
+    
+  
+  }, false);
+  document.getElementById("loginStoic").addEventListener('click', async function () { 
+    
+    try{
+      await CommonIdentityProvider.Login(WalletTypes.stoic);
+    }
+    catch(error){
+      console.log(error);
+    }
+  }, false);
+    
+  document.getElementById("logout").addEventListener('click', async function () {
+    try{
+      await CommonIdentityProvider.Logout(); 
+    }
+    catch(error){
+      console.log(error);
+    }        
+  }, false);
   
   GlobalDataProvider.MainPageWasLoaded = true;
 }, false)

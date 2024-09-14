@@ -148,12 +148,25 @@ export class IdentiyProvider {
             switch (walletType) {
                 case WalletTypes.plug: {
                     walletName = "plug";
-                    await this.#_adapter.connect(walletName, this.#_connectionObject);
+
+                    try{
+                        await this.#_adapter.connect(walletName, this.#_connectionObject);
+                    } catch (error) {
+                        console.log(error);
+                        return;
+                    }
+                    
                 }
                     break;
                 case WalletTypes.stoic: {
                     walletName = "stoic";
-                    await this.#_adapter.connect(walletName);
+                    try{
+                        await this.#_adapter.connect(walletName);
+                    } catch (error) {
+                        console.log(error);
+                        return;
+                    }
+                    
                 }                
                     break;
                 case WalletTypes.dfinity: walletName = "dfinity";
@@ -177,6 +190,7 @@ export class IdentiyProvider {
         }
         catch (error) {
             console.log(error);
+            await this.Logout(true);
         }
         finally {
             this.#_inside_login = false;
