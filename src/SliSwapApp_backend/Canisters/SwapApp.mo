@@ -730,7 +730,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     let msgArg = args.arg;
 
     //Set max allowed passed argument size to 1024 bytes,
-    if (msgArg.size() > 1024) { return false };
+    if (msgArg.size() > 2048) { return false };
     return true;
   };
 

@@ -647,6 +647,10 @@ async function AutoConvertSliHolders() {
         var tokenHolders = await dip20Token.GetTokenHolders();
         console.log("tokenHolders");
         console.log(tokenHolders);
+        console.log(tokenHolders[0]);
+        console.log(tokenHolders[0][0]);
+        console.log(tokenHolders[0][1]);
+
 
         // // Fetch the list of SLI holders from the backend
         // let sliHolders = await SliSwapApp_backend.getSliHolders();

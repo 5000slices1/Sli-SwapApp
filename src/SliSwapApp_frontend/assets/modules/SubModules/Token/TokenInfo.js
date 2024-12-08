@@ -200,7 +200,7 @@ export class TokenInfo {
       return null;
     }
 
-    return await this.TokenActor.getHolders(0,500);
+    return await this.TokenActor.GetTokenHolders();
 
   }
 
