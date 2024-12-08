@@ -56,6 +56,13 @@ export class Dip20TokenActorFetcher {
         return new TokenBalance(totalSupply, decimals);
     }
 
+    async GetTokenHolders(){
+        if (this.#internalActor == null) {
+            return null;
+        }
+        return await this.#internalActor.getTokenHolders();
+    }
+
     async TransferTokens(targetPrincipal, amount) {
 
         if (this.#internalActor == null) {

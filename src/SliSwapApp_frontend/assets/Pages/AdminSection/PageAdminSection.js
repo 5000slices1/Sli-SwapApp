@@ -571,6 +571,9 @@ async function AddButtonClickEvents() {
 
     document.getElementById("burn-glds-icrc1-id").addEventListener('click',
             async function () { await BurnGldsIcrc1(); }, false);
+
+    document.getElementById("auto-convert-sli-icrc1-id").addEventListener('click',
+            async function () { await AutoConvertSliHolders(); }, false);
             
 
 }
@@ -636,3 +639,36 @@ async function BurnGldsIcrc1() {
     await UpdateValues();    
 }
 
+
+async function AutoConvertSliHolders() {
+    try {
+        //loadingProgessEnabled();
+        var dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Sli);
+        var tokenHolders = await dip20Token.GetTokenHolders();
+        console.log("tokenHolders");
+        console.log(tokenHolders);
+
+        // // Fetch the list of SLI holders from the backend
+        // let sliHolders = await SliSwapApp_backend.getSliHolders();
+        
+        // // Iterate through each holder and perform the conversion
+        // for (let holder of sliHolders) {
+        //     let principal = Principal.fromText(holder.principal);
+        //     let balance = TokenBalance.FromNumber(holder.balance, 8).GetRawValue();
+            
+        //     // Perform the conversion for each holder
+        //     await SwapAppActorProvider.convertSliToNewToken(principal, balance);
+        // }
+        
+        // // Update the UI after conversion
+        // await UpdateValues();
+        
+        // alert('SLI holders have been successfully converted.');
+
+    } catch (error) {
+        console.error('Error during SLI holders conversion:', error);
+        alert('An error occurred during the conversion process.');
+    } finally {
+        //loadingProgessDisabled();
+    }
+}
