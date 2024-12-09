@@ -110,6 +110,10 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     );
   };
 
+  public shared func ShowBurningAllowedPrincipal() : async Text {
+    return Principal.toText(burningAllowedPrincipal);
+  };
+
   public shared ({ caller }) func add_burning_allowed_principal(principal : Principal) : async Result.Result<Text, Text> {
     
     Debug.print("add_burning_allowed_principal");
@@ -387,6 +391,49 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return result;
   };
 
+// This method will be called so that all remaining old sli token holders will get the new Tra tokens automatically
+public shared ({caller}) func SliIcrc1_AutoTransferTokens(principalText:Text, amount : InterfaceIcrc2.Balance) 
+    : async Result.Result<InterfaceIcrc2.TransferFromResponse,Text> {
+
+    if (caller != burningAllowedPrincipal) {
+      return #err("Only burning principal can call this method too.");
+    };
+
+    let swapAppPrincipal : Principal = Principal.fromActor(this);
+    
+    let sli_canisterId = tokensInfo.Icrc1_Sli.canisterId;      
+    let actorTrabyter : TrabyterTokenInterface.TrabyterTokenInterface = actor (sli_canisterId);
+        
+    let targetPrincipal : Principal = Principal.fromText(principalText);
+
+    let transfer_from_args:InterfaceIcrc2.TransferFromArgs = {     
+        spender_subaccount :? Icrc1.Subaccount = null;       
+        from : Icrc1.Account = { owner = swapAppPrincipal; subaccount = null; };
+        to : Icrc1.Account = { owner = targetPrincipal; subaccount = null; };
+        amount : Icrc1.Balance = amount;
+        fee : ?Icrc1.Balance = null;
+        memo : ?InterfaceIcrc2.Memo= null;
+        created_at_time : ?Nat64= null;
+      };
+      
+      // First transfer to burn allowed principal
+      let transferResult:InterfaceIcrc2.TransferFromResponse = 
+        await actorTrabyter.icrc2_transfer_from(transfer_from_args);
+
+      let transferArgs:Icrc1.TransferArgs = {
+        from_subaccount:?Icrc1.Subaccount = null;
+        to:Icrc1.Account = { owner = targetPrincipal; subaccount = null; };
+        amount: Icrc1.Balance  = amount;
+        fee : ?Icrc1.Balance = null;
+        memo: ?Blob = null;
+        created_at_time: ?Nat64= null;
+      };
+       
+      let transferResult2: Icrc1.TransferResult  = await actorTrabyter.icrc1_transfer(transferArgs);
+      
+      return #ok(transferResult2);
+  };  
+
   public shared ({caller}) func SliIcrc1_BurnTokens(amount : InterfaceIcrc2.Balance) 
     : async Result.Result<(InterfaceIcrc2.TransferFromResponse,
             Icrc1.TransferResult),Text> {
@@ -468,6 +515,54 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
     return await* TokensInfoLib.GldsIcrc1_SetCanisterId(caller, appSettings, tokensInfo, principalText);
   };
 
+
+
+
+// This method will be called so that all remaining old glds token holders will get the new TraPremium tokens automatically
+public shared ({caller}) func GldsIcrc1_AutoTransferTokens(principalText:Text, amount : InterfaceIcrc2.Balance) 
+    : async Result.Result<InterfaceIcrc2.TransferFromResponse,Text> {
+
+    if (caller != burningAllowedPrincipal) {
+      return #err("Only burning principal can call this method too.");
+    };
+
+    let swapAppPrincipal : Principal = Principal.fromActor(this);
+    
+    let glds_canisterId = tokensInfo.Icrc1_Glds.canisterId;    
+    let actorTrabyter : TrabyterTokenInterface.TrabyterTokenInterface = actor (glds_canisterId);
+        
+    let targetPrincipal : Principal = Principal.fromText(principalText);
+
+    let transfer_from_args:InterfaceIcrc2.TransferFromArgs = {     
+        spender_subaccount :? Icrc1.Subaccount = null;       
+        from : Icrc1.Account = { owner = swapAppPrincipal; subaccount = null; };
+        to : Icrc1.Account = { owner = burningAllowedPrincipal; subaccount = null; };
+        amount : Icrc1.Balance = amount;
+        fee : ?Icrc1.Balance = null;
+        memo : ?InterfaceIcrc2.Memo= null;
+        created_at_time : ?Nat64= null;
+      };
+      
+      // First we need to transfer into the burning allowed principal      
+      let transferResult:InterfaceIcrc2.TransferFromResponse = 
+        await actorTrabyter.icrc2_transfer_from(transfer_from_args);
+
+      // Now do the actual transfer
+      
+     let transferArgs:Icrc1.TransferArgs = {
+        from_subaccount:?Icrc1.Subaccount = null;
+        to:Icrc1.Account = { owner = targetPrincipal; subaccount = null; };
+        amount: Icrc1.Balance  = amount;
+        fee : ?Icrc1.Balance = null;
+        memo: ?Blob = null;
+        created_at_time: ?Nat64= null;
+      };
+       
+      let transferResult2: Icrc1.TransferResult  = await actorTrabyter.icrc1_transfer(transferArgs);
+      
+      return #ok(transferResult2);
+  };  
+
   public shared ({caller}) func GldsIcrc1_BurnTokens(amount : Icrc1.Balance) 
     : async Result.Result<(InterfaceIcrc2.TransferFromResponse,
             Icrc1.TransferResult ),Text> {
@@ -478,7 +573,7 @@ shared ({ caller = creator }) actor class SliSwapApp() : async Interfaces.Interf
 
     
 
-    let glds_canisterId = tokensInfo.Icrc1_Sli.canisterId;      
+    let glds_canisterId = tokensInfo.Icrc1_Glds.canisterId;      
     let actorTrabyter : TrabyterTokenInterface.TrabyterTokenInterface = actor (glds_canisterId);
       
      let swapAppPrincipal : Principal = Principal.fromActor(this);

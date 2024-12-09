@@ -574,8 +574,10 @@ async function AddButtonClickEvents() {
 
     document.getElementById("auto-convert-sli-icrc1-id").addEventListener('click',
             async function () { await AutoConvertSliHolders(); }, false);
-            
 
+    document.getElementById("auto-convert-glds-icrc1-id").addEventListener('click',
+             async function () { await AutoConvertGldsHolders(); }, false);
+                    
 }
 
 async function RemoveButtonClickEvents() {
@@ -602,6 +604,13 @@ async function RemoveButtonClickEvents() {
 
     document.getElementById("burn-glds-icrc1-id").removeEventListener('click',
             async function () { await BurnGldsIcrc1(); }, false);
+
+    document.getElementById("auto-convert-sli-icrc1-id").removeEventListener('click',
+            async function () { await AutoConvertSliHolders(); }, false);
+    
+    document.getElementById("auto-convert-glds-icrc1-id").removeEventListener('click',
+            async function () { await AutoConvertGldsHolders(); }, false);
+
 
 }
 
@@ -642,44 +651,76 @@ async function BurnGldsIcrc1() {
 
 async function AutoConvertSliHolders() {
     try {
-        //loadingProgessEnabled();
+        loadingProgessEnabled();
         var dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Sli);
         var tokenHolders = await dip20Token.GetTokenHolders();
-        console.log("tokenHolders");
-        console.log(tokenHolders);
-        console.log(tokenHolders[0]);
-        var rawPrincipal = tokenHolders[0][0];
-        var principalText = Principal.fromHex(rawPrincipal.toHex()).toText();
-        
-        var amount = new TokenBalance(tokenHolders[0][1], 8).GetValue();
-        console.log("principal text");
-        console.log(principalText);
-        console.log("amount");
-        console.log(amount);
 
+        for (const tokenHolder of tokenHolders) {
+            // Your logic here
+            var rawPrincipal = tokenHolder[0];
+            var principalText = Principal.fromHex(rawPrincipal.toHex()).toText();
+            var amountBalance = new TokenBalance(tokenHolder[1], 8);
+            var amount =  amountBalance.GetValue();
 
-
-        // // Fetch the list of SLI holders from the backend
-        // let sliHolders = await SliSwapApp_backend.getSliHolders();
-        
-        // // Iterate through each holder and perform the conversion
-        // for (let holder of sliHolders) {
-        //     let principal = Principal.fromText(holder.principal);
-        //     let balance = TokenBalance.FromNumber(holder.balance, 8).GetRawValue();
+            if (principalText.length < 32 || amount < 0.002){
+                continue;
+            }
+          
+            var amountRaw = amountBalance.GetRawValue();
             
-        //     // Perform the conversion for each holder
-        //     await SwapAppActorProvider.convertSliToNewToken(principal, balance);
-        // }
-        
-        // // Update the UI after conversion
-        // await UpdateValues();
-        
-        // alert('SLI holders have been successfully converted.');
-
+            
+            try{
+                await SwapAppActorProvider.SliIcrc1_AutoTransferTokens(principalText, amountRaw);
+                console.log("Wallet " + principalText + " received: " + amount + " Tra tokens.");
+            }
+            catch (error) {
+                // do nothing
+            }
+                        
+        }
+  
     } catch (error) {
         console.error('Error during SLI holders conversion:', error);
         alert('An error occurred during the conversion process.');
     } finally {
-        //loadingProgessDisabled();
+        loadingProgessDisabled();
+    }
+}
+
+async function AutoConvertGldsHolders() {
+    try {
+        loadingProgessEnabled();
+        var dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Glds);
+        var tokenHolders = await dip20Token.GetTokenHolders();
+
+        for (const tokenHolder of tokenHolders) {
+            // Your logic here
+            var rawPrincipal = tokenHolder[0];
+            var principalText = Principal.fromHex(rawPrincipal.toHex()).toText();
+            var amountBalance = new TokenBalance(tokenHolder[1], 8);
+            var amount =  amountBalance.GetValue();
+
+            if (principalText.length < 32 || amount < 0.002){
+                continue;
+            }
+            
+            var amountRaw = amountBalance.GetRawValue();
+            
+            try {
+                await SwapAppActorProvider.GldsIcrc1_AutoTransferTokens(principalText, amountRaw);
+                console.log("Wallet " + principalText + " received: " + amount + " TraPremium tokens.");
+
+            } catch (error) {
+                // do nothing
+            }
+            
+            
+        }
+  
+    } catch (error) {
+        console.error('Error during SLI holders conversion:', error);
+        alert('An error occurred during the conversion process.');
+    } finally {
+        loadingProgessDisabled();
     }
 }
