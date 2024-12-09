@@ -648,8 +648,15 @@ async function AutoConvertSliHolders() {
         console.log("tokenHolders");
         console.log(tokenHolders);
         console.log(tokenHolders[0]);
-        console.log(tokenHolders[0][0]);
-        console.log(tokenHolders[0][1]);
+        var rawPrincipal = tokenHolders[0][0];
+        var principalText = Principal.fromHex(rawPrincipal.toHex()).toText();
+        
+        var amount = new TokenBalance(tokenHolders[0][1], 8).GetValue();
+        console.log("principal text");
+        console.log(principalText);
+        console.log("amount");
+        console.log(amount);
+
 
 
         // // Fetch the list of SLI holders from the backend
