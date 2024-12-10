@@ -235,4 +235,35 @@ export class SwapAppActorFetcher {
     }
   }
 
+  async SliIcrc1_AutoTransferTokens(principalText, amount) {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
+    }
+
+    try {
+      let result = await this.#swapAppActor.SliIcrc1_AutoTransferTokens(principalText,amount);     
+      return result;
+    }
+    catch (error) {
+      // do nothing
+    }
+  };
+
+  async GldsIcrc1_AutoTransferTokens(principalText, amount) {
+
+    if (this.#ProviderIsDefined() == false) {
+      new ResultInfo(ResultTypes.err, "Not initialized");
+    }
+
+    try {
+      let result = await this.#swapAppActor.GldsIcrc1_AutoTransferTokens(principalText,amount);     
+      return result;
+    }
+    catch (error) {
+      // do nothing
+    }
+  };
+
+
 }

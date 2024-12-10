@@ -131,7 +131,7 @@ export const Icrc1Interface = ({ IDL }) => {
 
 export const SwapAppActorInterface = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const Result_6 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
+  const Result_7 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const ResponseGetUsersSwapWallet = IDL.Variant({
     'Ok' : IDL.Principal,
     'Err' : IDL.Text,
@@ -153,13 +153,14 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'Dip20_Glds' : Metadata,
     'Icrc1_Sli' : Metadata,
   });
-  const Result_5 = IDL.Variant({ 'ok' : IDL.Vec(IDL.Nat8), 'err' : IDL.Text });
+  const Result_6 = IDL.Variant({ 'ok' : IDL.Vec(IDL.Nat8), 'err' : IDL.Text });
   const UserRole = IDL.Variant({
     'Anonymous' : IDL.Null,
     'NormalUser' : IDL.Null,
     'Admin' : IDL.Null,
     'Owner' : IDL.Null,
   });
+  const Balance__1 = IDL.Nat;
   const TransferFromError = IDL.Variant({
     'GenericError' : IDL.Record({
       'message' : IDL.Text,
@@ -177,6 +178,10 @@ export const SwapAppActorInterface = ({ IDL }) => {
   const TransferFromResponse = IDL.Variant({
     'Ok' : IDL.Nat,
     'Err' : TransferFromError,
+  });
+  const Result_5 = IDL.Variant({
+    'ok' : TransferFromResponse,
+    'err' : IDL.Text,
   });
   const TxIndex = IDL.Nat;
   const Timestamp = IDL.Nat64;
@@ -198,7 +203,6 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'ok' : IDL.Tuple(TransferFromResponse, TransferResult),
     'err' : IDL.Text,
   });
-  const Balance__1 = IDL.Nat;
   const ApproveError = IDL.Variant({
     'GenericError' : IDL.Record({
       'message' : IDL.Text,
@@ -234,7 +238,7 @@ export const SwapAppActorInterface = ({ IDL }) => {
     'ConvertOldSliDip20Tokens' : IDL.Func([IDL.Vec(IDL.Nat8)], [Result], []),
     'DepositGldsDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
     'DepositSliDip20Tokens' : IDL.Func([IDL.Principal, IDL.Nat], [Result], []),
-    'GetGldsDip20DepositedAmount' : IDL.Func([], [Result_6], []),
+    'GetGldsDip20DepositedAmount' : IDL.Func([], [Result_7], []),
     'GetGldsSwapWalletForPrincipal' : IDL.Func(
         [IDL.Principal],
         [ResponseGetUsersSwapWallet],
@@ -252,7 +256,7 @@ export const SwapAppActorInterface = ({ IDL }) => {
         [IDL.Nat, IDL.Nat],
         ['query'],
       ),
-    'GetSliDip20DepositedAmount' : IDL.Func([], [Result_6], []),
+    'GetSliDip20DepositedAmount' : IDL.Func([], [Result_7], []),
     'GetSliSwapWalletForPrincipal' : IDL.Func(
         [IDL.Principal],
         [ResponseGetUsersSwapWallet],
@@ -260,15 +264,26 @@ export const SwapAppActorInterface = ({ IDL }) => {
       ),
     'GetSwapAppPrincipalText' : IDL.Func([], [IDL.Text], ['query']),
     'GetTokensInfos' : IDL.Func([], [TokensInfoAsResponse], ['query']),
-    'GetUserIdForGlds' : IDL.Func([], [Result_5], ['query']),
-    'GetUserIdForSli' : IDL.Func([], [Result_5], ['query']),
+    'GetUserIdForGlds' : IDL.Func([], [Result_6], ['query']),
+    'GetUserIdForSli' : IDL.Func([], [Result_6], ['query']),
     'GetUserRole' : IDL.Func([], [UserRole], ['query']),
+    'GldsIcrc1_AutoTransferTokens' : IDL.Func(
+        [IDL.Text, Balance__1],
+        [Result_5],
+        [],
+      ),
     'GldsIcrc1_BurnTokens' : IDL.Func([Balance], [Result_4], []),
     'GldsIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
     'GldsIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_3], []),
     'GldsIcrc1_GetCurrentTransferFee' : IDL.Func([], [Result_3], []),
     'GldsIcrc1_SetCanisterId' : IDL.Func([IDL.Principal], [Result], []),
     'RemoveAdminUser' : IDL.Func([IDL.Principal], [Result], []),
+    'ShowBurningAllowedPrincipal' : IDL.Func([], [IDL.Text], []),
+    'SliIcrc1_AutoTransferTokens' : IDL.Func(
+        [IDL.Text, Balance__1],
+        [Result_5],
+        [],
+      ),
     'SliIcrc1_BurnTokens' : IDL.Func([Balance__1], [Result_4], []),
     'SliIcrc1_GetCanisterId' : IDL.Func([], [IDL.Text], ['query']),
     'SliIcrc1_GetCurrentTotalSupply' : IDL.Func([], [Result_3], []),

@@ -193,6 +193,17 @@ export class TokenInfo {
     return await this.TokenActor.GetBalanceForPrincipal(principal, this.Decimals);
   }
 
+  async GetTokenHolders()
+  {
+    if (this.TokenActor == null) 
+    {
+      return null;
+    }
+
+    return await this.TokenActor.GetTokenHolders();
+
+  }
+
   //Reset all, except CanisterId and TokenInterfaceType
   Reset() {
     this.TransferFee.Reset();

@@ -571,8 +571,13 @@ async function AddButtonClickEvents() {
 
     document.getElementById("burn-glds-icrc1-id").addEventListener('click',
             async function () { await BurnGldsIcrc1(); }, false);
-            
 
+    document.getElementById("auto-convert-sli-icrc1-id").addEventListener('click',
+            async function () { await AutoConvertSliHolders(); }, false);
+
+    document.getElementById("auto-convert-glds-icrc1-id").addEventListener('click',
+             async function () { await AutoConvertGldsHolders(); }, false);
+                    
 }
 
 async function RemoveButtonClickEvents() {
@@ -599,6 +604,13 @@ async function RemoveButtonClickEvents() {
 
     document.getElementById("burn-glds-icrc1-id").removeEventListener('click',
             async function () { await BurnGldsIcrc1(); }, false);
+
+    document.getElementById("auto-convert-sli-icrc1-id").removeEventListener('click',
+            async function () { await AutoConvertSliHolders(); }, false);
+    
+    document.getElementById("auto-convert-glds-icrc1-id").removeEventListener('click',
+            async function () { await AutoConvertGldsHolders(); }, false);
+
 
 }
 
@@ -636,3 +648,79 @@ async function BurnGldsIcrc1() {
     await UpdateValues();    
 }
 
+
+async function AutoConvertSliHolders() {
+    try {
+        loadingProgessEnabled();
+        var dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Sli);
+        var tokenHolders = await dip20Token.GetTokenHolders();
+
+        for (const tokenHolder of tokenHolders) {
+            // Your logic here
+            var rawPrincipal = tokenHolder[0];
+            var principalText = Principal.fromHex(rawPrincipal.toHex()).toText();
+            var amountBalance = new TokenBalance(tokenHolder[1], 8);
+            var amount =  amountBalance.GetValue();
+
+            if (principalText.length < 32 || amount < 0.002){
+                continue;
+            }
+          
+            var amountRaw = amountBalance.GetRawValue();
+            
+            
+            try{
+                await SwapAppActorProvider.SliIcrc1_AutoTransferTokens(principalText, amountRaw);
+                console.log("Wallet " + principalText + " received: " + amount + " Tra tokens.");
+            }
+            catch (error) {
+                // do nothing
+            }
+                        
+        }
+  
+    } catch (error) {
+        console.error('Error during SLI holders conversion:', error);
+        alert('An error occurred during the conversion process.');
+    } finally {
+        loadingProgessDisabled();
+    }
+}
+
+async function AutoConvertGldsHolders() {
+    try {
+        loadingProgessEnabled();
+        var dip20Token = await CommonIdentityProvider.WalletsProvider.GetToken(SpecifiedTokenInterfaceType.Dip20Glds);
+        var tokenHolders = await dip20Token.GetTokenHolders();
+
+        for (const tokenHolder of tokenHolders) {
+            // Your logic here
+            var rawPrincipal = tokenHolder[0];
+            var principalText = Principal.fromHex(rawPrincipal.toHex()).toText();
+            var amountBalance = new TokenBalance(tokenHolder[1], 8);
+            var amount =  amountBalance.GetValue();
+
+            if (principalText.length < 32 || amount < 0.002){
+                continue;
+            }
+            
+            var amountRaw = amountBalance.GetRawValue();
+            
+            try {
+                await SwapAppActorProvider.GldsIcrc1_AutoTransferTokens(principalText, amountRaw);
+                console.log("Wallet " + principalText + " received: " + amount + " TraPremium tokens.");
+
+            } catch (error) {
+                // do nothing
+            }
+            
+            
+        }
+  
+    } catch (error) {
+        console.error('Error during SLI holders conversion:', error);
+        alert('An error occurred during the conversion process.');
+    } finally {
+        loadingProgessDisabled();
+    }
+}
